@@ -119,7 +119,7 @@
       <ModuleDefinitionFile>.\network.def</ModuleDefinitionFile>
       <ImportLibrary>../lib/$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>../lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>HPSocket_D.lib</AdditionalDependencies>
+      <AdditionalDependencies>socket.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

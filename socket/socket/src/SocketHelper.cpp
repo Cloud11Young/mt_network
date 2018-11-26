@@ -143,7 +143,7 @@ int GetIPAddress(const char* lpszHost, char* lpszIP, int& iIPLen, EnIPAddrType& 
 	return sockaddr_IN_2_A(addr, usFamily, lpszIP, iIPLen, usPort);
 }
 
-int GetSockAddrByHostName(LPCTSTR lpszHost, USHORT usPort, HP_SOCKADDR& addr)
+int GetSockAddrByHostName(const char* lpszHost, USHORT usPort, HP_SOCKADDR& addr)
 {
 	addr.family = DetermineAddrFamily(lpszHost);
 
@@ -154,7 +154,7 @@ int GetSockAddrByHostName(LPCTSTR lpszHost, USHORT usPort, HP_SOCKADDR& addr)
 
 }
 
-int GetSockAddrByHostNameDirectly(LPCTSTR lpszHost, USHORT usPort, HP_SOCKADDR& addr)
+int GetSockAddrByHostNameDirectly(const char* lpszHost, USHORT usPort, HP_SOCKADDR& addr)
 {
 	addr.ZeroAddr();
 
@@ -164,7 +164,7 @@ int GetSockAddrByHostNameDirectly(LPCTSTR lpszHost, USHORT usPort, HP_SOCKADDR& 
 	hints.ai_flags	= AI_ALL;
 	hints.ai_family	= addr.family;
 
-	int rs = ::getaddrinfo(CT2A(lpszHost), nullptr, &hints, &pInfo);
+	int rs = ::getaddrinfo(lpszHost, nullptr, &hints, &pInfo);
 
 	if(rs != NO_ERROR)
 	{
@@ -272,7 +272,7 @@ int RetrieveSockAddrIPAddresses(const vector<HP_PSOCKADDR>& vt, LPTIPAddr** lppp
 	ADDRESS_FAMILY	usFamily;
 	USHORT			usPort;
 	int				iAddrLength;
-	LPTSTR			lpszAddr;
+	char*			lpszAddr;
 	LPTIPAddr		lpItem;
 
 	(*lpppIPAddr) = new LPTIPAddr[iIPAddrCount + 1];
@@ -282,7 +282,7 @@ int RetrieveSockAddrIPAddresses(const vector<HP_PSOCKADDR>& vt, LPTIPAddr** lppp
 	{
 		pSockAddr	= vt[i];
 		iAddrLength	= HP_SOCKADDR::AddrMinStrLength(pSockAddr->family) + 6;
-		lpszAddr	= new TCHAR[iAddrLength];
+		lpszAddr	= new char[iAddrLength];
 
 		VERIFY(sockaddr_IN_2_A(*vt[i], usFamily, lpszAddr, iAddrLength, usPort));
 
@@ -322,9 +322,9 @@ int sockaddr_IN_2_A(const HP_SOCKADDR& addr, ADDRESS_FAMILY& usFamily, char* lps
 	usPort		= addr.Port();
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if(::InetNtop(addr.family, addr.SinAddr(), lpszAddress, iAddressLen))
+	if(::InetNtopA(addr.family, addr.SinAddr(), lpszAddress, iAddressLen))
 	{
-		iAddressLen	= lstrlen(lpszAddress) + 1;
+		iAddressLen = lstrlenA(lpszAddress) + 1;
 		isOK		= TRUE;
 	}
 	else
@@ -385,7 +385,7 @@ int sockaddr_A_2_IN(const char* lpszAddress, unsigned short usPort, HP_SOCKADDR&
 	return GetSockAddr(lpszAddress, usPort, addr);
 }
 
-int GetSocketAddress(SOCKET socket, LPTSTR lpszAddress, int& iAddressLen, USHORT& usPort, int bLocal)
+int GetSocketAddress(SOCKET socket, char* lpszAddress, int& iAddressLen, USHORT& usPort, int bLocal)
 {
 	HP_SOCKADDR addr;
 
@@ -399,12 +399,12 @@ int GetSocketAddress(SOCKET socket, LPTSTR lpszAddress, int& iAddressLen, USHORT
 	return sockaddr_IN_2_A(addr, usFamily, lpszAddress, iAddressLen, usPort);
 }
 
-int GetSocketLocalAddress(SOCKET socket, LPTSTR lpszAddress, int& iAddressLen, USHORT& usPort)
+int GetSocketLocalAddress(SOCKET socket, char* lpszAddress, int& iAddressLen, USHORT& usPort)
 {
 	return GetSocketAddress(socket, lpszAddress, iAddressLen, usPort, TRUE);
 }
 
-int GetSocketRemoteAddress(SOCKET socket, LPTSTR lpszAddress, int& iAddressLen, USHORT& usPort)
+int GetSocketRemoteAddress(SOCKET socket, char* lpszAddress, int& iAddressLen, USHORT& usPort)
 {
 	return GetSocketAddress(socket, lpszAddress, iAddressLen, usPort, FALSE);
 }
@@ -951,29 +951,29 @@ int NoBlockReceiveNotCheck(TBufferObj* pBufferObj)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LPCTSTR GetSocketErrorDesc(EnSocketError enCode)
+const char* GetSocketErrorDesc(EnSocketError enCode)
 {
 	switch(enCode)
 	{
-	case SE_OK:						return _T("SUCCESS");
-	case SE_ILLEGAL_STATE:			return _T("Illegal State");
-	case SE_INVALID_PARAM:			return _T("Invalid Parameter");
-	case SE_SOCKET_CREATE:			return _T("Create SOCKET Fail");
-	case SE_SOCKET_BIND:			return _T("Bind SOCKET Fail");
-	case SE_SOCKET_PREPARE:			return _T("Prepare SOCKET Fail");
-	case SE_SOCKET_LISTEN:			return _T("Listen SOCKET Fail");
-	case SE_CP_CREATE:				return _T("Create IOCP Fail");
-	case SE_WORKER_THREAD_CREATE:	return _T("Create Worker Thread Fail");
-	case SE_DETECT_THREAD_CREATE:	return _T("Create Detector Thread Fail");
-	case SE_SOCKE_ATTACH_TO_CP:		return _T("Attach SOCKET to IOCP Fail");
-	case SE_CONNECT_SERVER:			return _T("Connect to Server Fail");
-	case SE_NETWORK:				return _T("Network Error");
-	case SE_DATA_PROC:				return _T("Process Data Error");
-	case SE_DATA_SEND:				return _T("Send Data Fail");
+	case SE_OK:						return "SUCCESS";
+	case SE_ILLEGAL_STATE:			return "Illegal State";
+	case SE_INVALID_PARAM:			return "Invalid Parameter";
+	case SE_SOCKET_CREATE:			return "Create SOCKET Fail";
+	case SE_SOCKET_BIND:			return "Bind SOCKET Fail";
+	case SE_SOCKET_PREPARE:			return "Prepare SOCKET Fail";
+	case SE_SOCKET_LISTEN:			return "Listen SOCKET Fail";
+	case SE_CP_CREATE:				return "Create IOCP Fail";
+	case SE_WORKER_THREAD_CREATE:	return "Create Worker Thread Fail";
+	case SE_DETECT_THREAD_CREATE:	return "Create Detector Thread Fail";
+	case SE_SOCKE_ATTACH_TO_CP:		return "Attach SOCKET to IOCP Fail";
+	case SE_CONNECT_SERVER:			return "Connect to Server Fail";
+	case SE_NETWORK:				return "Network Error";
+	case SE_DATA_PROC:				return "Process Data Error";
+	case SE_DATA_SEND:				return "Send Data Fail";
 
-	case SE_SSL_ENV_NOT_READY:		return _T("SSL environment not ready");
+	case SE_SSL_ENV_NOT_READY:		return "SSL environment not ready";
 
-	default: ASSERT(FALSE);			return _T("UNKNOWN ERROR");
+	default: ASSERT(FALSE);			return "UNKNOWN ERROR";
 	}
 }
 

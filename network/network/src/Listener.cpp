@@ -59,8 +59,8 @@ EnHandleResult ServerListener::OnAccept(ITcpServer* pSender, CONNID dwConnID, UI
 		getnameinfo((SOCKADDR*)&sa, len, name, 50, NULL, 0, NI_NAMEREQD);
 
 		TCHAR hostname[50] = { 0 };
-		int iLength = MultiByteToWideChar(CP_ACP, 0, name, strlen(name) + 1, NULL, 0);
-		MultiByteToWideChar(CP_ACP, 0, name, strlen(name) + 1, hostname, iLength);
+		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
+		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
 		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, remoteaddr->pAddress, remoteaddr->usPort, hostname);
 	}
 	return HR_OK;
@@ -299,8 +299,8 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 		getnameinfo((SOCKADDR*)&sa, len, name, 50, NULL, 0, NI_NAMEREQD);
 
 		TCHAR hostname[50] = { 0 };
-		int iLength = MultiByteToWideChar(CP_ACP, 0, name, strlen(name) + 1, NULL, 0);
-		MultiByteToWideChar(CP_ACP, 0, name, strlen(name) + 1, hostname, iLength);
+		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
+		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
 		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, hostname);
 		m_vAddr[dwConnID] = m_remoteaddr;
 	}

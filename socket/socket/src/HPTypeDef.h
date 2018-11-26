@@ -154,7 +154,7 @@ typedef enum EnIPAddrType
 typedef struct TIPAddr
 {
 	EnIPAddrType type;
-	LPCTSTR		 address;
+	const char*	 address;
 } *LPTIPAddr, HP_TIPAddr, *HP_LPTIPAddr;
 
 /*****************************************************************************************************************************************************/

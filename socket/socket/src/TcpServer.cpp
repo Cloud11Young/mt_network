@@ -509,14 +509,14 @@ void CTcpServer::CloseClientSocketObj(TSocketObj* pSocketObj, EnSocketCloseFlag 
 	::ManualCloseSocket(socket, iShutdownFlag);
 }
 
-BOOL CTcpServer::GetListenAddress(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)
+int CTcpServer::GetListenAddress(char lpszAddress[], int& iAddressLen, USHORT& usPort)
 {
 	ASSERT(lpszAddress != nullptr && iAddressLen > 0);
 
 	return ::GetSocketLocalAddress(m_soListen, lpszAddress, iAddressLen, usPort);
 }
 
-BOOL CTcpServer::GetLocalAddress(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)
+int CTcpServer::GetLocalAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort)
 {
 	ASSERT(lpszAddress != nullptr && iAddressLen > 0);
 
@@ -528,7 +528,7 @@ BOOL CTcpServer::GetLocalAddress(CONNID dwConnID, TCHAR lpszAddress[], int& iAdd
 	return FALSE;
 }
 
-BOOL CTcpServer::GetRemoteAddress(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)
+BOOL CTcpServer::GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort)
 {
 	ASSERT(lpszAddress != nullptr && iAddressLen > 0);
 

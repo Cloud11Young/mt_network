@@ -667,15 +667,15 @@ int RetrieveSockAddrIPAddresses(const vector<HP_PSOCKADDR>& vt, __out LPTIPAddr*
 /* 释放 LPTIPAddr* */
 int FreeHostIPAddresses(LPTIPAddr* lppIPAddr);
 /* 把 HP_SOCKADDR 结构转换为地址字符串 */
-int sockaddr_IN_2_A(const HP_SOCKADDR& addr, __out ADDRESS_FAMILY& usFamily, __out LPTSTR lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
+int sockaddr_IN_2_A(const HP_SOCKADDR& addr, __out ADDRESS_FAMILY& usFamily, __out const char* lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
 /* 把地址字符串转换为 HP_SOCKADDR 结构 */
 int sockaddr_A_2_IN(const char* lpszAddress, unsigned short usPort, __out HP_SOCKADDR& addr);
 /* 获取 Socket 的本地或远程地址信息 */
-int GetSocketAddress(SOCKET socket, __out LPTSTR lpszAddress, __inout int& iAddressLen, __out USHORT& usPort, int bLocal = TRUE);
+int GetSocketAddress(SOCKET socket, __out char* lpszAddress, __inout int& iAddressLen, __out USHORT& usPort, int bLocal = TRUE);
 /* 获取 Socket 的本地地址信息 */
-int GetSocketLocalAddress(SOCKET socket, __out LPTSTR lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
+int GetSocketLocalAddress(SOCKET socket, __out char* lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
 /* 获取 Socket 的远程地址信息 */
-int GetSocketRemoteAddress(SOCKET socket, __out LPTSTR lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
+int GetSocketRemoteAddress(SOCKET socket, __out char* lpszAddress, __inout int& iAddressLen, __out USHORT& usPort);
 
 /* 64 位网络字节序转主机字节序 */
 ULONGLONG NToH64(ULONGLONG value);

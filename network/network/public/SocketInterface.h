@@ -1,27 +1,3 @@
-/*
- * Copyright: JessMA Open Source (ldcsaa@gmail.com)
- *
- * Version	: 5.0.2
- * Author	: Bruce Liang
- * Website	: http://www.jessma.org
- * Project	: https://github.com/ldcsaa
- * Blog		: http://www.cnblogs.com/ldcsaa
- * Wiki		: http://www.oschina.net/p/hp-socket
- * QQ Group	: 75375912, 44636872
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- 
 #pragma once
 
 #include <winsock2.h>
@@ -51,7 +27,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 GetLastError() 获取错误代码
 	*/
-	virtual BOOL Stop	()																		= 0;
+	virtual int Stop	()																		= 0;
 
 	/*
 	* 名称：发送数据
@@ -64,7 +40,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL Send	(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset = 0)	= 0;
+	virtual int Send	(CONNID dwConnID, const byte* pBuffer, int iLength, int iOffset = 0)	= 0;
 
 	/*
 	* 名称：发送多组数据
@@ -78,7 +54,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL SendPackets(CONNID dwConnID, const WSABUF pBuffers[], int iCount)	= 0;
+	virtual int SendPackets(CONNID dwConnID, const WSABUF pBuffers[], int iCount)	= 0;
 
 	/*
 	* 名称：断开连接
@@ -89,7 +65,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败
 	*/
-	virtual BOOL Disconnect(CONNID dwConnID, BOOL bForce = TRUE)					= 0;
+	virtual int Disconnect(CONNID dwConnID, int bForce = TRUE)					= 0;
 
 	/*
 	* 名称：断开超时连接
@@ -100,7 +76,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败
 	*/
-	virtual BOOL DisconnectLongConnections(DWORD dwPeriod, BOOL bForce = TRUE)		= 0;
+	virtual int DisconnectLongConnections(unsigned long dwPeriod, int bForce = TRUE)		= 0;
 
 	/*
 	* 名称：断开静默连接
@@ -111,7 +87,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败
 	*/
-	virtual BOOL DisconnectSilenceConnections(DWORD dwPeriod, BOOL bForce = TRUE)	= 0;
+	virtual int DisconnectSilenceConnections(unsigned long dwPeriod, int bForce = TRUE)	= 0;
 
 public:
 
@@ -127,7 +103,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败（无效的连接 ID）
 	*/
-	virtual BOOL SetConnectionExtra		(CONNID dwConnID, PVOID pExtra)			= 0;
+	virtual int SetConnectionExtra		(CONNID dwConnID, PVOID pExtra)			= 0;
 
 	/*
 	* 名称：获取连接的附加数据
@@ -138,70 +114,70 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败（无效的连接 ID）
 	*/
-	virtual BOOL GetConnectionExtra			(CONNID dwConnID, PVOID* ppExtra)	= 0;
+	virtual int GetConnectionExtra			(CONNID dwConnID, PVOID* ppExtra)	= 0;
 
 	/* 检测是否为安全连接（SSL/HTTPS） */
-	virtual BOOL IsSecure				()									= 0;
+	virtual int IsSecure				()									= 0;
 	/* 检查通信组件是否已启动 */
-	virtual BOOL HasStarted				()									= 0;
+	virtual int HasStarted				()									= 0;
 	/* 查看通信组件当前状态 */
 	virtual EnServiceState GetState		()									= 0;
 	/* 获取连接数 */
-	virtual DWORD GetConnectionCount	()									= 0;
+	virtual unsigned long GetConnectionCount	()									= 0;
 	/* 获取所有连接的 CONNID */
-	virtual BOOL GetAllConnectionIDs	(CONNID pIDs[], DWORD& dwCount)		= 0;
+	virtual int GetAllConnectionIDs	(CONNID pIDs[], unsigned long& dwCount)		= 0;
 	/* 获取某个连接时长（毫秒） */
-	virtual BOOL GetConnectPeriod		(CONNID dwConnID, DWORD& dwPeriod)	= 0;
+	virtual int GetConnectPeriod		(CONNID dwConnID, unsigned long& dwPeriod)	= 0;
 	/* 获取某个连接静默时间（毫秒） */
-	virtual BOOL GetSilencePeriod		(CONNID dwConnID, DWORD& dwPeriod)	= 0;
+	virtual int GetSilencePeriod		(CONNID dwConnID, unsigned long& dwPeriod)	= 0;
 	/* 获取某个连接的本地地址信息 */
-	virtual BOOL GetLocalAddress		(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetLocalAddress		(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 	/* 获取某个连接的远程地址信息 */
-	virtual BOOL GetRemoteAddress		(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetRemoteAddress		(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 	/* 获取最近一次失败操作的错误代码 */
 	virtual EnSocketError GetLastError	()									= 0;
 	/* 获取最近一次失败操作的错误描述 */
-	virtual LPCTSTR GetLastErrorDesc	()									= 0;
+	virtual const char* GetLastErrorDesc	()									= 0;
 	/* 获取连接中未发出数据的长度 */
-	virtual BOOL GetPendingDataLength	(CONNID dwConnID, int& iPending)	= 0;
+	virtual int GetPendingDataLength	(CONNID dwConnID, int& iPending)	= 0;
 
 	/* 设置数据发送策略 */
 	virtual void SetSendPolicy				(EnSendPolicy enSendPolicy)		= 0;
 	/* 设置最大连接数（组件会根据设置值预分配内存，因此需要根据实际情况设置，不宜过大）*/
-	virtual void SetMaxConnectionCount		(DWORD dwMaxConnectionCount)	= 0;
+	virtual void SetMaxConnectionCount		(unsigned long dwMaxConnectionCount)	= 0;
 	/* 设置 Socket 缓存对象锁定时间（毫秒，在锁定期间该 Socket 缓存对象不能被获取使用） */
-	virtual void SetFreeSocketObjLockTime	(DWORD dwFreeSocketObjLockTime)	= 0;
+	virtual void SetFreeSocketObjLockTime	(unsigned long dwFreeSocketObjLockTime)	= 0;
 	/* 设置 Socket 缓存池大小（通常设置为平均并发连接数的 1/3 - 1/2） */
-	virtual void SetFreeSocketObjPool		(DWORD dwFreeSocketObjPool)		= 0;
+	virtual void SetFreeSocketObjPool		(unsigned long dwFreeSocketObjPool)		= 0;
 	/* 设置内存块缓存池大小（通常设置为 Socket 缓存池大小的 2 - 3 倍） */
-	virtual void SetFreeBufferObjPool		(DWORD dwFreeBufferObjPool)		= 0;
+	virtual void SetFreeBufferObjPool		(unsigned long dwFreeBufferObjPool)		= 0;
 	/* 设置 Socket 缓存池回收阀值（通常设置为 Socket 缓存池大小的 3 倍） */
-	virtual void SetFreeSocketObjHold		(DWORD dwFreeSocketObjHold)		= 0;
+	virtual void SetFreeSocketObjHold		(unsigned long dwFreeSocketObjHold)		= 0;
 	/* 设置内存块缓存池回收阀值（通常设置为内存块缓存池大小的 3 倍） */
-	virtual void SetFreeBufferObjHold		(DWORD dwFreeBufferObjHold)		= 0;
+	virtual void SetFreeBufferObjHold		(unsigned long dwFreeBufferObjHold)		= 0;
 	/* 设置工作线程数量（通常设置为 2 * CPU + 2） */
-	virtual void SetWorkerThreadCount		(DWORD dwWorkerThreadCount)		= 0;
+	virtual void SetWorkerThreadCount		(unsigned long dwWorkerThreadCount)		= 0;
 	/* 设置是否标记静默时间（设置为 TRUE 时 DisconnectSilenceConnections() 和 GetSilencePeriod() 才有效，默认：TRUE） */
-	virtual void SetMarkSilence				(BOOL bMarkSilence)				= 0;
+	virtual void SetMarkSilence				(int bMarkSilence)				= 0;
 
 	/* 获取数据发送策略 */
 	virtual EnSendPolicy GetSendPolicy		()	= 0;
 	/* 获取最大连接数 */
-	virtual DWORD GetMaxConnectionCount		()	= 0;
+	virtual unsigned long GetMaxConnectionCount		()	= 0;
 	/* 获取 Socket 缓存对象锁定时间 */
-	virtual DWORD GetFreeSocketObjLockTime	()	= 0;
+	virtual unsigned long GetFreeSocketObjLockTime	()	= 0;
 	/* 获取 Socket 缓存池大小 */
-	virtual DWORD GetFreeSocketObjPool		()	= 0;
+	virtual unsigned long GetFreeSocketObjPool		()	= 0;
 	/* 获取内存块缓存池大小 */
-	virtual DWORD GetFreeBufferObjPool		()	= 0;
+	virtual unsigned long GetFreeBufferObjPool		()	= 0;
 	/* 获取 Socket 缓存池回收阀值 */
-	virtual DWORD GetFreeSocketObjHold		()	= 0;
+	virtual unsigned long GetFreeSocketObjHold		()	= 0;
 	/* 获取内存块缓存池回收阀值 */
-	virtual DWORD GetFreeBufferObjHold		()	= 0;
+	virtual unsigned long GetFreeBufferObjHold		()	= 0;
 	/* 获取工作线程数量 */
-	virtual DWORD GetWorkerThreadCount		()	= 0;
+	virtual unsigned long GetWorkerThreadCount		()	= 0;
 	/* 检测是否标记静默时间 */
-	virtual BOOL IsMarkSilence				()	= 0;
+	virtual int IsMarkSilence				()	= 0;
 
 public:
 	virtual ~IComplexSocket() {}
@@ -227,7 +203,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 GetLastError() 获取错误代码
 	*/
-	virtual BOOL Start	(LPCTSTR lpszBindAddress, USHORT usPort)							= 0;
+	virtual int Start	(LPCTSTR lpszBindAddress, USHORT usPort)							= 0;
 
 public:
 
@@ -235,7 +211,7 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 获取监听 Socket 的地址信息 */
-	virtual BOOL GetListenAddress(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetListenAddress(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 };
 
 /************************************************************************
@@ -260,7 +236,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL SendSmallFile		(CONNID dwConnID, LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
+	virtual int SendSmallFile		(CONNID dwConnID, LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
 
 #ifdef _SSL_SUPPORT
 	/*
@@ -277,7 +253,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 SYS_GetLastError() 获取失败原因
 	*/
-	virtual BOOL SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr, Fn_SNI_ServerNameCallback fnServerNameCallback = nullptr)	= 0;
+	virtual int SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr, Fn_SNI_ServerNameCallback fnServerNameCallback = nullptr)	= 0;
 
 	/*
 	* 名称：增加 SNI 主机证书
@@ -292,7 +268,7 @@ public:
 	* 返回值：	正数		-- 成功，并返回 SNI 主机证书对应的索引，该索引用于在 SNI 回调函数中定位 SNI 主机
 	*			负数		-- 失败，可通过 SYS_GetLastError() 获取失败原因
 	*/
-	virtual BOOL AddSSLContext		(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)															= 0;
+	virtual int AddSSLContext		(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)															= 0;
 
 	/*
 	* 名称：清理通信组件 SSL 运行环境
@@ -313,26 +289,26 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置 Accept 预投递数量（根据负载调整设置，Accept 预投递数量越大则支持的并发连接请求越多） */
-	virtual void SetAcceptSocketCount	(DWORD dwAcceptSocketCount)		= 0;
+	virtual void SetAcceptSocketCount	(unsigned long dwAcceptSocketCount)		= 0;
 	/* 设置通信数据缓冲区大小（根据平均通信数据包大小调整设置，通常设置为 1024 的倍数） */
-	virtual void SetSocketBufferSize	(DWORD dwSocketBufferSize)		= 0;
+	virtual void SetSocketBufferSize	(unsigned long dwSocketBufferSize)		= 0;
 	/* 设置监听 Socket 的等候队列大小（根据并发连接数量调整设置） */
-	virtual void SetSocketListenQueue	(DWORD dwSocketListenQueue)		= 0;
+	virtual void SetSocketListenQueue	(unsigned long dwSocketListenQueue)		= 0;
 	/* 设置正常心跳包间隔（毫秒，0 则不发送心跳包，默认：30 * 1000） */
-	virtual void SetKeepAliveTime		(DWORD dwKeepAliveTime)			= 0;
+	virtual void SetKeepAliveTime		(unsigned long dwKeepAliveTime)			= 0;
 	/* 设置异常心跳包间隔（毫秒，0 不发送心跳包，，默认：10 * 1000，如果超过若干次 [默认：WinXP 5 次, Win7 10 次] 检测不到心跳确认包则认为已断线） */
-	virtual void SetKeepAliveInterval	(DWORD dwKeepAliveInterval)		= 0;
+	virtual void SetKeepAliveInterval	(unsigned long dwKeepAliveInterval)		= 0;
 
 	/* 获取 Accept 预投递数量 */
-	virtual DWORD GetAcceptSocketCount	()	= 0;
+	virtual unsigned long GetAcceptSocketCount	()	= 0;
 	/* 获取通信数据缓冲区大小 */
-	virtual DWORD GetSocketBufferSize	()	= 0;
+	virtual unsigned long GetSocketBufferSize	()	= 0;
 	/* 获取监听 Socket 的等候队列大小 */
-	virtual DWORD GetSocketListenQueue	()	= 0;
+	virtual unsigned long GetSocketListenQueue	()	= 0;
 	/* 获取正常心跳包间隔 */
-	virtual DWORD GetKeepAliveTime		()	= 0;
+	virtual unsigned long GetKeepAliveTime		()	= 0;
 	/* 获取异常心跳包间隔 */
-	virtual DWORD GetKeepAliveInterval	()	= 0;
+	virtual unsigned long GetKeepAliveInterval	()	= 0;
 };
 
 /************************************************************************
@@ -352,23 +328,23 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置数据报文最大长度（建议在局域网环境下不超过 1472 字节，在广域网环境下不超过 548 字节） */
-	virtual void SetMaxDatagramSize		(DWORD dwMaxDatagramSize)	= 0;
+	virtual void SetMaxDatagramSize		(unsigned long dwMaxDatagramSize)	= 0;
 	/* 获取数据报文最大长度 */
-	virtual DWORD GetMaxDatagramSize	()							= 0;
+	virtual unsigned long GetMaxDatagramSize	()							= 0;
 
 	/* 设置 Receive 预投递数量（根据负载调整设置，Receive 预投递数量越大则丢包概率越小） */
-	virtual void SetPostReceiveCount	(DWORD dwPostReceiveCount)	= 0;
+	virtual void SetPostReceiveCount	(unsigned long dwPostReceiveCount)	= 0;
 	/* 获取 Receive 预投递数量 */
-	virtual DWORD GetPostReceiveCount	()							= 0;
+	virtual unsigned long GetPostReceiveCount	()							= 0;
 
 	/* 设置监测包尝试次数（0 则不发送监测跳包，如果超过最大尝试次数则认为已断线） */
-	virtual void SetDetectAttempts		(DWORD dwDetectAttempts)	= 0;
+	virtual void SetDetectAttempts		(unsigned long dwDetectAttempts)	= 0;
 	/* 设置监测包发送间隔（秒，0 不发送监测包） */
-	virtual void SetDetectInterval		(DWORD dwDetectInterval)	= 0;
+	virtual void SetDetectInterval		(unsigned long dwDetectInterval)	= 0;
 	/* 获取心跳检查次数 */
-	virtual DWORD GetDetectAttempts		()							= 0;
+	virtual unsigned long GetDetectAttempts		()							= 0;
 	/* 获取心跳检查间隔 */
-	virtual DWORD GetDetectInterval		()							= 0;
+	virtual unsigned long GetDetectInterval		()							= 0;
 };
 
 /************************************************************************
@@ -391,7 +367,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 GetLastError() 获取错误代码
 	*/
-	virtual BOOL Start			(LPCTSTR lpszBindAddress = nullptr, BOOL bAsyncConnect = TRUE)				= 0;
+	virtual int Start			(LPCTSTR lpszBindAddress = nullptr, int bAsyncConnect = TRUE)				= 0;
 
 	/*
 	* 名称：连接服务器
@@ -403,7 +379,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL Connect		(LPCTSTR lpszRemoteAddress, USHORT usPort, CONNID* pdwConnID = nullptr)		= 0;
+	virtual int Connect		(LPCTSTR lpszRemoteAddress, USHORT usPort, CONNID* pdwConnID = nullptr)		= 0;
 
 public:
 
@@ -411,7 +387,7 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 获取某个连接的远程主机信息 */
-	virtual BOOL GetRemoteHost	(CONNID dwConnID, TCHAR lpszHost[], int& iHostLen, USHORT& usPort)			= 0;
+	virtual int GetRemoteHost	(CONNID dwConnID, TCHAR lpszHost[], int& iHostLen, USHORT& usPort)			= 0;
 
 };
 
@@ -437,7 +413,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL SendSmallFile		(CONNID dwConnID, LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
+	virtual int SendSmallFile		(CONNID dwConnID, LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
 
 #ifdef _SSL_SUPPORT
 	/*
@@ -453,7 +429,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 SYS_GetLastError() 获取失败原因
 	*/
-	virtual BOOL SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)	= 0;
+	virtual int SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)	= 0;
 
 	/*
 	* 名称：清理通信组件 SSL 运行环境
@@ -474,23 +450,23 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置是否启用地址重用机制（默认：不启用） */
-	virtual void SetReuseAddress		(BOOL bReuseAddress)			= 0;
+	virtual void SetReuseAddress		(int bReuseAddress)			= 0;
 	/* 检测是否启用地址重用机制 */
-	virtual BOOL IsReuseAddress			()								= 0;
+	virtual int IsReuseAddress			()								= 0;
 
 	/* 设置通信数据缓冲区大小（根据平均通信数据包大小调整设置，通常设置为 1024 的倍数） */
-	virtual void SetSocketBufferSize	(DWORD dwSocketBufferSize)		= 0;
+	virtual void SetSocketBufferSize	(unsigned long dwSocketBufferSize)		= 0;
 	/* 设置正常心跳包间隔（毫秒，0 则不发送心跳包，默认：30 * 1000） */
-	virtual void SetKeepAliveTime		(DWORD dwKeepAliveTime)			= 0;
+	virtual void SetKeepAliveTime		(unsigned long dwKeepAliveTime)			= 0;
 	/* 设置异常心跳包间隔（毫秒，0 不发送心跳包，，默认：10 * 1000，如果超过若干次 [默认：WinXP 5 次, Win7 10 次] 检测不到心跳确认包则认为已断线） */
-	virtual void SetKeepAliveInterval	(DWORD dwKeepAliveInterval)		= 0;
+	virtual void SetKeepAliveInterval	(unsigned long dwKeepAliveInterval)		= 0;
 
 	/* 获取通信数据缓冲区大小 */
-	virtual DWORD GetSocketBufferSize	()	= 0;
+	virtual unsigned long GetSocketBufferSize	()	= 0;
 	/* 获取正常心跳包间隔 */
-	virtual DWORD GetKeepAliveTime		()	= 0;
+	virtual unsigned long GetKeepAliveTime		()	= 0;
 	/* 获取异常心跳包间隔 */
-	virtual DWORD GetKeepAliveInterval	()	= 0;
+	virtual unsigned long GetKeepAliveInterval	()	= 0;
 };
 
 /************************************************************************
@@ -515,7 +491,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 GetLastError() 获取错误代码
 	*/
-	virtual BOOL Start	(LPCTSTR lpszRemoteAddress, USHORT usPort, BOOL bAsyncConnect = TRUE, LPCTSTR lpszBindAddress = nullptr)	= 0;
+	virtual int Start	(LPCTSTR lpszRemoteAddress, USHORT usPort, int bAsyncConnect = TRUE, LPCTSTR lpszBindAddress = nullptr)	= 0;
 
 	/*
 	* 名称：关闭通信组件
@@ -525,7 +501,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 GetLastError() 获取错误代码
 	*/
-	virtual BOOL Stop	()																		= 0;
+	virtual int Stop	()																		= 0;
 
 	/*
 	* 名称：发送数据
@@ -537,7 +513,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL Send	(const BYTE* pBuffer, int iLength, int iOffset = 0)						= 0;
+	virtual int Send	(const BYTE* pBuffer, int iLength, int iOffset = 0)						= 0;
 
 	/*
 	* 名称：发送多组数据
@@ -550,7 +526,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL SendPackets(const WSABUF pBuffers[], int iCount)								= 0;
+	virtual int SendPackets(const WSABUF pBuffers[], int iCount)								= 0;
 
 public:
 
@@ -564,33 +540,33 @@ public:
 	virtual PVOID GetExtra					()													= 0;
 
 	/* 检测是否为安全连接（SSL/HTTPS） */
-	virtual BOOL IsSecure					()													= 0;
+	virtual int IsSecure					()													= 0;
 	/* 检查通信组件是否已启动 */
-	virtual BOOL HasStarted					()													= 0;
+	virtual int HasStarted					()													= 0;
 	/* 查看通信组件当前状态 */
 	virtual EnServiceState	GetState		()													= 0;
 	/* 获取最近一次失败操作的错误代码 */
 	virtual EnSocketError	GetLastError	()													= 0;
 	/* 获取最近一次失败操作的错误描述 */
-	virtual LPCTSTR			GetLastErrorDesc()													= 0;
+	virtual const char*		GetLastErrorDesc()													= 0;
 	/* 获取该组件对象的连接 ID */
 	virtual CONNID			GetConnectionID	()													= 0;
 	/* 获取 Client Socket 的地址信息 */
-	virtual BOOL GetLocalAddress		(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetLocalAddress		(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 	/* 获取连接的远程主机信息 */
-	virtual BOOL GetRemoteHost			(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)		= 0;
+	virtual int GetRemoteHost			(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)		= 0;
 	/* 获取连接中未发出数据的长度 */
-	virtual BOOL GetPendingDataLength	(int& iPending)											= 0;
+	virtual int GetPendingDataLength	(int& iPending)											= 0;
 
 	/* 设置内存块缓存池大小（通常设置为 -> PUSH 模型：5 - 10；PULL 模型：10 - 20 ） */
-	virtual void SetFreeBufferPoolSize		(DWORD dwFreeBufferPoolSize)						= 0;
+	virtual void SetFreeBufferPoolSize		(unsigned long dwFreeBufferPoolSize)						= 0;
 	/* 设置内存块缓存池回收阀值（通常设置为内存块缓存池大小的 3 倍） */
-	virtual void SetFreeBufferPoolHold		(DWORD dwFreeBufferPoolHold)						= 0;
+	virtual void SetFreeBufferPoolHold		(unsigned long dwFreeBufferPoolHold)						= 0;
 
 	/* 获取内存块缓存池大小 */
-	virtual DWORD GetFreeBufferPoolSize		()													= 0;
+	virtual unsigned long GetFreeBufferPoolSize		()													= 0;
 	/* 获取内存块缓存池回收阀值 */
-	virtual DWORD GetFreeBufferPoolHold		()													= 0;
+	virtual unsigned long GetFreeBufferPoolHold		()													= 0;
 
 public:
 	virtual ~IClient() {}
@@ -617,7 +593,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 Windows API 函数 ::GetLastError() 获取 Windows 错误代码
 	*/
-	virtual BOOL SendSmallFile		(LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
+	virtual int SendSmallFile		(LPCTSTR lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr)	= 0;
 
 #ifdef _SSL_SUPPORT
 	/*
@@ -633,7 +609,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败，可通过 SYS_GetLastError() 获取失败原因
 	*/
-	virtual BOOL SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)	= 0;
+	virtual int SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)	= 0;
 
 	/*
 	* 名称：清理通信组件 SSL 运行环境
@@ -654,18 +630,18 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置通信数据缓冲区大小（根据平均通信数据包大小调整设置，通常设置为：(N * 1024) - sizeof(TBufferObj)） */
-	virtual void SetSocketBufferSize	(DWORD dwSocketBufferSize)	= 0;
+	virtual void SetSocketBufferSize	(unsigned long dwSocketBufferSize)	= 0;
 	/* 设置正常心跳包间隔（毫秒，0 则不发送心跳包，默认：30 * 1000） */
-	virtual void SetKeepAliveTime		(DWORD dwKeepAliveTime)		= 0;
+	virtual void SetKeepAliveTime		(unsigned long dwKeepAliveTime)		= 0;
 	/* 设置异常心跳包间隔（毫秒，0 不发送心跳包，，默认：10 * 1000，如果超过若干次 [默认：WinXP 5 次, Win7 10 次] 检测不到心跳确认包则认为已断线） */
-	virtual void SetKeepAliveInterval	(DWORD dwKeepAliveInterval)	= 0;
+	virtual void SetKeepAliveInterval	(unsigned long dwKeepAliveInterval)	= 0;
 
 	/* 获取通信数据缓冲区大小 */
-	virtual DWORD GetSocketBufferSize	()	= 0;
+	virtual unsigned long GetSocketBufferSize	()	= 0;
 	/* 获取正常心跳包间隔 */
-	virtual DWORD GetKeepAliveTime		()	= 0;
+	virtual unsigned long GetKeepAliveTime		()	= 0;
 	/* 获取异常心跳包间隔 */
-	virtual DWORD GetKeepAliveInterval	()	= 0;
+	virtual unsigned long GetKeepAliveInterval	()	= 0;
 };
 
 /************************************************************************
@@ -685,18 +661,18 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置数据报文最大长度（建议在局域网环境下不超过 1472 字节，在广域网环境下不超过 548 字节） */
-	virtual void SetMaxDatagramSize	(DWORD dwMaxDatagramSize)	= 0;
+	virtual void SetMaxDatagramSize	(unsigned long dwMaxDatagramSize)	= 0;
 	/* 获取数据报文最大长度 */
-	virtual DWORD GetMaxDatagramSize()							= 0;
+	virtual unsigned long GetMaxDatagramSize()							= 0;
 
 	/* 设置监测包尝试次数（0 则不发送监测跳包，如果超过最大尝试次数则认为已断线） */
-	virtual void SetDetectAttempts	(DWORD dwDetectAttempts)	= 0;
+	virtual void SetDetectAttempts	(unsigned long dwDetectAttempts)	= 0;
 	/* 设置监测包发送间隔（秒，0 不发送监测包） */
-	virtual void SetDetectInterval	(DWORD dwDetectInterval)	= 0;
+	virtual void SetDetectInterval	(unsigned long dwDetectInterval)	= 0;
 	/* 获取心跳检查次数 */
-	virtual DWORD GetDetectAttempts	()							= 0;
+	virtual unsigned long GetDetectAttempts	()							= 0;
 	/* 获取心跳检查间隔 */
-	virtual DWORD GetDetectInterval	()							= 0;
+	virtual unsigned long GetDetectInterval	()							= 0;
 };
 
 /************************************************************************
@@ -716,14 +692,14 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置数据报文最大长度（建议在局域网环境下不超过 1472 字节，在广域网环境下不超过 548 字节） */
-	virtual void SetMaxDatagramSize	(DWORD dwMaxDatagramSize)		= 0;
+	virtual void SetMaxDatagramSize	(unsigned long dwMaxDatagramSize)		= 0;
 	/* 获取数据报文最大长度 */
-	virtual DWORD GetMaxDatagramSize()								= 0;
+	virtual unsigned long GetMaxDatagramSize()								= 0;
 
 	/* 设置是否启用地址重用机制（默认：不启用） */
-	virtual void SetReuseAddress	(BOOL bReuseAddress)			= 0;
+	virtual void SetReuseAddress	(int bReuseAddress)			= 0;
 	/* 检测是否启用地址重用机制 */
-	virtual BOOL IsReuseAddress		()								= 0;
+	virtual int IsReuseAddress		()								= 0;
 
 	/* 设置传播模式（组播或广播） */
 	virtual void SetCastMode		(EnCastMode enCastMode)			= 0;
@@ -736,12 +712,12 @@ public:
 	virtual int GetMultiCastTtl		()								= 0;
 
 	/* 设置是否启用组播环路（TRUE or FALSE） */
-	virtual void SetMultiCastLoop	(BOOL bMCLoop)					= 0;
+	virtual void SetMultiCastLoop	(int bMCLoop)					= 0;
 	/* 检测是否启用组播环路 */
-	virtual BOOL IsMultiCastLoop	()								= 0;
+	virtual int IsMultiCastLoop	()								= 0;
 
 	/* 获取当前数据报的远程地址信息（通常在 OnReceive 事件中调用） */
-	virtual BOOL GetRemoteAddress	(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetRemoteAddress	(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 };
 
 /************************************************************************
@@ -878,12 +854,12 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置数据包最大长度（有效数据包最大长度不能超过 4194303/0x3FFFFF 字节，默认：262144/0x40000） */
-	virtual void SetMaxPackSize		(DWORD dwMaxPackSize)			= 0;
+	virtual void SetMaxPackSize		(unsigned long dwMaxPackSize)			= 0;
 	/* 设置包头标识（有效包头标识取值范围 0 ~ 1023/0x3FF，当包头标识为 0 时不校验包头，默认：0） */
 	virtual void SetPackHeaderFlag	(USHORT usPackHeaderFlag)		= 0;
 
 	/* 获取数据包最大长度 */
-	virtual DWORD GetMaxPackSize	()								= 0;
+	virtual unsigned long GetMaxPackSize	()								= 0;
 	/* 获取包头标识 */
 	virtual USHORT GetPackHeaderFlag()								= 0;
 
@@ -903,12 +879,12 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置数据包最大长度（有效数据包最大长度不能超过 4194303/0x3FFFFF 字节，默认：262144/0x40000） */
-	virtual void SetMaxPackSize		(DWORD dwMaxPackSize)			= 0;
+	virtual void SetMaxPackSize		(unsigned long dwMaxPackSize)			= 0;
 	/* 设置包头标识（有效包头标识取值范围 0 ~ 1023/0x3FF，当包头标识为 0 时不校验包头，默认：0） */
 	virtual void SetPackHeaderFlag	(USHORT usPackHeaderFlag)		= 0;
 
 	/* 获取数据包最大长度 */
-	virtual DWORD GetMaxPackSize	()								= 0;
+	virtual unsigned long GetMaxPackSize	()								= 0;
 	/* 获取包头标识 */
 	virtual USHORT GetPackHeaderFlag()								= 0;
 
@@ -1330,7 +1306,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendWSMessage(CONNID dwConnID, BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4] = nullptr, BYTE* pData = nullptr, int iLength = 0, ULONGLONG ullBodyLen = 0)	= 0;
+	virtual int SendWSMessage(CONNID dwConnID, int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4] = nullptr, BYTE* pData = nullptr, int iLength = 0, ULONGLONG ullBodyLen = 0)	= 0;
 
 public:
 
@@ -1343,9 +1319,9 @@ public:
 	virtual EnHttpVersion GetLocalVersion()												= 0;
 
 	/* 检查是否升级协议 */
-	virtual BOOL IsUpgrade(CONNID dwConnID)												= 0;
+	virtual int IsUpgrade(CONNID dwConnID)												= 0;
 	/* 检查是否有 Keep-Alive 标识 */
-	virtual BOOL IsKeepAlive(CONNID dwConnID)											= 0;
+	virtual int IsKeepAlive(CONNID dwConnID)											= 0;
 	/* 获取协议版本 */
 	virtual USHORT GetVersion(CONNID dwConnID)											= 0;
 	/* 获取内容长度 */
@@ -1362,30 +1338,30 @@ public:
 	virtual USHORT GetParseErrorCode(CONNID dwConnID, LPCSTR* lpszErrorDesc = nullptr)	= 0;
 
 	/* 获取某个请求头（单值） */
-	virtual BOOL GetHeader(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetHeader(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
 	/* 获取某个请求头（多值） */
-	virtual BOOL GetHeaders(CONNID dwConnID, LPCSTR lpszName, LPCSTR lpszValue[], DWORD& dwCount)	= 0;
+	virtual int GetHeaders(CONNID dwConnID, LPCSTR lpszName, LPCSTR lpszValue[], unsigned long& dwCount)	= 0;
 	/* 获取所有请求头 */
-	virtual BOOL GetAllHeaders(CONNID dwConnID, THeader lpHeaders[], DWORD& dwCount)				= 0;
+	virtual int GetAllHeaders(CONNID dwConnID, THeader lpHeaders[], unsigned long& dwCount)				= 0;
 	/* 获取所有请求头名称 */
-	virtual BOOL GetAllHeaderNames(CONNID dwConnID, LPCSTR lpszName[], DWORD& dwCount)				= 0;
+	virtual int GetAllHeaderNames(CONNID dwConnID, LPCSTR lpszName[], unsigned long& dwCount)				= 0;
 
 	/* 获取 Cookie */
-	virtual BOOL GetCookie(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetCookie(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
 	/* 获取所有 Cookie */
-	virtual BOOL GetAllCookies(CONNID dwConnID, TCookie lpCookies[], DWORD& dwCount)				= 0;
+	virtual int GetAllCookies(CONNID dwConnID, TCookie lpCookies[], unsigned long& dwCount)				= 0;
 
 	/*
 	// !! maybe implemented in future !! //
 
-	virtual BOOL GetParam(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
-	virtual BOOL GetParams(CONNID dwConnID, LPCSTR lpszName, LPCSTR lpszValue[], DWORD& dwCount)	= 0;
-	virtual BOOL GetAllParams(CONNID dwConnID, LPPARAM lpszParam[], DWORD& dwCount)					= 0;
-	virtual BOOL GetAllParamNames(CONNID dwConnID, LPCSTR lpszName[], DWORD& dwCount)				= 0;
+	virtual int GetParam(CONNID dwConnID, LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetParams(CONNID dwConnID, LPCSTR lpszName, LPCSTR lpszValue[], unsigned long& dwCount)	= 0;
+	virtual int GetAllParams(CONNID dwConnID, LPPARAM lpszParam[], unsigned long& dwCount)					= 0;
+	virtual int GetAllParamNames(CONNID dwConnID, LPCSTR lpszName[], unsigned long& dwCount)				= 0;
 	*/
 
 	/* 获取当前 WebSocket 消息状态，传入 nullptr 则不获取相应字段 */
-	virtual BOOL GetWSMessageState(CONNID dwConnID, BOOL* lpbFinal, BYTE* lpiReserved, BYTE* lpiOperationCode, LPCBYTE* lpszMask, ULONGLONG* lpullBodyLen, ULONGLONG* lpullBodyRemain)	= 0;
+	virtual int GetWSMessageState(CONNID dwConnID, int* lpbFinal, BYTE* lpiReserved, BYTE* lpiOperationCode, LPCBYTE* lpszMask, ULONGLONG* lpullBodyLen, ULONGLONG* lpullBodyRemain)	= 0;
 
 public:
 	virtual ~IComplexHttp() {}
@@ -1416,7 +1392,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendRequest(CONNID dwConnID, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0)	= 0;
+	virtual int SendRequest(CONNID dwConnID, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0)	= 0;
 
 	/*
 	* 名称：发送本地文件
@@ -1431,26 +1407,26 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendLocalFile(CONNID dwConnID, LPCSTR lpszFileName, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)							= 0;
+	virtual int SendLocalFile(CONNID dwConnID, LPCSTR lpszFileName, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)							= 0;
 
 	/* 发送 POST 请求 */
-	virtual BOOL SendPost(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
+	virtual int SendPost(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
 	/* 发送 PUT 请求 */
-	virtual BOOL SendPut(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
+	virtual int SendPut(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
 	/* 发送 PATCH 请求 */
-	virtual BOOL SendPatch(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
+	virtual int SendPatch(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
 	/* 发送 GET 请求 */
-	virtual BOOL SendGet(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendGet(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 DELETE 请求 */
-	virtual BOOL SendDelete(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
+	virtual int SendDelete(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
 	/* 发送 HEAD 请求 */
-	virtual BOOL SendHead(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendHead(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 TRACE 请求 */
-	virtual BOOL SendTrace(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendTrace(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 OPTIONS 请求 */
-	virtual BOOL SendOptions(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
+	virtual int SendOptions(CONNID dwConnID, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
 	/* 发送 CONNECT 请求 */
-	virtual BOOL SendConnect(CONNID dwConnID, LPCSTR lpszHost, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
+	virtual int SendConnect(CONNID dwConnID, LPCSTR lpszHost, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
 
 public:
 
@@ -1461,9 +1437,9 @@ public:
 	virtual USHORT GetStatusCode(CONNID dwConnID)						= 0;
 
 	/* 设置是否使用 Cookie（默认：TRUE） */
-	virtual void SetUseCookie(BOOL bUseCookie)							= 0;
+	virtual void SetUseCookie(int bUseCookie)							= 0;
 	/* 检查是否使用 Cookie */
-	virtual BOOL IsUseCookie()											= 0;
+	virtual int IsUseCookie()											= 0;
 };
 
 /************************************************************************
@@ -1491,7 +1467,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendResponse(CONNID dwConnID, USHORT usStatusCode, LPCSTR lpszDesc = nullptr, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pData = nullptr, int iLength = 0)	= 0;
+	virtual int SendResponse(CONNID dwConnID, USHORT usStatusCode, LPCSTR lpszDesc = nullptr, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pData = nullptr, int iLength = 0)	= 0;
 
 	/*
 	* 名称：发送本地文件
@@ -1506,7 +1482,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendLocalFile(CONNID dwConnID, LPCSTR lpszFileName, USHORT usStatusCode = HSC_OK, LPCSTR lpszDesc = nullptr, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)				= 0;
+	virtual int SendLocalFile(CONNID dwConnID, LPCSTR lpszFileName, USHORT usStatusCode = HSC_OK, LPCSTR lpszDesc = nullptr, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)				= 0;
 
 	/*
 	* 名称：释放连接
@@ -1516,7 +1492,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL Release(CONNID dwConnID)								= 0;
+	virtual int Release(CONNID dwConnID)								= 0;
 
 public:
 
@@ -1527,9 +1503,9 @@ public:
 	virtual LPCSTR GetHost(CONNID dwConnID)								= 0;
 
 	/* 设置连接释放延时（默认：3000 毫秒） */
-	virtual void SetReleaseDelay(DWORD dwReleaseDelay)					= 0;
+	virtual void SetReleaseDelay(unsigned long dwReleaseDelay)					= 0;
 	/* 获取连接释放延时 */
-	virtual DWORD GetReleaseDelay()										= 0;
+	virtual unsigned long GetReleaseDelay()										= 0;
 
 	/* 获取请求行 URL 域掩码（URL 域参考：EnHttpUrlField） */
 	virtual USHORT GetUrlFieldSet(CONNID dwConnID)						= 0;
@@ -1568,7 +1544,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendWSMessage(BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4] = nullptr, BYTE* pData = nullptr, int iLength = 0, ULONGLONG ullBodyLen = 0)	= 0;
+	virtual int SendWSMessage(int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4] = nullptr, BYTE* pData = nullptr, int iLength = 0, ULONGLONG ullBodyLen = 0)	= 0;
 
 public:
 
@@ -1581,9 +1557,9 @@ public:
 	virtual EnHttpVersion GetLocalVersion()								= 0;
 
 	/* 检查是否升级协议 */
-	virtual BOOL IsUpgrade()											= 0;
+	virtual int IsUpgrade()											= 0;
 	/* 检查是否有 Keep-Alive 标识 */
-	virtual BOOL IsKeepAlive()											= 0;
+	virtual int IsKeepAlive()											= 0;
 	/* 获取协议版本 */
 	virtual USHORT GetVersion()											= 0;
 	/* 获取内容长度 */
@@ -1603,30 +1579,30 @@ public:
 	virtual USHORT GetStatusCode()										= 0;
 
 	/* 获取某个请求头（单值） */
-	virtual BOOL GetHeader(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetHeader(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
 	/* 获取某个请求头（多值） */
-	virtual BOOL GetHeaders(LPCSTR lpszName, LPCSTR lpszValue[], DWORD& dwCount)	= 0;
+	virtual int GetHeaders(LPCSTR lpszName, LPCSTR lpszValue[], unsigned long& dwCount)	= 0;
 	/* 获取所有请求头 */
-	virtual BOOL GetAllHeaders(THeader lpHeaders[], DWORD& dwCount)					= 0;
+	virtual int GetAllHeaders(THeader lpHeaders[], unsigned long& dwCount)					= 0;
 	/* 获取所有请求头名称 */
-	virtual BOOL GetAllHeaderNames(LPCSTR lpszName[], DWORD& dwCount)				= 0;
+	virtual int GetAllHeaderNames(LPCSTR lpszName[], unsigned long& dwCount)				= 0;
 
 	/* 获取 Cookie */
-	virtual BOOL GetCookie(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetCookie(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
 	/* 获取所有 Cookie */
-	virtual BOOL GetAllCookies(TCookie lpCookies[], DWORD& dwCount)					= 0;
+	virtual int GetAllCookies(TCookie lpCookies[], unsigned long& dwCount)					= 0;
 
 	/*
 	// !! maybe implemented in future !! //
 
-	virtual BOOL GetParam(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
-	virtual BOOL GetParams(LPCSTR lpszName, LPCSTR lpszValue[], DWORD& dwCount)		= 0;
-	virtual BOOL GetAllParams(LPPARAM lpszParam[], DWORD& dwCount)					= 0;
-	virtual BOOL GetAllParamNames(LPCSTR lpszName[], DWORD& dwCount)				= 0;
+	virtual int GetParam(LPCSTR lpszName, LPCSTR* lpszValue)						= 0;
+	virtual int GetParams(LPCSTR lpszName, LPCSTR lpszValue[], unsigned long& dwCount)		= 0;
+	virtual int GetAllParams(LPPARAM lpszParam[], unsigned long& dwCount)					= 0;
+	virtual int GetAllParamNames(LPCSTR lpszName[], unsigned long& dwCount)				= 0;
 	*/
 
 	/* 获取当前 WebSocket 消息状态，传入 nullptr 则不获取相应字段 */
-	virtual BOOL GetWSMessageState(BOOL* lpbFinal, BYTE* lpiReserved, BYTE* lpiOperationCode, LPCBYTE* lpszMask, ULONGLONG* lpullBodyLen, ULONGLONG* lpullBodyRemain)	= 0;
+	virtual int GetWSMessageState(int* lpbFinal, BYTE* lpiReserved, BYTE* lpiOperationCode, LPCBYTE* lpszMask, ULONGLONG* lpullBodyLen, ULONGLONG* lpullBodyRemain)	= 0;
 
 public:
 	virtual ~IHttp() {}
@@ -1656,7 +1632,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendRequest(LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0)	= 0;
+	virtual int SendRequest(LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0)	= 0;
 
 	/*
 	* 名称：发送本地文件
@@ -1671,26 +1647,26 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL SendLocalFile(LPCSTR lpszFileName, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)							= 0;
+	virtual int SendLocalFile(LPCSTR lpszFileName, LPCSTR lpszMethod, LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)							= 0;
 
 	/* 发送 POST 请求 */
-	virtual BOOL SendPost(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
+	virtual int SendPost(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
 	/* 发送 PUT 请求 */
-	virtual BOOL SendPut(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
+	virtual int SendPut(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)														= 0;
 	/* 发送 PATCH 请求 */
-	virtual BOOL SendPatch(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
+	virtual int SendPatch(LPCSTR lpszPath, const THeader lpHeaders[], int iHeaderCount, const BYTE* pBody, int iLength)													= 0;
 	/* 发送 GET 请求 */
-	virtual BOOL SendGet(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendGet(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 DELETE 请求 */
-	virtual BOOL SendDelete(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendDelete(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 HEAD 请求 */
-	virtual BOOL SendHead(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendHead(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 TRACE 请求 */
-	virtual BOOL SendTrace(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
+	virtual int SendTrace(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																		= 0;
 	/* 发送 OPTIONS 请求 */
-	virtual BOOL SendOptions(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
+	virtual int SendOptions(LPCSTR lpszPath, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
 	/* 发送 CONNECT 请求 */
-	virtual BOOL SendConnect(LPCSTR lpszHost, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
+	virtual int SendConnect(LPCSTR lpszHost, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0)																	= 0;
 
 public:
 
@@ -1698,9 +1674,9 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置是否使用 Cookie（默认：TRUE） */
-	virtual void SetUseCookie(BOOL bUseCookie)								= 0;
+	virtual void SetUseCookie(int bUseCookie)								= 0;
 	/* 检查是否使用 Cookie */
-	virtual BOOL IsUseCookie()												= 0;
+	virtual int IsUseCookie()												= 0;
 };
 
 /************************************************************************
@@ -1725,7 +1701,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL OpenUrl(LPCSTR lpszMethod, LPCSTR lpszUrl, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0, BOOL bForceReconnect = FALSE)	= 0;
+	virtual int OpenUrl(LPCSTR lpszMethod, LPCSTR lpszUrl, const THeader lpHeaders[] = nullptr, int iHeaderCount = 0, const BYTE* pBody = nullptr, int iLength = 0, int bForceReconnect = FALSE)	= 0;
 
 	/***********************************************************************/
 	/***************************** 组件操作方法 *****************************/
@@ -1738,7 +1714,7 @@ public:
 	* 返回值：	TRUE			-- 成功
 	*			FALSE			-- 失败
 	*/
-	virtual BOOL CleanupRequestResult	()									= 0;
+	virtual int CleanupRequestResult	()									= 0;
 
 public:
 
@@ -1746,17 +1722,17 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置连接超时（毫秒，0：系统默认超时，默认：5000） */
-	virtual void SetConnectTimeout		(DWORD dwConnectTimeout)			= 0;
+	virtual void SetConnectTimeout		(unsigned long dwConnectTimeout)			= 0;
 	/* 设置请求超时（毫秒，0：无限等待，默认：10000） */
-	virtual void SetRequestTimeout		(DWORD dwRequestTimeout)			= 0;
+	virtual void SetRequestTimeout		(unsigned long dwRequestTimeout)			= 0;
 
 	/* 获取连接超时 */
-	virtual DWORD GetConnectTimeout		()									= 0;
+	virtual unsigned long GetConnectTimeout		()									= 0;
 	/* 获取请求超时 */
-	virtual DWORD GetRequestTimeout		()									= 0;
+	virtual unsigned long GetRequestTimeout		()									= 0;
 
 	/* 获取响应体 */
-	virtual BOOL GetResponseBody		(LPCBYTE* lpszBody, int* iLength)	= 0;
+	virtual int GetResponseBody		(LPCBYTE* lpszBody, int* iLength)	= 0;
 };
 
 
@@ -1926,7 +1902,7 @@ public:
 	* 返回值：	HR_OK / HR_IGNORE	-- 继续执行
 	*			HR_ERROR			-- 引发 OnClose() 事件并关闭连接
 	*/
-	virtual EnHandleResult OnWSMessageHeader(T* pSender, CONNID dwConnID, BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	= 0;
+	virtual EnHandleResult OnWSMessageHeader(T* pSender, CONNID dwConnID, int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	= 0;
 
 	/*
 	* 名称：WebSocket 数据包体通知
@@ -2009,7 +1985,7 @@ public:
 	virtual EnHttpParseResult OnChunkComplete(IHttpServer* pSender, CONNID dwConnID)									{return HPR_OK;}
 	virtual EnHttpParseResult OnUpgrade(IHttpServer* pSender, CONNID dwConnID, EnHttpUpgradeType enUpgradeType)			{return HPR_OK;}
 
-	virtual EnHandleResult OnWSMessageHeader(IHttpServer* pSender, CONNID dwConnID, BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
+	virtual EnHandleResult OnWSMessageHeader(IHttpServer* pSender, CONNID dwConnID, int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageBody(IHttpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength)		{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageComplete(IHttpServer* pSender, CONNID dwConnID)									{return HR_IGNORE;}
 };
@@ -2037,7 +2013,7 @@ public:
 	virtual EnHttpParseResult OnChunkComplete(IHttpAgent* pSender, CONNID dwConnID)										{return HPR_OK;}
 	virtual EnHttpParseResult OnUpgrade(IHttpAgent* pSender, CONNID dwConnID, EnHttpUpgradeType enUpgradeType)			{return HPR_OK;}
 
-	virtual EnHandleResult OnWSMessageHeader(IHttpAgent* pSender, CONNID dwConnID, BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
+	virtual EnHandleResult OnWSMessageHeader(IHttpAgent* pSender, CONNID dwConnID, int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageBody(IHttpAgent* pSender, CONNID dwConnID, const BYTE* pData, int iLength)		{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageComplete(IHttpAgent* pSender, CONNID dwConnID)									{return HR_IGNORE;}
 };
@@ -2065,7 +2041,7 @@ public:
 	virtual EnHttpParseResult OnChunkComplete(IHttpClient* pSender, CONNID dwConnID)									{return HPR_OK;}
 	virtual EnHttpParseResult OnUpgrade(IHttpClient* pSender, CONNID dwConnID, EnHttpUpgradeType enUpgradeType)			{return HPR_OK;}
 
-	virtual EnHandleResult OnWSMessageHeader(IHttpClient* pSender, CONNID dwConnID, BOOL bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
+	virtual EnHandleResult OnWSMessageHeader(IHttpClient* pSender, CONNID dwConnID, int bFinal, BYTE iReserved, BYTE iOperationCode, const BYTE lpszMask[4], ULONGLONG ullBodyLen)	{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageBody(IHttpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength)		{return HR_IGNORE;}
 	virtual EnHandleResult OnWSMessageComplete(IHttpClient* pSender, CONNID dwConnID)									{return HR_IGNORE;}
 };
@@ -2149,20 +2125,3 @@ public:
 // };
 
 
-/*class BufferPool{
-public:
-	static BufferPool* Instance(){
-		if (ptr == NULL)
-			ptr = new BufferPool;
-		return ptr;
-	}
-	std::queue<Buffer*>* CreateBuffer(CONNID dwConID);
-	std::queue<Buffer*>* CreateCompleteBuffer(CONNID dwConID);
-	std::queue<Buffer*>* GetCompleteBuffers(CONNID dwConID);
-private:
-	BufferPool(){}
-	~BufferPool(){}
-	static BufferPool* ptr;
-	std::map<CONNID, std::queue<Buffer*>* > m_mapPool;
-	std::map<CONNID, std::queue<Buffer*>* > m_mapCompletePool;
-};*/

@@ -19,9 +19,9 @@ public:
 	virtual int			Disconnect					(CONNID dwConnID, int bForce = TRUE);
 	virtual int			DisconnectLongConnections	(unsigned long dwPeriod, int bForce = TRUE);
 	virtual int			DisconnectSilenceConnections(unsigned long dwPeriod, int bForce = TRUE);
-	virtual int			GetListenAddress			(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
-	virtual int			GetLocalAddress				(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
-	virtual int			GetRemoteAddress			(CONNID dwConnID, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int			GetListenAddress			(char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int			GetLocalAddress				(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int			GetRemoteAddress			(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
 	
 	virtual int GetPendingDataLength	(CONNID dwConnID, int& iPending);
 	virtual unsigned long GetConnectionCount	();
