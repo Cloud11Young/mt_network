@@ -130,7 +130,7 @@ public:
 		return pObj;
 	}
 
-	BOOL IsValid	()	const	{return m_pObj != nullptr	;}
+	int IsValid	()	const	{return m_pObj != nullptr	;}
 	T* Get			()	const	{return m_pObj				;}
 	T* operator ->	()	const	{return m_pObj				;}
 	operator T*		()	const	{return m_pObj				;}
@@ -155,52 +155,52 @@ SOCKET_API ITcpServer* HP_Create_TcpServer(ITcpServerListener* pListener);
 //////////////////////////////////////////////////////////////////////////
 
 // 创建 ITcpAgent 对象
-SOCKET_API ITcpAgent* HP_Create_TcpAgent(ITcpAgentListener* pListener);
+//SOCKET_API ITcpAgent* HP_Create_TcpAgent(ITcpAgentListener* pListener);
 // 创建 ITcpClient 对象
 SOCKET_API ITcpClient* HP_Create_TcpClient(ITcpClientListener* pListener);
 // 创建 ITcpPullServer 对象
-SOCKET_API ITcpPullServer* HP_Create_TcpPullServer(ITcpServerListener* pListener);
+//SOCKET_API ITcpPullServer* HP_Create_TcpPullServer(ITcpServerListener* pListener);
 // 创建 ITcpPullAgent 对象
-SOCKET_API ITcpPullAgent* HP_Create_TcpPullAgent(ITcpAgentListener* pListener);
+//SOCKET_API ITcpPullAgent* HP_Create_TcpPullAgent(ITcpAgentListener* pListener);
 // 创建 ITcpPullClient 对象
-SOCKET_API ITcpPullClient* HP_Create_TcpPullClient(ITcpClientListener* pListener);
+//SOCKET_API ITcpPullClient* HP_Create_TcpPullClient(ITcpClientListener* pListener);
 // 创建 ITcpPackServer 对象
 SOCKET_API ITcpPackServer* HP_Create_TcpPackServer(ITcpServerListener* pListener);
 // 创建 ITcpPackAgent 对象
-SOCKET_API ITcpPackAgent* HP_Create_TcpPackAgent(ITcpAgentListener* pListener);
+//SOCKET_API ITcpPackAgent* HP_Create_TcpPackAgent(ITcpAgentListener* pListener);
 // 创建 ITcpPackClient 对象
 SOCKET_API ITcpPackClient* HP_Create_TcpPackClient(ITcpClientListener* pListener);
 // 创建 IUdpServer 对象
-SOCKET_API IUdpServer* HP_Create_UdpServer(IUdpServerListener* pListener);
+//SOCKET_API IUdpServer* HP_Create_UdpServer(IUdpServerListener* pListener);
 // 创建 IUdpClient 对象
-SOCKET_API IUdpClient* HP_Create_UdpClient(IUdpClientListener* pListener);
+//SOCKET_API IUdpClient* HP_Create_UdpClient(IUdpClientListener* pListener);
 // 创建 IUdpCast 对象
-SOCKET_API IUdpCast* HP_Create_UdpCast(IUdpCastListener* pListener);
+//SOCKET_API IUdpCast* HP_Create_UdpCast(IUdpCastListener* pListener);
 
 // 销毁 ITcpServer 对象
 SOCKET_API void HP_Destroy_TcpServer(ITcpServer* pServer);
 // 销毁 ITcpAgent 对象
-SOCKET_API void HP_Destroy_TcpAgent(ITcpAgent* pAgent);
+//SOCKET_API void HP_Destroy_TcpAgent(ITcpAgent* pAgent);
 // 销毁 ITcpClient 对象
 SOCKET_API void HP_Destroy_TcpClient(ITcpClient* pClient);
 // 销毁 ITcpPullServer 对象
-SOCKET_API void HP_Destroy_TcpPullServer(ITcpPullServer* pServer);
+//SOCKET_API void HP_Destroy_TcpPullServer(ITcpPullServer* pServer);
 // 销毁 ITcpPullAgent 对象
-SOCKET_API void HP_Destroy_TcpPullAgent(ITcpPullAgent* pAgent);
+//SOCKET_API void HP_Destroy_TcpPullAgent(ITcpPullAgent* pAgent);
 // 销毁 ITcpPullClient 对象
-SOCKET_API void HP_Destroy_TcpPullClient(ITcpPullClient* pClient);
+//SOCKET_API void HP_Destroy_TcpPullClient(ITcpPullClient* pClient);
 // 销毁 ITcpPackServer 对象
 SOCKET_API void HP_Destroy_TcpPackServer(ITcpPackServer* pServer);
 // 销毁 ITcpPackAgent 对象
-SOCKET_API void HP_Destroy_TcpPackAgent(ITcpPackAgent* pAgent);
+//SOCKET_API void HP_Destroy_TcpPackAgent(ITcpPackAgent* pAgent);
 // 销毁 ITcpPackClient 对象
 SOCKET_API void HP_Destroy_TcpPackClient(ITcpPackClient* pClient);
 // 销毁 IUdpServer 对象
-SOCKET_API void HP_Destroy_UdpServer(IUdpServer* pServer);
+//SOCKET_API void HP_Destroy_UdpServer(IUdpServer* pServer);
 // 销毁 IUdpClient 对象
-SOCKET_API void HP_Destroy_UdpClient(IUdpClient* pClient);
+//SOCKET_API void HP_Destroy_UdpClient(IUdpClient* pClient);
 // 销毁 IUdpCast 对象
-SOCKET_API void HP_Destroy_UdpCast(IUdpCast* pCast);
+//SOCKET_API void HP_Destroy_UdpCast(IUdpCast* pCast);
 
 // ITcpServer 对象创建器
 struct TcpServer_Creator
@@ -217,18 +217,18 @@ struct TcpServer_Creator
 };
 
 // ITcpAgent 对象创建器
-struct TcpAgent_Creator
-{
-	static ITcpAgent* Create(ITcpAgentListener* pListener)
-	{
-		return HP_Create_TcpAgent(pListener);
-	}
-
-	static void Destroy(ITcpAgent* pAgent)
-	{
-		HP_Destroy_TcpAgent(pAgent);
-	}
-};
+// struct TcpAgent_Creator
+// {
+// 	static ITcpAgent* Create(ITcpAgentListener* pListener)
+// 	{
+// 		return HP_Create_TcpAgent(pListener);
+// 	}
+// 
+// 	static void Destroy(ITcpAgent* pAgent)
+// 	{
+// 		HP_Destroy_TcpAgent(pAgent);
+// 	}
+// };
 
 // ITcpClient 对象创建器
 struct TcpClient_Creator
@@ -245,46 +245,46 @@ struct TcpClient_Creator
 };
 
 // ITcpPullServer 对象创建器
-struct TcpPullServer_Creator
-{
-	static ITcpPullServer* Create(ITcpServerListener* pListener)
-	{
-		return HP_Create_TcpPullServer(pListener);
-	}
-
-	static void Destroy(ITcpPullServer* pServer)
-	{
-		HP_Destroy_TcpPullServer(pServer);
-	}
-};
+// struct TcpPullServer_Creator
+// {
+// 	static ITcpPullServer* Create(ITcpServerListener* pListener)
+// 	{
+// 		return HP_Create_TcpPullServer(pListener);
+// 	}
+// 
+// 	static void Destroy(ITcpPullServer* pServer)
+// 	{
+// 		HP_Destroy_TcpPullServer(pServer);
+// 	}
+// };
 
 // ITcpPullAgent 对象创建器
-struct TcpPullAgent_Creator
-{
-	static ITcpPullAgent* Create(ITcpAgentListener* pListener)
-	{
-		return HP_Create_TcpPullAgent(pListener);
-	}
-
-	static void Destroy(ITcpPullAgent* pAgent)
-	{
-		HP_Destroy_TcpPullAgent(pAgent);
-	}
-};
+// struct TcpPullAgent_Creator
+// {
+// 	static ITcpPullAgent* Create(ITcpAgentListener* pListener)
+// 	{
+// 		return HP_Create_TcpPullAgent(pListener);
+// 	}
+// 
+// 	static void Destroy(ITcpPullAgent* pAgent)
+// 	{
+// 		HP_Destroy_TcpPullAgent(pAgent);
+// 	}
+// };
 
 // ITcpPullClient 对象创建器
-struct TcpPullClient_Creator
-{
-	static ITcpPullClient* Create(ITcpClientListener* pListener)
-	{
-		return HP_Create_TcpPullClient(pListener);
-	}
-
-	static void Destroy(ITcpPullClient* pClient)
-	{
-		HP_Destroy_TcpPullClient(pClient);
-	}
-};
+// struct TcpPullClient_Creator
+// {
+// 	static ITcpPullClient* Create(ITcpClientListener* pListener)
+// 	{
+// 		return HP_Create_TcpPullClient(pListener);
+// 	}
+// 
+// 	static void Destroy(ITcpPullClient* pClient)
+// 	{
+// 		HP_Destroy_TcpPullClient(pClient);
+// 	}
+// };
 
 // ITcpPackServer 对象创建器
 struct TcpPackServer_Creator
@@ -301,18 +301,18 @@ struct TcpPackServer_Creator
 };
 
 // ITcpPackAgent 对象创建器
-struct TcpPackAgent_Creator
-{
-	static ITcpPackAgent* Create(ITcpAgentListener* pListener)
-	{
-		return HP_Create_TcpPackAgent(pListener);
-	}
-
-	static void Destroy(ITcpPackAgent* pAgent)
-	{
-		HP_Destroy_TcpPackAgent(pAgent);
-	}
-};
+// struct TcpPackAgent_Creator
+// {
+// 	static ITcpPackAgent* Create(ITcpAgentListener* pListener)
+// 	{
+// 		return HP_Create_TcpPackAgent(pListener);
+// 	}
+// 
+// 	static void Destroy(ITcpPackAgent* pAgent)
+// 	{
+// 		HP_Destroy_TcpPackAgent(pAgent);
+// 	}
+// };
 
 // ITcpPackClient 对象创建器
 struct TcpPackClient_Creator
@@ -329,185 +329,185 @@ struct TcpPackClient_Creator
 };
 
 // IUdpServer 对象创建器
-struct UdpServer_Creator
-{
-	static IUdpServer* Create(IUdpServerListener* pListener)
-	{
-		return HP_Create_UdpServer(pListener);
-	}
-
-	static void Destroy(IUdpServer* pServer)
-	{
-		HP_Destroy_UdpServer(pServer);
-	}
-};
-
-// IUdpClient 对象创建器
-struct UdpClient_Creator
-{
-	static IUdpClient* Create(IUdpClientListener* pListener)
-	{
-		return HP_Create_UdpClient(pListener);
-	}
-
-	static void Destroy(IUdpClient* pClient)
-	{
-		HP_Destroy_UdpClient(pClient);
-	}
-};
+// struct UdpServer_Creator
+// {
+// 	static IUdpServer* Create(IUdpServerListener* pListener)
+// 	{
+// 		return HP_Create_UdpServer(pListener);
+// 	}
+// 
+// 	static void Destroy(IUdpServer* pServer)
+// 	{
+// 		HP_Destroy_UdpServer(pServer);
+// 	}
+// };
 
 // IUdpClient 对象创建器
-struct UdpCast_Creator
-{
-	static IUdpCast* Create(IUdpCastListener* pListener)
-	{
-		return HP_Create_UdpCast(pListener);
-	}
+// struct UdpClient_Creator
+// {
+// 	static IUdpClient* Create(IUdpClientListener* pListener)
+// 	{
+// 		return HP_Create_UdpClient(pListener);
+// 	}
+// 
+// 	static void Destroy(IUdpClient* pClient)
+// 	{
+// 		HP_Destroy_UdpClient(pClient);
+// 	}
+// };
 
-	static void Destroy(IUdpCast* pCast)
-	{
-		HP_Destroy_UdpCast(pCast);
-	}
-};
+// IUdpClient 对象创建器
+// struct UdpCast_Creator
+// {
+// 	static IUdpCast* Create(IUdpCastListener* pListener)
+// 	{
+// 		return HP_Create_UdpCast(pListener);
+// 	}
+// 
+// 	static void Destroy(IUdpCast* pCast)
+// 	{
+// 		HP_Destroy_UdpCast(pCast);
+// 	}
+// };
 
 // ITcpServer 对象智能指针
 typedef CHPSocketPtr<ITcpServer, ITcpServerListener, TcpServer_Creator>			CTcpServerPtr;
 // ITcpAgent 对象智能指针
-typedef CHPSocketPtr<ITcpAgent, ITcpAgentListener, TcpAgent_Creator>			CTcpAgentPtr;
+//typedef CHPSocketPtr<ITcpAgent, ITcpAgentListener, TcpAgent_Creator>			CTcpAgentPtr;
 // ITcpClient 对象智能指针
 typedef CHPSocketPtr<ITcpClient, ITcpClientListener, TcpClient_Creator>			CTcpClientPtr;
 // ITcpPullServer 对象智能指针
-typedef CHPSocketPtr<ITcpPullServer, ITcpServerListener, TcpPullServer_Creator>	CTcpPullServerPtr;
+//typedef CHPSocketPtr<ITcpPullServer, ITcpServerListener, TcpPullServer_Creator>	CTcpPullServerPtr;
 // ITcpPullAgent 对象智能指针
-typedef CHPSocketPtr<ITcpPullAgent, ITcpAgentListener, TcpPullAgent_Creator>	CTcpPullAgentPtr;
+//typedef CHPSocketPtr<ITcpPullAgent, ITcpAgentListener, TcpPullAgent_Creator>	CTcpPullAgentPtr;
 // ITcpPullClient 对象智能指针
-typedef CHPSocketPtr<ITcpPullClient, ITcpClientListener, TcpPullClient_Creator>	CTcpPullClientPtr;
+//typedef CHPSocketPtr<ITcpPullClient, ITcpClientListener, TcpPullClient_Creator>	CTcpPullClientPtr;
 // ITcpPackServer 对象智能指针
 typedef CHPSocketPtr<ITcpPackServer, ITcpServerListener, TcpPackServer_Creator>	CTcpPackServerPtr;
 // ITcpPackAgent 对象智能指针
-typedef CHPSocketPtr<ITcpPackAgent, ITcpAgentListener, TcpPackAgent_Creator>	CTcpPackAgentPtr;
+//typedef CHPSocketPtr<ITcpPackAgent, ITcpAgentListener, TcpPackAgent_Creator>	CTcpPackAgentPtr;
 // ITcpPackClient 对象智能指针
 typedef CHPSocketPtr<ITcpPackClient, ITcpClientListener, TcpPackClient_Creator>	CTcpPackClientPtr;
 // IUdpServer 对象智能指针
-typedef CHPSocketPtr<IUdpServer, IUdpServerListener, UdpServer_Creator>			CUdpServerPtr;
+//typedef CHPSocketPtr<IUdpServer, IUdpServerListener, UdpServer_Creator>			CUdpServerPtr;
 // IUdpClient 对象智能指针
-typedef CHPSocketPtr<IUdpClient, IUdpClientListener, UdpClient_Creator>			CUdpClientPtr;
+//typedef CHPSocketPtr<IUdpClient, IUdpClientListener, UdpClient_Creator>			CUdpClientPtr;
 // IUdpCast 对象智能指针
-typedef CHPSocketPtr<IUdpCast, IUdpCastListener, UdpCast_Creator>				CUdpCastPtr;
+//typedef CHPSocketPtr<IUdpCast, IUdpCastListener, UdpCast_Creator>				CUdpCastPtr;
 
 /*****************************************************************************************************************************************************/
 /******************************************************************** HTTP Exports *******************************************************************/
 /*****************************************************************************************************************************************************/
 
 // 创建 IHttpServer 对象
-SOCKET_API IHttpServer* HP_Create_HttpServer(IHttpServerListener* pListener);
+//SOCKET_API IHttpServer* HP_Create_HttpServer(IHttpServerListener* pListener);
 // 创建 IHttpAgent 对象
-SOCKET_API IHttpAgent* HP_Create_HttpAgent(IHttpAgentListener* pListener);
+//SOCKET_API IHttpAgent* HP_Create_HttpAgent(IHttpAgentListener* pListener);
 // 创建 IHttpClient 对象
-SOCKET_API IHttpClient* HP_Create_HttpClient(IHttpClientListener* pListener);
+//SOCKET_API IHttpClient* HP_Create_HttpClient(IHttpClientListener* pListener);
 // 创建 IHttpSyncClient 对象
-SOCKET_API IHttpSyncClient* HP_Create_HttpSyncClient(IHttpClientListener* pListener);
+//SOCKET_API IHttpSyncClient* HP_Create_HttpSyncClient(IHttpClientListener* pListener);
 
 // 销毁 IHttpServer 对象
-SOCKET_API void HP_Destroy_HttpServer(IHttpServer* pServer);
+//SOCKET_API void HP_Destroy_HttpServer(IHttpServer* pServer);
 // 销毁 IHttpAgent 对象
-SOCKET_API void HP_Destroy_HttpAgent(IHttpAgent* pAgent);
+//SOCKET_API void HP_Destroy_HttpAgent(IHttpAgent* pAgent);
 // 销毁 IHttpClient 对象
-SOCKET_API void HP_Destroy_HttpClient(IHttpClient* pClient);
+//SOCKET_API void HP_Destroy_HttpClient(IHttpClient* pClient);
 // 销毁 IHttpSyncClient 对象
-SOCKET_API void HP_Destroy_HttpSyncClient(IHttpSyncClient* pClient);
+//SOCKET_API void HP_Destroy_HttpSyncClient(IHttpSyncClient* pClient);
 
 // IHttpServer 对象创建器
-struct HttpServer_Creator
-{
-	static IHttpServer* Create(IHttpServerListener* pListener)
-	{
-		return HP_Create_HttpServer(pListener);
-	}
-
-	static void Destroy(IHttpServer* pServer)
-	{
-		HP_Destroy_HttpServer(pServer);
-	}
-};
+// struct HttpServer_Creator
+// {
+// 	static IHttpServer* Create(IHttpServerListener* pListener)
+// 	{
+// 		return HP_Create_HttpServer(pListener);
+// 	}
+// 
+// 	static void Destroy(IHttpServer* pServer)
+// 	{
+// 		HP_Destroy_HttpServer(pServer);
+// 	}
+// };
 
 // IHttpAgent 对象创建器
-struct HttpAgent_Creator
-{
-	static IHttpAgent* Create(IHttpAgentListener* pListener)
-	{
-		return HP_Create_HttpAgent(pListener);
-	}
-
-	static void Destroy(IHttpAgent* pAgent)
-	{
-		HP_Destroy_HttpAgent(pAgent);
-	}
-};
+// struct HttpAgent_Creator
+// {
+// 	static IHttpAgent* Create(IHttpAgentListener* pListener)
+// 	{
+// 		return HP_Create_HttpAgent(pListener);
+// 	}
+// 
+// 	static void Destroy(IHttpAgent* pAgent)
+// 	{
+// 		HP_Destroy_HttpAgent(pAgent);
+// 	}
+// };
 
 // IHttpClient 对象创建器
-struct HttpClient_Creator
-{
-	static IHttpClient* Create(IHttpClientListener* pListener)
-	{
-		return HP_Create_HttpClient(pListener);
-	}
-
-	static void Destroy(IHttpClient* pClient)
-	{
-		HP_Destroy_HttpClient(pClient);
-	}
-};
+// struct HttpClient_Creator
+// {
+// 	static IHttpClient* Create(IHttpClientListener* pListener)
+// 	{
+// 		return HP_Create_HttpClient(pListener);
+// 	}
+// 
+// 	static void Destroy(IHttpClient* pClient)
+// 	{
+// 		HP_Destroy_HttpClient(pClient);
+// 	}
+// };
 
 // IHttpSyncClient 对象创建器
-struct HttpSyncClient_Creator
-{
-	static IHttpSyncClient* Create(IHttpClientListener* pListener)
-	{
-		return HP_Create_HttpSyncClient(pListener);
-	}
-
-	static void Destroy(IHttpSyncClient* pClient)
-	{
-		HP_Destroy_HttpSyncClient(pClient);
-	}
-};
+// struct HttpSyncClient_Creator
+// {
+// 	static IHttpSyncClient* Create(IHttpClientListener* pListener)
+// 	{
+// 		return HP_Create_HttpSyncClient(pListener);
+// 	}
+// 
+// 	static void Destroy(IHttpSyncClient* pClient)
+// 	{
+// 		HP_Destroy_HttpSyncClient(pClient);
+// 	}
+// };
 
 // IHttpServer 对象智能指针
-typedef CHPSocketPtr<IHttpServer, IHttpServerListener, HttpServer_Creator>			CHttpServerPtr;
+//typedef CHPSocketPtr<IHttpServer, IHttpServerListener, HttpServer_Creator>			CHttpServerPtr;
 // IHttpAgent 对象智能指针
-typedef CHPSocketPtr<IHttpAgent, IHttpAgentListener, HttpAgent_Creator>				CHttpAgentPtr;
+//typedef CHPSocketPtr<IHttpAgent, IHttpAgentListener, HttpAgent_Creator>				CHttpAgentPtr;
 // IHttpClient 对象智能指针
-typedef CHPSocketPtr<IHttpClient, IHttpClientListener, HttpClient_Creator>			CHttpClientPtr;
+//typedef CHPSocketPtr<IHttpClient, IHttpClientListener, HttpClient_Creator>			CHttpClientPtr;
 // IHttpSyncClient 对象智能指针
-typedef CHPSocketPtr<IHttpSyncClient, IHttpClientListener, HttpSyncClient_Creator>	CHttpSyncClientPtr;
+//typedef CHPSocketPtr<IHttpSyncClient, IHttpClientListener, HttpSyncClient_Creator>	CHttpSyncClientPtr;
 
 /**************************************************************************/
 /*************************** HTTP Cookie 管理方法 **************************/
 
 /* 从文件加载 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_LoadFromFile(LPCSTR lpszFile, BOOL bKeepExists = TRUE);
+SOCKET_API int HP_HttpCookie_MGR_LoadFromFile(LPCSTR lpszFile, int bKeepExists = TRUE);
 /* 保存 Cookie 到文件 */
-SOCKET_API BOOL HP_HttpCookie_MGR_SaveToFile(LPCSTR lpszFile, BOOL bKeepExists = TRUE);
+SOCKET_API int HP_HttpCookie_MGR_SaveToFile(LPCSTR lpszFile, int bKeepExists = TRUE);
 /* 清理 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_ClearCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
+SOCKET_API int HP_HttpCookie_MGR_ClearCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
 /* 清理过期 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_RemoveExpiredCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
+SOCKET_API int HP_HttpCookie_MGR_RemoveExpiredCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
 /* 设置 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_SetCookie(LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge = -1, BOOL bHttpOnly = FALSE, BOOL bSecure = FALSE, int enSameSite = 0, BOOL bOnlyUpdateValueIfExists = TRUE);
+SOCKET_API int HP_HttpCookie_MGR_SetCookie(LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge = -1, int bHttpOnly = FALSE, int bSecure = FALSE, int enSameSite = 0, int bOnlyUpdateValueIfExists = TRUE);
 /* 删除 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_DeleteCookie(LPCSTR lpszDomain, LPCSTR lpszPath, LPCSTR lpszName);
+SOCKET_API int HP_HttpCookie_MGR_DeleteCookie(LPCSTR lpszDomain, LPCSTR lpszPath, LPCSTR lpszName);
 /* 设置是否允许第三方 Cookie */
-SOCKET_API void HP_HttpCookie_MGR_SetEnableThirdPartyCookie(BOOL bEnableThirdPartyCookie = TRUE);
+SOCKET_API void HP_HttpCookie_MGR_SetEnableThirdPartyCookie(int bEnableThirdPartyCookie = TRUE);
 /* 检查是否允许第三方 Cookie */
-SOCKET_API BOOL HP_HttpCookie_MGR_IsEnableThirdPartyCookie();
+SOCKET_API int HP_HttpCookie_MGR_IsEnableThirdPartyCookie();
 
 /* Cookie expires 字符串转换为整数 */
-SOCKET_API BOOL HP_HttpCookie_HLP_ParseExpires(LPCSTR lpszExpires, __time64_t& tmExpires);
+SOCKET_API int HP_HttpCookie_HLP_ParseExpires(LPCSTR lpszExpires, __time64_t& tmExpires);
 /* 整数转换为 Cookie expires 字符串 */
-SOCKET_API BOOL HP_HttpCookie_HLP_MakeExpiresStr(char lpszBuff[], int& iBuffLen, __time64_t tmExpires);
+SOCKET_API int HP_HttpCookie_HLP_MakeExpiresStr(char lpszBuff[], int& iBuffLen, __time64_t tmExpires);
 /* 生成 Cookie 字符串 */
-SOCKET_API BOOL HP_HttpCookie_HLP_ToString(char lpszBuff[], int& iBuffLen, LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge /*= -1*/, BOOL bHttpOnly /*= FALSE*/, BOOL bSecure /*= FALSE*/, int enSameSite /*= 0*/);
+SOCKET_API int HP_HttpCookie_HLP_ToString(char lpszBuff[], int& iBuffLen, LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge /*= -1*/, int bHttpOnly /*= FALSE*/, int bSecure /*= FALSE*/, int enSameSite /*= 0*/);
 /* 获取当前 UTC 时间 */
 SOCKET_API __time64_t HP_HttpCookie_HLP_CurrentUTCTime();
 /* Max-Age -> expires */
@@ -523,7 +523,7 @@ SOCKET_API int HP_HttpCookie_HLP_ExpiresToMaxAge(__time64_t tmExpires);
 SOCKET_API DWORD HP_GetHPSocketVersion();
 
 // 获取错误描述文本
-SOCKET_API LPCTSTR HP_GetSocketErrorDesc(EnSocketError enCode);
+SOCKET_API const char* HP_GetSocketErrorDesc(EnSocketError enCode);
 // 调用系统的 GetLastError() 方法获取系统错误代码
 SOCKET_API DWORD SYS_GetLastError();
 // 调用系统的 WSAGetLastError() 方法获取系统错误代码
@@ -538,9 +538,9 @@ SOCKET_API int SYS_IoctlSocket(SOCKET sock, long cmd, u_long* arg);
 SOCKET_API int SYS_WSAIoctl(SOCKET sock, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuffer, LPVOID lpvOutBuffer, DWORD cbOutBuffer, LPDWORD lpcbBytesReturned);
 
 // 设置 socket 选项：IPPROTO_TCP -> TCP_NODELAY
-SOCKET_API int SYS_SSO_NoDelay(SOCKET sock, BOOL bNoDelay);
+SOCKET_API int SYS_SSO_NoDelay(SOCKET sock, int bNoDelay);
 // 设置 socket 选项：SOL_SOCKET -> SO_DONTLINGER
-SOCKET_API int SYS_SSO_DontLinger(SOCKET sock, BOOL bDont);
+SOCKET_API int SYS_SSO_DontLinger(SOCKET sock, int bDont);
 // 设置 socket 选项：SOL_SOCKET -> SO_LINGER
 SOCKET_API int SYS_SSO_Linger(SOCKET sock, USHORT l_onoff, USHORT l_linger);
 // 设置 socket 选项：SOL_SOCKET -> SO_RCVBUF
@@ -548,21 +548,21 @@ SOCKET_API int SYS_SSO_RecvBuffSize(SOCKET sock, int size);
 // 设置 socket 选项：SOL_SOCKET -> SO_SNDBUF
 SOCKET_API int SYS_SSO_SendBuffSize(SOCKET sock, int size);
 // 设置 socket 选项：SOL_SOCKET -> SO_REUSEADDR
-SOCKET_API int SYS_SSO_ReuseAddress(SOCKET sock, BOOL bReuse);
+SOCKET_API int SYS_SSO_ReuseAddress(SOCKET sock, int bReuse);
 
 // 获取 SOCKET 本地地址信息
-SOCKET_API BOOL SYS_GetSocketLocalAddress(SOCKET socket, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
+SOCKET_API int SYS_GetSocketLocalAddress(SOCKET socket, char lpszAddress[], int& iAddressLen, USHORT& usPort);
 // 获取 SOCKET 远程地址信息
-SOCKET_API BOOL SYS_GetSocketRemoteAddress(SOCKET socket, TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
+SOCKET_API int SYS_GetSocketRemoteAddress(SOCKET socket, char lpszAddress[], int& iAddressLen, USHORT& usPort);
 
 /* 枚举主机 IP 地址 */
-SOCKET_API BOOL SYS_EnumHostIPAddresses(LPCTSTR lpszHost, EnIPAddrType enType, LPTIPAddr** lpppIPAddr, int& iIPAddrCount);
+SOCKET_API int SYS_EnumHostIPAddresses(const char* lpszHost, EnIPAddrType enType, LPTIPAddr** lpppIPAddr, int& iIPAddrCount);
 /* 释放 LPTIPAddr* */
-SOCKET_API BOOL SYS_FreeHostIPAddresses(LPTIPAddr* lppIPAddr);
+SOCKET_API int SYS_FreeHostIPAddresses(LPTIPAddr* lppIPAddr);
 /* 检查字符串是否符合 IP 地址格式 */
-SOCKET_API BOOL SYS_IsIPAddress(LPCTSTR lpszAddress, EnIPAddrType* penType = nullptr);
+SOCKET_API int SYS_IsIPAddress(const char* lpszAddress, EnIPAddrType* penType = nullptr);
 /* 通过主机名获取 IP 地址 */
-SOCKET_API BOOL SYS_GetIPAddress(LPCTSTR lpszHost, TCHAR lpszIP[], int& iIPLenth, EnIPAddrType& enType);
+SOCKET_API int SYS_GetIPAddress(const char* lpszHost, TCHAR lpszIP[], int& iIPLenth, EnIPAddrType& enType);
 
 /* 64 位网络字节序转主机字节序 */
 SOCKET_API ULONGLONG SYS_NToH64(ULONGLONG value);
@@ -570,21 +570,21 @@ SOCKET_API ULONGLONG SYS_NToH64(ULONGLONG value);
 SOCKET_API ULONGLONG SYS_HToN64(ULONGLONG value);
 
 // CP_XXX -> UNICODE
-SOCKET_API BOOL SYS_CodePageToUnicode(int iCodePage, const char szSrc[], WCHAR szDest[], int& iDestLength);
+SOCKET_API int SYS_CodePageToUnicode(int iCodePage, const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> CP_XXX
-SOCKET_API BOOL SYS_UnicodeToCodePage(int iCodePage, const WCHAR szSrc[], char szDest[], int& iDestLength);
+SOCKET_API int SYS_UnicodeToCodePage(int iCodePage, const wchar_t szSrc[], char szDest[], int& iDestLength);
 // GBK -> UNICODE
-SOCKET_API BOOL SYS_GbkToUnicode(const char szSrc[], WCHAR szDest[], int& iDestLength);
+SOCKET_API int SYS_GbkToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> GBK
-SOCKET_API BOOL SYS_UnicodeToGbk(const WCHAR szSrc[], char szDest[], int& iDestLength);
+SOCKET_API int SYS_UnicodeToGbk(const wchar_t szSrc[], char szDest[], int& iDestLength);
 // UTF8 -> UNICODE
-SOCKET_API BOOL SYS_Utf8ToUnicode(const char szSrc[], WCHAR szDest[], int& iDestLength);
+SOCKET_API int SYS_Utf8ToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> UTF8
-SOCKET_API BOOL SYS_UnicodeToUtf8(const WCHAR szSrc[], char szDest[], int& iDestLength);
+SOCKET_API int SYS_UnicodeToUtf8(const wchar_t szSrc[], char szDest[], int& iDestLength);
 // GBK -> UTF8
-SOCKET_API BOOL SYS_GbkToUtf8(const char szSrc[], char szDest[], int& iDestLength);
+SOCKET_API int SYS_GbkToUtf8(const char szSrc[], char szDest[], int& iDestLength);
 // UTF8 -> GBK
-SOCKET_API BOOL SYS_Utf8ToGbk(const char szSrc[], char szDest[], int& iDestLength);
+SOCKET_API int SYS_Utf8ToGbk(const char szSrc[], char szDest[], int& iDestLength);
 
 // 普通压缩（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
 SOCKET_API int SYS_Compress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
@@ -597,7 +597,7 @@ SOCKET_API int SYS_Uncompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDes
 //（默认参数：iWindowBits -> 15）
 SOCKET_API int SYS_UncompressEx(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen, int iWindowBits = 15);
 // 推测压缩结果长度
-SOCKET_API DWORD SYS_GuessCompressBound(DWORD dwSrcLen, BOOL bGZip = FALSE);
+SOCKET_API DWORD SYS_GuessCompressBound(DWORD dwSrcLen, int bGZip = FALSE);
 
 // Gzip 压缩（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
 SOCKET_API int SYS_GZipCompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);

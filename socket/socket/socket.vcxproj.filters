@@ -45,6 +45,18 @@
     <ClInclude Include="src\HPSocket.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\TcpClient.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TcpPackClient.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TcpPackServer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MiscHelper.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +72,18 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="src\HPSocket.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpPackClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TcpPackServer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MiscHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

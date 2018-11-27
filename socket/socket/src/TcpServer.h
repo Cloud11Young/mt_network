@@ -11,7 +11,7 @@ class CTcpServer : public ITcpServer
 public:
 	virtual int Start	(const char* lpszBindAddress, unsigned short usPort);
 	virtual int Stop	();
-	virtual int Send	(CONNID dwConnID, const byte* pBuffer, int iLength, int iOffset = 0);
+	virtual int Send	(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset = 0);
 	virtual int SendSmallFile(CONNID dwConnID, const char* lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr);
 	virtual int SendPackets	(CONNID dwConnID, const WSABUF pBuffers[], int iCount)	{return DoSendPackets(dwConnID, pBuffers, iCount);}
 	virtual int			HasStarted					()	{return m_enState == SS_STARTED || m_enState == SS_STARTING;}

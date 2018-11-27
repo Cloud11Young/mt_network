@@ -47,9 +47,9 @@ ULONGLONG GetTimeGap64(ULONGLONG ullOriginal)
 }
 #endif
 
-BOOL PeekMessageLoop(BOOL bDispatchQuitMsg)
+int PeekMessageLoop(int bDispatchQuitMsg)
 {
-	BOOL value = TRUE;
+	int value = TRUE;
 
 	MSG msg;
 	while(::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -101,7 +101,7 @@ DWORD WaitForMultipleObjectsWithMessageLoop(DWORD dwHandles, HANDLE szHandles[],
 
 }
 
-BOOL MsgWaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds, DWORD dwWakeMask, DWORD dwFlags)
+int MsgWaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds, DWORD dwWakeMask, DWORD dwFlags)
 {
 	DWORD dwResult = WaitForMultipleObjectsWithMessageLoop(1, &hHandle, dwMilliseconds, dwWakeMask, dwFlags);
 

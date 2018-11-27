@@ -30,7 +30,7 @@
 
 const CInitSocket CTcpClient::sm_wsSocket;
 
-BOOL CTcpClient::Start(LPCTSTR lpszRemoteAddress, USHORT usPort, BOOL bAsyncConnect, LPCTSTR lpszBindAddress)
+int CTcpClient::Start(const char* lpszRemoteAddress, USHORT usPort, int bAsyncConnect, const char* lpszBindAddress)
 {
 	if(!CheckParams() || !CheckStarting())
 		return FALSE;
@@ -38,7 +38,7 @@ BOOL CTcpClient::Start(LPCTSTR lpszRemoteAddress, USHORT usPort, BOOL bAsyncConn
 	PrepareStart();
 	m_ccContext.Reset();
 
-	BOOL isOK		= FALSE;
+	int isOK		= FALSE;
 	m_bAsyncConnect	= bAsyncConnect;
 
 	HP_SOCKADDR addrRemote, addrBind;
@@ -81,7 +81,7 @@ BOOL CTcpClient::Start(LPCTSTR lpszRemoteAddress, USHORT usPort, BOOL bAsyncConn
 	return isOK;
 }
 
-BOOL CTcpClient::CheckParams()
+int CTcpClient::CheckParams()
 {
 	if	(((int)m_dwSocketBufferSize > 0)									&&
 		((int)m_dwFreeBufferPoolSize >= 0)									&&
@@ -103,7 +103,7 @@ void CTcpClient::PrepareStart()
 	m_itPool.Prepare();
 }
 
-BOOL CTcpClient::CheckStarting()
+int CTcpClient::CheckStarting()
 {
 	CSpinLock locallock(m_csState);
 
@@ -118,7 +118,7 @@ BOOL CTcpClient::CheckStarting()
 	return TRUE;
 }
 
-BOOL CTcpClient::CheckStoping(DWORD dwCurrentThreadID)
+int CTcpClient::CheckStoping(DWORD dwCurrentThreadID)
 {
 	if(m_enState == SS_STOPPED)
 		return FALSE;
@@ -166,7 +166,7 @@ int CTcpClient::CreateClientSocket(const char* lpszRemoteAddress, HP_SOCKADDR& a
 	if(m_soClient == INVALID_SOCKET)
 		return FALSE;
 
-	BOOL bOnOff	= (m_dwKeepAliveTime > 0 && m_dwKeepAliveInterval > 0);
+	int bOnOff	= (m_dwKeepAliveTime > 0 && m_dwKeepAliveInterval > 0);
 	VERIFY(::SSO_KeepAliveVals(m_soClient, bOnOff, m_dwKeepAliveTime, m_dwKeepAliveInterval) == NO_ERROR);
 
 	m_evSocket = ::WSACreateEvent();
@@ -177,7 +177,7 @@ int CTcpClient::CreateClientSocket(const char* lpszRemoteAddress, HP_SOCKADDR& a
 	return TRUE;
 }
 
-BOOL CTcpClient::BindClientSocket(const HP_SOCKADDR& addrBind)
+int CTcpClient::BindClientSocket(const HP_SOCKADDR& addrBind)
 {
 	if(addrBind.IsSpecified() && (::bind(m_soClient, addrBind.Addr(), addrBind.AddrSize()) == SOCKET_ERROR))
 		return FALSE;
@@ -187,9 +187,9 @@ BOOL CTcpClient::BindClientSocket(const HP_SOCKADDR& addrBind)
 	return TRUE;
 }
 
-BOOL CTcpClient::ConnectToServer(const HP_SOCKADDR& addrRemote)
+int CTcpClient::ConnectToServer(const HP_SOCKADDR& addrRemote)
 {
-	BOOL isOK = FALSE;
+	int isOK = FALSE;
 
 	if(m_bAsyncConnect)
 	{
@@ -217,7 +217,7 @@ BOOL CTcpClient::ConnectToServer(const HP_SOCKADDR& addrRemote)
 	return isOK;
 }
 
-BOOL CTcpClient::CreateWorkerThread()
+int CTcpClient::CreateWorkerThread()
 {
 	m_hWorker = (HANDLE)_beginthreadex(nullptr, 0, WorkerThreadProc, (LPVOID)this, 0, &m_dwWorkerID);
 
@@ -228,7 +228,7 @@ UINT WINAPI CTcpClient::WorkerThreadProc(LPVOID pv)
 {
 	TRACE("---------------> Client Worker Thread 0x%08X started <---------------\n", ::GetCurrentThreadId());
 
-	BOOL bCallStop		= TRUE;
+	int bCallStop		= TRUE;
 	CTcpClient* pClient	= (CTcpClient*)pv;
 	HANDLE hEvents[]	= {pClient->m_evSocket, pClient->m_evBuffer, pClient->m_evWorker};
 
@@ -272,9 +272,9 @@ UINT WINAPI CTcpClient::WorkerThreadProc(LPVOID pv)
 	return 0;
 }
 
-BOOL CTcpClient::ProcessNetworkEvent()
+int CTcpClient::ProcessNetworkEvent()
 {
-	BOOL bContinue = TRUE;
+	int bContinue = TRUE;
 	WSANETWORKEVENTS events;
 	
 	int rc = ::WSAEnumNetworkEvents(m_soClient, m_evSocket, &events);
@@ -297,7 +297,7 @@ BOOL CTcpClient::ProcessNetworkEvent()
 	return bContinue;
 }
 
-BOOL CTcpClient::HandleError(WSANETWORKEVENTS& events)
+int CTcpClient::HandleError(WSANETWORKEVENTS& events)
 {
 	int iCode						= ::WSAGetLastError();
 	EnSocketOperation enOperation	= SO_UNKNOWN;
@@ -317,9 +317,9 @@ BOOL CTcpClient::HandleError(WSANETWORKEVENTS& events)
 	return FALSE;
 }
 
-BOOL CTcpClient::HandleRead(WSANETWORKEVENTS& events)
+int CTcpClient::HandleRead(WSANETWORKEVENTS& events)
 {
-	BOOL bContinue	= TRUE;
+	int bContinue	= TRUE;
 	int iCode		= events.iErrorCode[FD_READ_BIT];
 
 	if(iCode == 0)
@@ -333,9 +333,9 @@ BOOL CTcpClient::HandleRead(WSANETWORKEVENTS& events)
 	return bContinue;
 }
 
-BOOL CTcpClient::HandleWrite(WSANETWORKEVENTS& events)
+int CTcpClient::HandleWrite(WSANETWORKEVENTS& events)
 {
-	BOOL bContinue	= TRUE;
+	int bContinue	= TRUE;
 	int iCode		= events.iErrorCode[FD_WRITE_BIT];
 
 	if(iCode == 0)
@@ -349,9 +349,9 @@ BOOL CTcpClient::HandleWrite(WSANETWORKEVENTS& events)
 	return bContinue;
 }
 
-BOOL CTcpClient::HandleConnect(WSANETWORKEVENTS& events)
+int CTcpClient::HandleConnect(WSANETWORKEVENTS& events)
 {
-	BOOL bContinue	= TRUE;
+	int bContinue	= TRUE;
 	int iCode		= events.iErrorCode[FD_CONNECT_BIT];
 
 	if(iCode == 0)
@@ -380,7 +380,7 @@ BOOL CTcpClient::HandleConnect(WSANETWORKEVENTS& events)
 	return bContinue;
 }
 
-BOOL CTcpClient::HandleClose(WSANETWORKEVENTS& events)
+int CTcpClient::HandleClose(WSANETWORKEVENTS& events)
 {
 	int iCode = events.iErrorCode[FD_CLOSE_BIT];
 
@@ -392,7 +392,7 @@ BOOL CTcpClient::HandleClose(WSANETWORKEVENTS& events)
 	return FALSE;
 }
 
-BOOL CTcpClient::ReadData()
+int CTcpClient::ReadData()
 {
 	while(TRUE)
 	{
@@ -432,9 +432,9 @@ BOOL CTcpClient::ReadData()
 	return TRUE;
 }
 
-BOOL CTcpClient::SendData()
+int CTcpClient::SendData()
 {
-	BOOL isOK = TRUE;
+	int isOK = TRUE;
 
 	while(TRUE)
 	{
@@ -481,7 +481,7 @@ TItem* CTcpClient::GetSendBuffer()
 	return pItem;
 }
 
-BOOL CTcpClient::DoSendData(TItem* pItem)
+int CTcpClient::DoSendData(TItem* pItem)
 {
 	while(!pItem->IsEmpty())
 	{
@@ -523,7 +523,7 @@ BOOL CTcpClient::DoSendData(TItem* pItem)
 	return TRUE;
 }
 
-BOOL CTcpClient::Stop()
+int CTcpClient::Stop()
 {
 	DWORD dwCurrentThreadID = ::GetCurrentThreadId();
 
@@ -587,7 +587,7 @@ void CTcpClient::WaitForWorkerThreadEnd(DWORD dwCurrentThreadID)
 	}
 }
 
-BOOL CTcpClient::Send(const BYTE* pBuffer, int iLength, int iOffset)
+int CTcpClient::Send(const BYTE* pBuffer, int iLength, int iOffset)
 {
 	ASSERT(pBuffer && iLength > 0);
 
@@ -600,7 +600,7 @@ BOOL CTcpClient::Send(const BYTE* pBuffer, int iLength, int iOffset)
 	return SendPackets(&buffer, 1);
 }
 
-BOOL CTcpClient::DoSendPackets(const WSABUF pBuffers[], int iCount)
+int CTcpClient::DoSendPackets(const WSABUF pBuffers[], int iCount)
 {
 	ASSERT(pBuffers && iCount > 0);
 
@@ -629,14 +629,14 @@ BOOL CTcpClient::DoSendPackets(const WSABUF pBuffers[], int iCount)
 	return (result == NO_ERROR);
 }
 
-BOOL CTcpClient::SendInternal(const WSABUF pBuffers[], int iCount)
+int CTcpClient::SendInternal(const WSABUF pBuffers[], int iCount)
 {
 	int result = NO_ERROR;
 
 	ASSERT(m_iPending >= 0);
 
 	int iPending	= m_iPending;
-	BOOL isPending	= m_iPending > 0;
+	int isPending	= m_iPending > 0;
 
 	for(int i = 0; i < iCount; i++)
 	{
@@ -657,7 +657,7 @@ BOOL CTcpClient::SendInternal(const WSABUF pBuffers[], int iCount)
 	return result;
 }
 
-BOOL CTcpClient::SendSmallFile(LPCTSTR lpszFileName, const LPWSABUF pHead, const LPWSABUF pTail)
+int CTcpClient::SendSmallFile(const char* lpszFileName, const LPWSABUF pHead, const LPWSABUF pTail)
 {
 	CAtlFile file;
 	CAtlFileMapping<> fmap;
@@ -682,22 +682,22 @@ void CTcpClient::SetLastError(EnSocketError code, LPCSTR func, int ec)
 	::SetLastError(ec);
 }
 
-BOOL CTcpClient::GetLocalAddress(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)
+int CTcpClient::GetLocalAddress(char lpszAddress[], int& iAddressLen, USHORT& usPort)
 {
 	ASSERT(lpszAddress != nullptr && iAddressLen > 0);
 
 	return ::GetSocketLocalAddress(m_soClient, lpszAddress, iAddressLen, usPort);
 }
 
-void CTcpClient::SetRemoteHost(LPCTSTR lpszHost, USHORT usPort)
+void CTcpClient::SetRemoteHost(const char* lpszHost, USHORT usPort)
 {
 	m_strHost = lpszHost;
 	m_usPort  = usPort;
 }
 
-BOOL CTcpClient::GetRemoteHost(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)
+int CTcpClient::GetRemoteHost(char lpszHost[], int& iHostLen, USHORT& usPort)
 {
-	BOOL isOK = FALSE;
+	int isOK = FALSE;
 
 	if(m_strHost.IsEmpty())
 		return isOK;
@@ -706,7 +706,7 @@ BOOL CTcpClient::GetRemoteHost(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)
 
 	if(iHostLen >= iLen)
 	{
-		memcpy(lpszHost, CA2CT(m_strHost), iLen * sizeof(TCHAR));
+		memcpy(lpszHost, CA2CT(m_strHost), iLen * sizeof(char));
 		usPort = m_usPort;
 
 		isOK = TRUE;
@@ -718,7 +718,7 @@ BOOL CTcpClient::GetRemoteHost(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)
 }
 
 
-BOOL CTcpClient::GetRemoteHost(LPCSTR* lpszHost, USHORT* pusPort)
+int CTcpClient::GetRemoteHost(const char** lpszHost, USHORT* pusPort)
 {
 	*lpszHost = m_strHost;
 

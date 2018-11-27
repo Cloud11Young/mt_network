@@ -33,7 +33,7 @@
 class CTcpClient : public ITcpClient
 {
 public:
-	virtual int Start	(LPCTSTR lpszRemoteAddress, USHORT usPort, int bAsyncConnect = TRUE, LPCTSTR lpszBindAddress = nullptr);
+	virtual int Start	(const char* lpszRemoteAddress, USHORT usPort, int bAsyncConnect = TRUE, const char* lpszBindAddress = nullptr);
 	virtual int Stop	();
 	virtual int Send	(const BYTE* pBuffer, int iLength, int iOffset = 0);
 	virtual int SendSmallFile	(const char* lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr);
@@ -44,14 +44,9 @@ public:
 	virtual EnSocketError	GetLastError		()	{return m_enLastError;}
 	virtual const char*		GetLastErrorDesc	()	{return ::GetSocketErrorDesc(m_enLastError);}
 
-	virtual int GetLocalAddress		(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort);
-	virtual int GetRemoteHost			(TCHAR lpszHost[], int& iHostLen, USHORT& usPort);
+	virtual int GetLocalAddress		(char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int GetRemoteHost			(char lpszHost[], int& iHostLen, USHORT& usPort);
 	virtual int GetPendingDataLength	(int& iPending) {iPending = m_iPending; return HasStarted();}
-
-#ifdef _SSL_SUPPORT
-	virtual int SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, LPCTSTR lpszPemCertFile = nullptr, LPCTSTR lpszPemKeyFile = nullptr, LPCTSTR lpszKeyPasswod = nullptr, LPCTSTR lpszCAPemCertFileOrPath = nullptr)	{return FALSE;}
-	virtual void CleanupSSLContext	()																																													{}
-#endif
 
 public:
 	virtual int IsSecure				() {return FALSE;}
@@ -120,14 +115,14 @@ protected:
 protected:
 	void SetReserved	(PVOID pReserved)	{m_pReserved = pReserved;}						
 	PVOID GetReserved	()					{return m_pReserved;}
-	int GetRemoteHost	(LPCSTR* lpszHost, USHORT* pusPort = nullptr);
+	int GetRemoteHost	(const char** lpszHost, USHORT* pusPort = nullptr);
 
 private:
-	void SetRemoteHost	(LPCTSTR lpszHost, USHORT usPort);
+	void SetRemoteHost	(const char* lpszHost, USHORT usPort);
 
 	int CheckStarting();
 	int CheckStoping(DWORD dwCurrentThreadID);
-	int CreateClientSocket(LPCTSTR lpszRemoteAddress, HP_SOCKADDR& addrRemote, USHORT usPort, LPCTSTR lpszBindAddress, HP_SOCKADDR& addrBind);
+	int CreateClientSocket(const char* lpszRemoteAddress, HP_SOCKADDR& addrRemote, USHORT usPort, const char* lpszBindAddress, HP_SOCKADDR& addrBind);
 	int BindClientSocket(const HP_SOCKADDR& addrBind);
 	int ConnectToServer(const HP_SOCKADDR& addrRemote);
 	int CreateWorkerThread();

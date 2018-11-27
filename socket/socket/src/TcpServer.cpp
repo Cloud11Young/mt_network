@@ -82,7 +82,7 @@ void CTcpServer::SetLastError(EnSocketError code, LPCSTR func, int ec)
 	TRACE("%s --> Error: %d, EC: %d\n", func, code, ec);
 }
 
-BOOL CTcpServer::Start(const char* lpszBindAddress, unsigned short usPort)
+int CTcpServer::Start(const char* lpszBindAddress, unsigned short usPort)
 {
 	if(!CheckParams() || !CheckStarting())
 		return FALSE;
@@ -107,7 +107,7 @@ BOOL CTcpServer::Start(const char* lpszBindAddress, unsigned short usPort)
 	return FALSE;
 }
 
-BOOL CTcpServer::CheckParams()
+int CTcpServer::CheckParams()
 {
 	if	((m_enSendPolicy >= SP_PACK && m_enSendPolicy <= SP_DIRECT)								&&
 		((int)m_dwMaxConnectionCount > 0)														&&
@@ -140,7 +140,7 @@ void CTcpServer::PrepareStart()
 	m_bfObjPool.Prepare();
 }
 
-BOOL CTcpServer::CheckStarting()
+int CTcpServer::CheckStarting()
 {
 	CSpinLock locallock(m_csState);
 
@@ -155,7 +155,7 @@ BOOL CTcpServer::CheckStarting()
 	return TRUE;
 }
 
-BOOL CTcpServer::CheckStoping()
+int CTcpServer::CheckStoping()
 {
 	if(m_enState == SS_STOPPED)
 		return FALSE;
@@ -178,9 +178,9 @@ BOOL CTcpServer::CheckStoping()
 	return FALSE;
 }
 
-BOOL CTcpServer::CreateListenSocket(const char* lpszBindAddress, unsigned short usPort)
+int CTcpServer::CreateListenSocket(const char* lpszBindAddress, unsigned short usPort)
 {
-	BOOL isOK = FALSE;
+	int isOK = FALSE;
 
 	if(!lpszBindAddress || lpszBindAddress[0] == 0)
 		lpszBindAddress = DEFAULT_IPV4_BIND_ADDRESS;
@@ -194,7 +194,7 @@ BOOL CTcpServer::CreateListenSocket(const char* lpszBindAddress, unsigned short 
 
 		if(m_soListen != INVALID_SOCKET)
 		{
-			BOOL bOnOff	= (m_dwKeepAliveTime > 0 && m_dwKeepAliveInterval > 0);
+			int bOnOff	= (m_dwKeepAliveTime > 0 && m_dwKeepAliveInterval > 0);
 			::SSO_KeepAliveVals(m_soListen, bOnOff, m_dwKeepAliveTime, m_dwKeepAliveInterval);
 			::SSO_NoBlock(m_soListen);
 			
@@ -232,7 +232,7 @@ BOOL CTcpServer::CreateListenSocket(const char* lpszBindAddress, unsigned short 
 	return isOK;
 }
 
-BOOL CTcpServer::CreateCompletePort()
+int CTcpServer::CreateCompletePort()
 {
 	m_hCompletePort	= ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	if(m_hCompletePort == nullptr)
@@ -241,9 +241,9 @@ BOOL CTcpServer::CreateCompletePort()
 	return (m_hCompletePort != nullptr);
 }
 
-BOOL CTcpServer::CreateWorkerThreads()
+int CTcpServer::CreateWorkerThreads()
 {
-	BOOL isOK = TRUE;
+	int isOK = TRUE;
 
 	for(DWORD i = 0; i < m_dwWorkerThreadCount; i++)
 	{
@@ -261,9 +261,9 @@ BOOL CTcpServer::CreateWorkerThreads()
 	return isOK;
 }
 
-BOOL CTcpServer::StartAccept()
+int CTcpServer::StartAccept()
 {
-	BOOL isOK = TRUE;
+	int isOK = TRUE;
 
 	if(::CreateIoCompletionPort((HANDLE)m_soListen, m_hCompletePort, m_soListen, 0))
 	{
@@ -281,7 +281,7 @@ BOOL CTcpServer::StartAccept()
 	return isOK;
 }
 
-BOOL CTcpServer::Stop()
+int CTcpServer::Stop()
 {
 	if(!CheckStoping())
 		return FALSE;
@@ -385,7 +385,7 @@ void CTcpServer::AddFreeSocketObj(TSocketObj* pSocketObj, EnSocketCloseFlag enFl
 	}
 }
 
-void CTcpServer::ReleaseGCSocketObj(BOOL bForce)
+void CTcpServer::ReleaseGCSocketObj(int bForce)
 {
 	TSocketObj* pSocketObj	= nullptr;
 	DWORD now				= ::TimeGetTime();
@@ -402,9 +402,9 @@ void CTcpServer::ReleaseGCSocketObj(BOOL bForce)
 	}
 }
 
-BOOL CTcpServer::InvalidSocketObj(TSocketObj* pSocketObj)
+int CTcpServer::InvalidSocketObj(TSocketObj* pSocketObj)
 {
-	BOOL bDone = FALSE;
+	int bDone = FALSE;
 
 	if(TSocketObj::IsValid(pSocketObj))
 	{
@@ -528,7 +528,7 @@ int CTcpServer::GetLocalAddress(CONNID dwConnID, char lpszAddress[], int& iAddre
 	return FALSE;
 }
 
-BOOL CTcpServer::GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort)
+int CTcpServer::GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort)
 {
 	ASSERT(lpszAddress != nullptr && iAddressLen > 0);
 
@@ -543,13 +543,13 @@ BOOL CTcpServer::GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAdd
 	return FALSE;
 }
 
-BOOL CTcpServer::SetConnectionExtra(CONNID dwConnID, PVOID pExtra)
+int CTcpServer::SetConnectionExtra(CONNID dwConnID, PVOID pExtra)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionExtra(pSocketObj, pExtra);
 }
 
-BOOL CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra)
+int CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -560,13 +560,13 @@ BOOL CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra)
 	return FALSE;
 }
 
-BOOL CTcpServer::GetConnectionExtra(CONNID dwConnID, PVOID* ppExtra)
+int CTcpServer::GetConnectionExtra(CONNID dwConnID, PVOID* ppExtra)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionExtra(pSocketObj, ppExtra);
 }
 
-BOOL CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra)
+int CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra)
 {
 	ASSERT(ppExtra != nullptr);
 
@@ -579,13 +579,13 @@ BOOL CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra)
 	return FALSE;
 }
 
-BOOL CTcpServer::SetConnectionReserved(CONNID dwConnID, PVOID pReserved)
+int CTcpServer::SetConnectionReserved(CONNID dwConnID, PVOID pReserved)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionReserved(pSocketObj, pReserved);
 }
 
-BOOL CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved)
+int CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -596,13 +596,13 @@ BOOL CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved)
 	return FALSE;
 }
 
-BOOL CTcpServer::GetConnectionReserved(CONNID dwConnID, PVOID* ppReserved)
+int CTcpServer::GetConnectionReserved(CONNID dwConnID, PVOID* ppReserved)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionReserved(pSocketObj, ppReserved);
 }
 
-BOOL CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved)
+int CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved)
 {
 	ASSERT(ppReserved != nullptr);
 
@@ -615,13 +615,13 @@ BOOL CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved
 	return FALSE;
 }
 
-BOOL CTcpServer::SetConnectionReserved2(CONNID dwConnID, PVOID pReserved2)
+int CTcpServer::SetConnectionReserved2(CONNID dwConnID, PVOID pReserved2)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionReserved2(pSocketObj, pReserved2);
 }
 
-BOOL CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2)
+int CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -632,13 +632,13 @@ BOOL CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2
 	return FALSE;
 }
 
-BOOL CTcpServer::GetConnectionReserved2(CONNID dwConnID, PVOID* ppReserved2)
+int CTcpServer::GetConnectionReserved2(CONNID dwConnID, PVOID* ppReserved2)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionReserved2(pSocketObj, ppReserved2);
 }
 
-BOOL CTcpServer::GetConnectionReserved2(TSocketObj* pSocketObj, PVOID* ppReserved2)
+int CTcpServer::GetConnectionReserved2(TSocketObj* pSocketObj, PVOID* ppReserved2)
 {
 	ASSERT(ppReserved2 != nullptr);
 
@@ -651,7 +651,7 @@ BOOL CTcpServer::GetConnectionReserved2(TSocketObj* pSocketObj, PVOID* ppReserve
 	return FALSE;
 }
 
-BOOL CTcpServer::GetPendingDataLength(CONNID dwConnID, int& iPending)
+int CTcpServer::GetPendingDataLength(CONNID dwConnID, int& iPending)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 
@@ -669,14 +669,14 @@ DWORD CTcpServer::GetConnectionCount()
 	return m_bfActiveSockets.Elements();
 }
 
-BOOL CTcpServer::GetAllConnectionIDs(CONNID pIDs[], DWORD& dwCount)
+int CTcpServer::GetAllConnectionIDs(CONNID pIDs[], DWORD& dwCount)
 {
 	return m_bfActiveSockets.GetAllElementIndexes(pIDs, dwCount);
 }
 
-BOOL CTcpServer::GetConnectPeriod(CONNID dwConnID, DWORD& dwPeriod)
+int CTcpServer::GetConnectPeriod(CONNID dwConnID, DWORD& dwPeriod)
 {
-	BOOL isOK				= TRUE;
+	int isOK				= TRUE;
 	TSocketObj* pSocketObj	= FindSocketObj(dwConnID);
 
 	if(TSocketObj::IsValid(pSocketObj))
@@ -687,12 +687,12 @@ BOOL CTcpServer::GetConnectPeriod(CONNID dwConnID, DWORD& dwPeriod)
 	return isOK;
 }
 
-BOOL CTcpServer::GetSilencePeriod(CONNID dwConnID, DWORD& dwPeriod)
+int CTcpServer::GetSilencePeriod(CONNID dwConnID, DWORD& dwPeriod)
 {
 	if(!m_bMarkSilence)
 		return FALSE;
 
-	BOOL isOK				= TRUE;
+	int isOK				= TRUE;
 	TSocketObj* pSocketObj	= FindSocketObj(dwConnID);
 
 	if(TSocketObj::IsValid(pSocketObj))
@@ -703,9 +703,9 @@ BOOL CTcpServer::GetSilencePeriod(CONNID dwConnID, DWORD& dwPeriod)
 	return isOK;
 }
 
-BOOL CTcpServer::Disconnect(CONNID dwConnID, BOOL bForce)
+int CTcpServer::Disconnect(CONNID dwConnID, int bForce)
 {
-	BOOL isOK				= FALSE;
+	int isOK				= FALSE;
 	TSocketObj* pSocketObj	= FindSocketObj(dwConnID);
 
 	if(TSocketObj::IsValid(pSocketObj))
@@ -719,7 +719,7 @@ BOOL CTcpServer::Disconnect(CONNID dwConnID, BOOL bForce)
 	return isOK;
 }
 
-BOOL CTcpServer::DisconnectLongConnections(DWORD dwPeriod, BOOL bForce)
+int CTcpServer::DisconnectLongConnections(DWORD dwPeriod, int bForce)
 {
 	if(dwPeriod > MAX_CONNECTION_PERIOD)
 		return FALSE;
@@ -740,7 +740,7 @@ BOOL CTcpServer::DisconnectLongConnections(DWORD dwPeriod, BOOL bForce)
 	return TRUE;
 }
 
-BOOL CTcpServer::DisconnectSilenceConnections(DWORD dwPeriod, BOOL bForce)
+int CTcpServer::DisconnectSilenceConnections(DWORD dwPeriod, int bForce)
 {
 	if(!m_bMarkSilence)
 		return FALSE;
@@ -814,9 +814,9 @@ void CTcpServer::CloseCompletePort()
 	}
 }
 
-BOOL CTcpServer::DoAccept()
+int CTcpServer::DoAccept()
 {
-	BOOL isOK = FALSE;
+	int isOK = FALSE;
 
 	if(HasStarted())
 	{
@@ -857,7 +857,7 @@ UINT WINAPI CTcpServer::WorkerThreadProc(LPVOID pv)
 		OVERLAPPED* pOverlapped;
 		TSocketObj* pSocketObj;
 		
-		BOOL result = ::GetQueuedCompletionStatus
+		int result = ::GetQueuedCompletionStatus
 												(
 													pServer->m_hCompletePort,
 													&dwBytes,
@@ -1094,7 +1094,7 @@ void CTcpServer::HandleReceive(CONNID dwConnID, TSocketObj* pSocketObj, TBufferO
 	}
 }
 
-BOOL CTcpServer::ContinueReceive(TSocketObj* pSocketObj, TBufferObj* pBufferObj, EnHandleResult& hr)
+int CTcpServer::ContinueReceive(TSocketObj* pSocketObj, TBufferObj* pBufferObj, EnHandleResult& hr)
 {
 	int rs = NO_ERROR;
 
@@ -1144,7 +1144,7 @@ int CTcpServer::DoReceive(TSocketObj* pSocketObj, TBufferObj* pBufferObj)
 	return result;
 }
 
-BOOL CTcpServer::Send(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset)
+int CTcpServer::Send(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset)
 {
 	ASSERT(pBuffer && iLength > 0);
 
@@ -1157,7 +1157,7 @@ BOOL CTcpServer::Send(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOf
 	return SendPackets(dwConnID, &buffer, 1);
 }
 
-BOOL CTcpServer::DoSendPackets(CONNID dwConnID, const WSABUF pBuffers[], int iCount)
+int CTcpServer::DoSendPackets(CONNID dwConnID, const WSABUF pBuffers[], int iCount)
 {
 	ASSERT(pBuffers && iCount > 0);
 
@@ -1172,7 +1172,7 @@ BOOL CTcpServer::DoSendPackets(CONNID dwConnID, const WSABUF pBuffers[], int iCo
 	return DoSendPackets(pSocketObj, pBuffers, iCount);
 }
 
-BOOL CTcpServer::DoSendPackets(TSocketObj* pSocketObj, const WSABUF pBuffers[], int iCount)
+int CTcpServer::DoSendPackets(TSocketObj* pSocketObj, const WSABUF pBuffers[], int iCount)
 {
 	ASSERT(pSocketObj && pBuffers && iCount > 0);
 
@@ -1415,8 +1415,8 @@ void CTcpServer::CheckError(TSocketObj* pSocketObj, EnSocketOperation enOperatio
 }
 
 
-// BOOL CTcpServer::StartDataThread(){
-// 	BOOL isOK = TRUE;
+// int CTcpServer::StartDataThread(){
+// 	int isOK = TRUE;
 // 	
 // 	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, DataThreadProc, (LPVOID)this, 0, nullptr);
 // 	

@@ -54,18 +54,18 @@ DWORD GetDefaultTcpSocketBufferSize()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_FAMILY DetermineAddrFamily(LPCTSTR lpszAddress)
+ADDRESS_FAMILY DetermineAddrFamily(const char* lpszAddress)
 {
 	if (!lpszAddress || lpszAddress[0] == 0)
 		return AF_UNSPEC;
 
-	if(::StrChr(lpszAddress, IPV6_ADDR_SEPARATOR_CHAR))
+	if(::StrChrA(lpszAddress, IPV6_ADDR_SEPARATOR_CHAR))
 		return AF_INET6;
 
 	TCHAR c;
 	int arr[4];
 
-	if(stscanf_s(lpszAddress, _T("%d.%d.%d.%d%c"), &arr[0], &arr[1], &arr[2], &arr[3], &c, 1) != 4)
+	if(sscanf_s(lpszAddress, "%d.%d.%d.%d%c", &arr[0], &arr[1], &arr[2], &arr[3], &c, 1) != 4)
 		return AF_UNSPEC;
 
 	for(int i = 0; i < 4; i++)
@@ -77,7 +77,7 @@ ADDRESS_FAMILY DetermineAddrFamily(LPCTSTR lpszAddress)
 	return AF_INET;
 }
 
-int GetInAddr(LPCTSTR lpszAddress, HP_ADDR& addr)
+int GetInAddr(const char* lpszAddress, HP_ADDR& addr)
 {
 	addr.family = DetermineAddrFamily(lpszAddress);
 
@@ -85,7 +85,7 @@ int GetInAddr(LPCTSTR lpszAddress, HP_ADDR& addr)
 		return FALSE;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	return (::InetPton(addr.family, lpszAddress, addr.Addr()) == TRUE);
+	return (::InetPtonA(addr.family, lpszAddress, addr.Addr()) == TRUE);
 #else
 	HP_SOCKADDR sockAddr(addr.family);
 
@@ -98,7 +98,7 @@ int GetInAddr(LPCTSTR lpszAddress, HP_ADDR& addr)
 #endif
 }
 
-int GetSockAddr(LPCTSTR lpszAddress, USHORT usPort, HP_SOCKADDR& addr)
+int GetSockAddr(const char* lpszAddress, USHORT usPort, HP_SOCKADDR& addr)
 {
 	if(addr.family != AF_INET && addr.family != AF_INET6)
 	{
@@ -117,7 +117,7 @@ int GetSockAddr(LPCTSTR lpszAddress, USHORT usPort, HP_SOCKADDR& addr)
 	return TRUE;
 }
 
-int IsIPAddress(LPCTSTR lpszAddress, EnIPAddrType* penType)
+int IsIPAddress(const char* lpszAddress, EnIPAddrType* penType)
 {
 	HP_ADDR addr;
 
@@ -195,7 +195,7 @@ int GetSockAddrByHostNameDirectly(const char* lpszHost, USHORT usPort, HP_SOCKAD
 	return isOK;
 }
 
-int EnumHostIPAddresses(LPCTSTR lpszHost, EnIPAddrType enType, LPTIPAddr** lpppIPAddr, int& iIPAddrCount)
+int EnumHostIPAddresses(const char* lpszHost, EnIPAddrType enType, LPTIPAddr** lpppIPAddr, int& iIPAddrCount)
 {
 	*lpppIPAddr	 = nullptr;
 	iIPAddrCount = 0;
@@ -239,7 +239,7 @@ int EnumHostIPAddresses(LPCTSTR lpszHost, EnIPAddrType enType, LPTIPAddr** lpppI
 	hints.ai_flags	= AI_ALL;
 	hints.ai_family	= usFamily;
 
-	int rs = ::getaddrinfo(CT2A(lpszHost), nullptr, &hints, &pInfo);
+	int rs = ::getaddrinfo(lpszHost, nullptr, &hints, &pInfo);
 
 	if(rs != NO_ERROR)
 	{
@@ -469,32 +469,34 @@ LPFN_DISCONNECTEX Get_DisconnectEx_FuncPtr	(SOCKET sock)
 	return (LPFN_DISCONNECTEX)GetExtensionFuncPtr(sock, guid);
 }
 
-HRESULT ReadSmallFile(LPCTSTR lpszFileName, CAtlFile& file, CAtlFileMapping<>& fmap, DWORD dwMaxFileSize)
+HRESULT ReadSmallFile(const char* lpszFileName, CAtlFile& file, CAtlFileMapping<>& fmap, DWORD dwMaxFileSize)
 {
 	ASSERT(lpszFileName != nullptr);
 
-	HRESULT hr = file.Create(lpszFileName, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
+// 	HRESULT hr = file.Create(lpszFileName, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
+// 
+// 	if(SUCCEEDED(hr))
+// 	{
+// 		ULONGLONG ullLen;
+// 		hr = file.GetSize(ullLen);
+// 
+// 		if(SUCCEEDED(hr))
+// 		{
+// 			if(ullLen > 0 && ullLen <= dwMaxFileSize)
+// 				hr = fmap.MapFile(file);
+// 			else if(ullLen == 0)
+// 				hr = HRESULT_FROM_WIN32(ERROR_FILE_INVALID);
+// 			else
+// 				hr = HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE);
+// 		}
+// 	}
 
-	if(SUCCEEDED(hr))
-	{
-		ULONGLONG ullLen;
-		hr = file.GetSize(ullLen);
+//	return hr;
 
-		if(SUCCEEDED(hr))
-		{
-			if(ullLen > 0 && ullLen <= dwMaxFileSize)
-				hr = fmap.MapFile(file);
-			else if(ullLen == 0)
-				hr = HRESULT_FROM_WIN32(ERROR_FILE_INVALID);
-			else
-				hr = HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE);
-		}
-	}
-
-	return hr;
+	return 0;
 }
 
-HRESULT MakeSmallFilePackage(LPCTSTR lpszFileName, CAtlFile& file, CAtlFileMapping<>& fmap, WSABUF szBuf[3], const LPWSABUF pHead, const LPWSABUF pTail)
+HRESULT MakeSmallFilePackage(const char* lpszFileName, CAtlFile& file, CAtlFileMapping<>& fmap, WSABUF szBuf[3], const LPWSABUF pHead, const LPWSABUF pTail)
 {
 	DWORD dwMaxFileSize = MAX_SMALL_FILE_SIZE - (pHead ? pHead->len : 0) - (pTail ? pTail->len : 0);
 	ASSERT(dwMaxFileSize <= MAX_SMALL_FILE_SIZE);

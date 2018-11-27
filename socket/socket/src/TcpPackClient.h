@@ -30,7 +30,7 @@
 template<class T> class CTcpPackClientT : public IPackClient, public T
 {
 public:
-	virtual BOOL SendPackets(const WSABUF pBuffers[], int iCount)
+	virtual int SendPackets(const WSABUF pBuffers[], int iCount)
 	{
 		int iNewCount = iCount + 1;
 		unique_ptr<WSABUF[]> buffers(new WSABUF[iNewCount]);
@@ -48,7 +48,7 @@ protected:
 		return ParsePack(this, &m_pkInfo, &m_lsBuffer, pSender, m_dwMaxPackSize, m_usHeaderFlag, pData, iLength);
 	}
 
-	virtual BOOL CheckParams()
+	virtual int CheckParams()
 	{
 		if	((m_dwMaxPackSize > 0 && m_dwMaxPackSize <= TCP_PACK_MAX_SIZE_LIMIT)	&&
 			(m_usHeaderFlag >= 0 && m_usHeaderFlag <= TCP_PACK_HEADER_FLAG_LIMIT)	)
