@@ -6,3 +6,4 @@ ipch/
 *.pch
 *.res
 *.idb
+*.opensdf
