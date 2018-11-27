@@ -12,6 +12,7 @@ CNetComm::CNetComm():m_pServer(NULL),m_pClient(NULL){
 	m_pSrvListen = new ServerListener;
 	m_pClientListen = new ClientListener;
 	m_bConStart = FALSE;
+	memset(m_conIP, 0, sizeof(*m_conIP)*IP_LEN);
 }
 
 CNetComm::~CNetComm(){
@@ -29,7 +30,7 @@ void CNetComm::Release(){
 
 }
 
-BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, DWORD dwPort, wchar_t* strIp){//需要提供Server服务
+BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* strIp){//需要提供Server服务
 	m_pSrvListen->RegCallBack(callback);
 
 	m_pServer = HP_Create_TcpServer(m_pSrvListen);
@@ -38,9 +39,9 @@ BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, DWORD dwPort, wchar_t*
 
 	m_pServerCtrl = callback;
 
-	TCHAR cIP[64] = {0};
+	char cIP[64] = {0};
 	/*memcpy(cIP, strIp.GetBuffer(), 64);*/
-	wcscpy(cIP, strIp);
+	strcpy_s(cIP, strIp);
 	if (m_pServer->Start(cIP, dwPort)){
 		if (!m_pSrvListen->StartDataThread()){
 			return FALSE;
@@ -70,9 +71,11 @@ BOOL CNetComm::GetStatus(BOOL &bIsServer, BOOL &bIsClient){
 	return TRUE;
 }
 
-BOOL CNetComm::ConnectTo(wchar_t* pIP, DWORD uPort, BOOL bAutoReconnect/* = TRUE*/){
+BOOL CNetComm::ConnectTo(char* pIP, USHORT uPort, BOOL bAutoReconnect/* = TRUE*/){
 	m_bAutoReconnect = bAutoReconnect;
-	m_conIP = pIP;
+//	m_conIP = pIP;
+	if (pIP == NULL || strlen(pIP) == 0)	return FALSE;
+	strcpy_s(m_conIP, pIP);
 	m_conPort = uPort;
 
 	if (m_bAutoReconnect){
@@ -87,7 +90,7 @@ BOOL CNetComm::ConnectTo(wchar_t* pIP, DWORD uPort, BOOL bAutoReconnect/* = TRUE
 	return TRUE;	
 }
 
-BOOL CNetComm::Disconnect(wchar_t* pIP, DWORD uPort){
+int CNetComm::Disconnect(char* pIP, USHORT uPort){
 	if (m_pClient)
 		return m_pClient->Stop();
 	if (m_pServer){
@@ -111,7 +114,7 @@ BOOL CNetComm::Disconnect(wchar_t* pIP, DWORD uPort){
 	return FALSE;
 }
 
-BOOL CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, wchar_t* pIP, DWORD uPort, DWORD dwWay /*= SEND_ASYN*/){
+int CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, char* pIP, USHORT uPort, DWORD dwWay /*= SEND_ASYN*/){
 	PacketHead head;
 	head.DataSize = dwMsgLen;
 	head.DataType = 1;
@@ -122,7 +125,7 @@ BOOL CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, wchar_t* pIP, DWORD uPort, D
 	
 	BOOL bSend = FALSE;
 	if (m_pServer && m_pServer->HasStarted()){
-		CONNID id = m_pSrvListen->FindConnID(pIP, wcslen(pIP), uPort);		
+		CONNID id = m_pSrvListen->FindConnID(pIP, strlen(pIP), uPort);		
 		bSend = m_pServer->Send(id, (BYTE*)pTmp, sizeof(head) + dwMsgLen);
 	}
 
@@ -135,13 +138,13 @@ BOOL CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, wchar_t* pIP, DWORD uPort, D
 	return bSend;
 }
 
-BOOL CNetComm::GetSocket(wchar_t* pIP, DWORD uPort, list<HANDLE> SocketList){
+int CNetComm::GetSocket(char* pIP, USHORT uPort, list<HANDLE> SocketList){
 
 	return FALSE;
 }
 
-BOOL CNetComm::Uninitialize(){
-	BOOL isOK=FALSE;
+int CNetComm::Uninitialize(){
+	int isOK = FALSE;
 	if (m_pServer){
 		isOK = m_pServer->Stop();		
 	}
@@ -151,7 +154,7 @@ BOOL CNetComm::Uninitialize(){
 	return isOK;
 }
 
-BOOL CNetComm::StartConnectThread(CString IP, DWORD port){
+int CNetComm::StartConnectThread(const char* IP, USHORT port){
 	BOOL isOK = TRUE;
 
 	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, ConnectThread, (LPVOID)this, 0, nullptr);
@@ -172,7 +175,7 @@ UINT WINAPI CNetComm::ConnectThread(LPVOID p){
 		{
 			if (pNet->m_pClientCtrl != NULL && pNet->m_pClientCtrl->lpErrorCB)
 			{
-				pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP.GetBuffer(), pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
+				pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
 			}
 		}
 		Sleep(100);

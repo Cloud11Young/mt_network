@@ -5,6 +5,8 @@
 #include "../public/CriticalSection.h"
 #include "DataType.h"
 #include "INetComm.h"
+#include <deque>
+#include <map>
 
 class ServerListener :public CTcpServerListener{
 public:
@@ -20,7 +22,7 @@ public:
 	virtual EnHandleResult OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
 public:
 	RemoteAddress* FindRemoteAddr(CONNID dwConnID);
-	CONNID FindConnID(TCHAR* sIP, int IPLen, USHORT usPort);
+	CONNID FindConnID(char* sIP, int IPLen, USHORT usPort);
 	void DeleteRemoteAddr(CONNID dwConnID);	
 	void RegCallBack(PUSER_CB callback);
 	BOOL StartDataThread();

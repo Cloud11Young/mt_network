@@ -19,7 +19,7 @@ typedef struct {
 
 typedef struct {
 	CONNID  dwConnID;
-	TCHAR	pAddress[50];
+	char	pAddress[50];
 	int		iAddressLen;
 	USHORT	usPort;
 }RemoteAddress;

@@ -552,9 +552,9 @@ public:
 	/* 获取该组件对象的连接 ID */
 	virtual CONNID			GetConnectionID	()													= 0;
 	/* 获取 Client Socket 的地址信息 */
-	virtual int GetLocalAddress		(TCHAR lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
+	virtual int GetLocalAddress		(char lpszAddress[], int& iAddressLen, USHORT& usPort)	= 0;
 	/* 获取连接的远程主机信息 */
-	virtual int GetRemoteHost			(TCHAR lpszHost[], int& iHostLen, USHORT& usPort)		= 0;
+	virtual int GetRemoteHost			(char lpszHost[], int& iHostLen, USHORT& usPort)		= 0;
 	/* 获取连接中未发出数据的长度 */
 	virtual int GetPendingDataLength	(int& iPending)											= 0;
 

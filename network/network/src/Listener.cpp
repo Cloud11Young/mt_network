@@ -5,19 +5,19 @@
 #include <winsock2.h>
 #include "../public/HPSocket.h"
 
-static wchar_t* GetLastErrorToString(DWORD errorCode)
+static char* GetLastErrorToString(DWORD errorCode)
 {
 	//因为FORMAT_MESSAGE_ALLOCATE_BUFFER标志，这个函数帮你分配内存，所以需要LocalFree来释放
 
-	wchar_t *text;
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+	char *text=NULL;
+	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&text, 0, NULL);
+		text, 0, NULL);
 //	std::string str = WideToMultiByte(text);
 	//	CStringA result(text);    //结果
-	wchar_t* ptmp = new wchar_t[wcslen(text) + 1];
-	wcscpy(ptmp, text);
+	char* ptmp = new char[strlen(text) + 1];
+	strcpy_s(ptmp, strlen(text) + 1,text);
 	LocalFree(text);
 	return ptmp;
 }
@@ -44,7 +44,7 @@ EnHandleResult ServerListener::OnPrepareListen(ITcpServer* pSender, SOCKET soLis
 EnHandleResult ServerListener::OnAccept(ITcpServer* pSender, CONNID dwConnID, UINT_PTR soClient){
 	RemoteAddress* remoteaddr=new RemoteAddress;
 	remoteaddr->dwConnID = dwConnID;
-	remoteaddr->iAddressLen = sizeof(remoteaddr->pAddress) / sizeof(TCHAR);
+	remoteaddr->iAddressLen = sizeof(remoteaddr->pAddress) / sizeof(char);
 	BOOL bGet=pSender->GetRemoteAddress(dwConnID, remoteaddr->pAddress, remoteaddr->iAddressLen, remoteaddr->usPort);
 	if (bGet == FALSE)
 		return HR_ERROR;
@@ -58,10 +58,10 @@ EnHandleResult ServerListener::OnAccept(ITcpServer* pSender, CONNID dwConnID, UI
 		char name[50] = { 0 };
 		getnameinfo((SOCKADDR*)&sa, len, name, 50, NULL, 0, NI_NAMEREQD);
 
-		TCHAR hostname[50] = { 0 };
-		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
-		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
-		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, remoteaddr->pAddress, remoteaddr->usPort, hostname);
+// 		TCHAR hostname[50] = { 0 };
+// 		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
+// 		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
+		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, remoteaddr->pAddress, remoteaddr->usPort, name);
 	}
 	return HR_OK;
 }
@@ -105,7 +105,7 @@ EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnS
 	{
 		if (m_pCallBack->lpErrorCB)
 		{
-			wchar_t* sErr = GetLastErrorToString(iErrorCode); 
+			char* sErr = GetLastErrorToString(iErrorCode); 
 			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort, sErr);
 			delete[] sErr;
 		}
@@ -127,7 +127,7 @@ void ServerListener::DeleteRemoteAddr(CONNID dwConnID){
 		m_vAddr.erase(it);
 }
 
-CONNID ServerListener::FindConnID(TCHAR* sIP, int IPLen, USHORT usPort){
+CONNID ServerListener::FindConnID(char* sIP, int IPLen, USHORT usPort){
 	for (auto it = m_vAddr.begin(); it != m_vAddr.end(); it++){
 		RemoteAddress* pAddr = it->second;
 		if (!memcmp(sIP, pAddr->pAddress, IPLen) && pAddr->usPort == usPort)
@@ -285,8 +285,8 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 
 	char cIP[50] = { 0 };
 	int clen = sizeof(cIP) / sizeof(char);
-	int size = WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, NULL, 0, NULL, NULL);
-	WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, cIP, size, NULL, NULL);
+// 	int size = WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, NULL, 0, NULL, NULL);
+// 	WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, cIP, size, NULL, NULL);
 	
 	if (m_pCallBack){
 		SOCKADDR_IN sa;
@@ -298,10 +298,10 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 		char name[50] = { 0 };
 		getnameinfo((SOCKADDR*)&sa, len, name, 50, NULL, 0, NI_NAMEREQD);
 
-		TCHAR hostname[50] = { 0 };
-		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
-		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
-		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, hostname);
+// 		TCHAR hostname[50] = { 0 };
+// 		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
+// 		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
+		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, name);
 		m_vAddr[dwConnID] = m_remoteaddr;
 	}
 	return HR_OK;
@@ -341,7 +341,7 @@ EnHandleResult ClientListener::OnClose(ITcpClient* pSender, CONNID dwConnID, EnS
 	{
 		if (m_pCallBack->lpErrorCB)
 		{
-			wchar_t* sErr = GetLastErrorToString(iErrorCode);
+			char* sErr = GetLastErrorToString(iErrorCode);
 			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, sErr);
 			delete[] sErr;
 		}

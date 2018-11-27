@@ -1,26 +1,3 @@
-/*
- * Copyright: JessMA Open Source (ldcsaa@gmail.com)
- *
- * Version	: 5.0.2
- * Author	: Bruce Liang
- * Website	: http://www.jessma.org
- * Project	: https://github.com/ldcsaa
- * Blog		: http://www.cnblogs.com/ldcsaa
- * Wiki		: http://www.oschina.net/p/hp-socket
- * QQ Group	: 75375912, 44636872
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 /******************************************************************************
 Module:  HPSocket
@@ -486,34 +463,34 @@ typedef CHPSocketPtr<ITcpPackClient, ITcpClientListener, TcpPackClient_Creator>	
 /*************************** HTTP Cookie 管理方法 **************************/
 
 /* 从文件加载 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_LoadFromFile(LPCSTR lpszFile, int bKeepExists = TRUE);
-/* 保存 Cookie 到文件 */
-SOCKET_API int HP_HttpCookie_MGR_SaveToFile(LPCSTR lpszFile, int bKeepExists = TRUE);
-/* 清理 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_ClearCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
-/* 清理过期 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_RemoveExpiredCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
-/* 设置 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_SetCookie(LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge = -1, int bHttpOnly = FALSE, int bSecure = FALSE, int enSameSite = 0, int bOnlyUpdateValueIfExists = TRUE);
-/* 删除 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_DeleteCookie(LPCSTR lpszDomain, LPCSTR lpszPath, LPCSTR lpszName);
-/* 设置是否允许第三方 Cookie */
-SOCKET_API void HP_HttpCookie_MGR_SetEnableThirdPartyCookie(int bEnableThirdPartyCookie = TRUE);
-/* 检查是否允许第三方 Cookie */
-SOCKET_API int HP_HttpCookie_MGR_IsEnableThirdPartyCookie();
+// SOCKET_API int HP_HttpCookie_MGR_LoadFromFile(LPCSTR lpszFile, int bKeepExists = TRUE);
+// /* 保存 Cookie 到文件 */
+// SOCKET_API int HP_HttpCookie_MGR_SaveToFile(LPCSTR lpszFile, int bKeepExists = TRUE);
+// /* 清理 Cookie */
+// SOCKET_API int HP_HttpCookie_MGR_ClearCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
+// /* 清理过期 Cookie */
+// SOCKET_API int HP_HttpCookie_MGR_RemoveExpiredCookies(LPCSTR lpszDomain = nullptr, LPCSTR lpszPath = nullptr);
+// /* 设置 Cookie */
+// SOCKET_API int HP_HttpCookie_MGR_SetCookie(LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge = -1, int bHttpOnly = FALSE, int bSecure = FALSE, int enSameSite = 0, int bOnlyUpdateValueIfExists = TRUE);
+// /* 删除 Cookie */
+// SOCKET_API int HP_HttpCookie_MGR_DeleteCookie(LPCSTR lpszDomain, LPCSTR lpszPath, LPCSTR lpszName);
+// /* 设置是否允许第三方 Cookie */
+// SOCKET_API void HP_HttpCookie_MGR_SetEnableThirdPartyCookie(int bEnableThirdPartyCookie = TRUE);
+// /* 检查是否允许第三方 Cookie */
+// SOCKET_API int HP_HttpCookie_MGR_IsEnableThirdPartyCookie();
 
 /* Cookie expires 字符串转换为整数 */
-SOCKET_API int HP_HttpCookie_HLP_ParseExpires(LPCSTR lpszExpires, __time64_t& tmExpires);
-/* 整数转换为 Cookie expires 字符串 */
-SOCKET_API int HP_HttpCookie_HLP_MakeExpiresStr(char lpszBuff[], int& iBuffLen, __time64_t tmExpires);
-/* 生成 Cookie 字符串 */
-SOCKET_API int HP_HttpCookie_HLP_ToString(char lpszBuff[], int& iBuffLen, LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge /*= -1*/, int bHttpOnly /*= FALSE*/, int bSecure /*= FALSE*/, int enSameSite /*= 0*/);
-/* 获取当前 UTC 时间 */
-SOCKET_API __time64_t HP_HttpCookie_HLP_CurrentUTCTime();
-/* Max-Age -> expires */
-SOCKET_API __time64_t HP_HttpCookie_HLP_MaxAgeToExpires(int iMaxAge);
-/* expires -> Max-Age */
-SOCKET_API int HP_HttpCookie_HLP_ExpiresToMaxAge(__time64_t tmExpires);
+// SOCKET_API int HP_HttpCookie_HLP_ParseExpires(LPCSTR lpszExpires, __time64_t& tmExpires);
+// /* 整数转换为 Cookie expires 字符串 */
+// SOCKET_API int HP_HttpCookie_HLP_MakeExpiresStr(char lpszBuff[], int& iBuffLen, __time64_t tmExpires);
+// /* 生成 Cookie 字符串 */
+// SOCKET_API int HP_HttpCookie_HLP_ToString(char lpszBuff[], int& iBuffLen, LPCSTR lpszName, LPCSTR lpszValue, LPCSTR lpszDomain, LPCSTR lpszPath, int iMaxAge /*= -1*/, int bHttpOnly /*= FALSE*/, int bSecure /*= FALSE*/, int enSameSite /*= 0*/);
+// /* 获取当前 UTC 时间 */
+// SOCKET_API __time64_t HP_HttpCookie_HLP_CurrentUTCTime();
+// /* Max-Age -> expires */
+// SOCKET_API __time64_t HP_HttpCookie_HLP_MaxAgeToExpires(int iMaxAge);
+// /* expires -> Max-Age */
+// SOCKET_API int HP_HttpCookie_HLP_ExpiresToMaxAge(__time64_t tmExpires);
 
 /*****************************************************************************************************************************************************/
 /*************************************************************** Global Function Exports *************************************************************/
@@ -565,61 +542,61 @@ SOCKET_API int SYS_IsIPAddress(const char* lpszAddress, EnIPAddrType* penType = 
 SOCKET_API int SYS_GetIPAddress(const char* lpszHost, TCHAR lpszIP[], int& iIPLenth, EnIPAddrType& enType);
 
 /* 64 位网络字节序转主机字节序 */
-SOCKET_API ULONGLONG SYS_NToH64(ULONGLONG value);
+//SOCKET_API ULONGLONG SYS_NToH64(ULONGLONG value);
 /* 64 位主机字节序转网络字节序 */
-SOCKET_API ULONGLONG SYS_HToN64(ULONGLONG value);
+//SOCKET_API ULONGLONG SYS_HToN64(ULONGLONG value);
 
 // CP_XXX -> UNICODE
-SOCKET_API int SYS_CodePageToUnicode(int iCodePage, const char szSrc[], wchar_t szDest[], int& iDestLength);
+//SOCKET_API int SYS_CodePageToUnicode(int iCodePage, const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> CP_XXX
-SOCKET_API int SYS_UnicodeToCodePage(int iCodePage, const wchar_t szSrc[], char szDest[], int& iDestLength);
+//SOCKET_API int SYS_UnicodeToCodePage(int iCodePage, const wchar_t szSrc[], char szDest[], int& iDestLength);
 // GBK -> UNICODE
-SOCKET_API int SYS_GbkToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
+//SOCKET_API int SYS_GbkToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> GBK
-SOCKET_API int SYS_UnicodeToGbk(const wchar_t szSrc[], char szDest[], int& iDestLength);
+//SOCKET_API int SYS_UnicodeToGbk(const wchar_t szSrc[], char szDest[], int& iDestLength);
 // UTF8 -> UNICODE
-SOCKET_API int SYS_Utf8ToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
+//SOCKET_API int SYS_Utf8ToUnicode(const char szSrc[], wchar_t szDest[], int& iDestLength);
 // UNICODE -> UTF8
-SOCKET_API int SYS_UnicodeToUtf8(const wchar_t szSrc[], char szDest[], int& iDestLength);
+//SOCKET_API int SYS_UnicodeToUtf8(const wchar_t szSrc[], char szDest[], int& iDestLength);
 // GBK -> UTF8
-SOCKET_API int SYS_GbkToUtf8(const char szSrc[], char szDest[], int& iDestLength);
+//SOCKET_API int SYS_GbkToUtf8(const char szSrc[], char szDest[], int& iDestLength);
 // UTF8 -> GBK
-SOCKET_API int SYS_Utf8ToGbk(const char szSrc[], char szDest[], int& iDestLength);
+//SOCKET_API int SYS_Utf8ToGbk(const char szSrc[], char szDest[], int& iDestLength);
 
 // 普通压缩（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_Compress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_Compress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // 高级压缩（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
 //（默认参数：iLevel -> -1，iMethod -> 8，iWindowBits -> 15，iMemLevel -> 8，iStrategy -> 0）
-SOCKET_API int SYS_CompressEx(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen, int iLevel = -1, int iMethod = 8, int iWindowBits = 15, int iMemLevel = 8, int iStrategy = 0);
+//SOCKET_API int SYS_CompressEx(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen, int iLevel = -1, int iMethod = 8, int iWindowBits = 15, int iMemLevel = 8, int iStrategy = 0);
 // 普通解压（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_Uncompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_Uncompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // 高级解压（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
 //（默认参数：iWindowBits -> 15）
-SOCKET_API int SYS_UncompressEx(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen, int iWindowBits = 15);
+//SOCKET_API int SYS_UncompressEx(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen, int iWindowBits = 15);
 // 推测压缩结果长度
-SOCKET_API DWORD SYS_GuessCompressBound(DWORD dwSrcLen, int bGZip = FALSE);
+//SOCKET_API DWORD SYS_GuessCompressBound(DWORD dwSrcLen, int bGZip = FALSE);
 
 // Gzip 压缩（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_GZipCompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_GZipCompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // Gzip 解压（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_GZipUncompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_GZipUncompress(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // 推测 Gzip 解压结果长度（如果返回 0 或不合理值则说明输入内容并非有效的 Gzip 格式）
-SOCKET_API DWORD SYS_GZipGuessUncompressBound(const BYTE* lpszSrc, DWORD dwSrcLen);
+//SOCKET_API DWORD SYS_GZipGuessUncompressBound(const BYTE* lpszSrc, DWORD dwSrcLen);
 
 // 计算 Base64 编码后长度
-SOCKET_API DWORD SYS_GuessBase64EncodeBound(DWORD dwSrcLen);
+//SOCKET_API DWORD SYS_GuessBase64EncodeBound(DWORD dwSrcLen);
 // 计算 Base64 解码后长度
-SOCKET_API DWORD SYS_GuessBase64DecodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
+//SOCKET_API DWORD SYS_GuessBase64DecodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
 // Base64 编码（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_Base64Encode(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_Base64Encode(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // Base64 解码（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_Base64Decode(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_Base64Decode(const BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 
 // 计算 URL 编码后长度
-SOCKET_API DWORD SYS_GuessUrlEncodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
+//SOCKET_API DWORD SYS_GuessUrlEncodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
 // 计算 URL 解码后长度
-SOCKET_API DWORD SYS_GuessUrlDecodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
+//SOCKET_API DWORD SYS_GuessUrlDecodeBound(const BYTE* lpszSrc, DWORD dwSrcLen);
 // URL 编码（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_UrlEncode(BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_UrlEncode(BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
 // URL 解码（返回值：0 -> 成功，-3 -> 输入数据不正确，-5 -> 输出缓冲区不足）
-SOCKET_API int SYS_UrlDecode(BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);
+//SOCKET_API int SYS_UrlDecode(BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen);

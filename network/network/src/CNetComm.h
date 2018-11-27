@@ -11,6 +11,7 @@
 #include "Listener.h"
 #include "DataType.h"
 
+#define IP_LEN 32
 
 class CNetComm :public INetComm{
 public:
@@ -18,31 +19,31 @@ public:
 	virtual ~CNetComm();
 	virtual void Release();
 
-	virtual BOOL Initialize(PVOID pThis, PUSER_CB callback, DWORD dwPort, wchar_t* strIp);//需要提供Server服务
-	virtual BOOL Initialize(PVOID pThis, PUSER_CB callback);//不需要提供Server服务
-	virtual BOOL GetStatus(BOOL &bIsServer, BOOL &bIsClient);
-	virtual BOOL ConnectTo(wchar_t* pIP, DWORD uPort, BOOL bAutoReconnect = TRUE);
-	virtual BOOL Disconnect(wchar_t* pIP, DWORD uPort);
+	virtual int Initialize(void* pThis, PUSER_CB callback, USHORT dwPort, char* strIp);//需要提供Server服务
+	virtual int Initialize(void* pThis, PUSER_CB callback);//不需要提供Server服务
+	virtual int GetStatus(int &bIsServer, int &bIsClient);
+	virtual int ConnectTo(char* pIP, USHORT uPort, BOOL bAutoReconnect = TRUE);
+	virtual int Disconnect(char* pIP, USHORT uPort);
 
-	virtual BOOL SendMsg(LPVOID pMsg, DWORD dwMsgLen, wchar_t* pIP, DWORD uPort, DWORD dwWay = SEND_ASYN);
-	virtual BOOL GetSocket(wchar_t* pIP, DWORD uPort, list<HANDLE> SocketList);
+	virtual int SendMsg(void* pMsg, DWORD dwMsgLen, char* pIP, USHORT uPort, DWORD dwWay = SEND_ASYN);
+	virtual int GetSocket(char* pIP, USHORT uPort, list<HANDLE> SocketList);
 
-	virtual BOOL Uninitialize();
+	virtual int Uninitialize();
 private:
-	BOOL StartConnectThread(CString IP,DWORD port);
+	int StartConnectThread(const char* IP, USHORT port);
 	static UINT WINAPI ConnectThread(LPVOID p);
 private:
 	ITcpServer* m_pServer;
 	ITcpClient* m_pClient;
 	PUSER_CB    m_pServerCtrl;
 	PUSER_CB    m_pClientCtrl;
-	BOOL		m_bAutoReconnect;
+	int		m_bAutoReconnect;
 	ServerListener* m_pSrvListen;
 	ClientListener* m_pClientListen;
-	CMTX m_extractlock;
-	CString m_conIP;
-	DWORD   m_conPort;
-	BOOL    m_bConStart;
+	CMTX     m_extractlock;
+	char     m_conIP[IP_LEN];
+	USHORT   m_conPort;
+	int      m_bConStart;
 };
 
 #endif
