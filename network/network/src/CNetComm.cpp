@@ -120,7 +120,7 @@ BOOL CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, wchar_t* pIP, DWORD uPort, D
  	memcpy(pTmp, &head, sizeof(head));
 	memcpy(pTmp + sizeof(head), pMsg, dwMsgLen);
 	
-	BOOL bSend;
+	BOOL bSend = FALSE;
 	if (m_pServer && m_pServer->HasStarted()){
 		CONNID id = m_pSrvListen->FindConnID(pIP, wcslen(pIP), uPort);		
 		bSend = m_pServer->Send(id, (BYTE*)pTmp, sizeof(head) + dwMsgLen);
