@@ -13,11 +13,11 @@
 
 //#pragma comment(lib,"../lib/network.lib")
 
-static void CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, wchar_t* strPcName);
-static void DISCONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort);
-static void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, wchar_t* strIP, DWORD dwPort);
-static void PREAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort);
-static void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, BOOL bOK);
+static void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName);
+static void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
+static void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
+static void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
+static void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK);
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -115,7 +115,7 @@ BOOL Ctest_network_srvDlg::OnInitDialog()
 // 	pCallback->lpPostAutoConnectCB;
 
 	INetComm::CreateInstance(&m_pNetwork);
-	BOOL bInit = m_pNetwork->Initialize(NULL, pCallback, 9900, _T("192.168.101.13"));
+	BOOL bInit = m_pNetwork->Initialize(NULL, pCallback, 9900, "192.168.101.13");
 	if (!bInit)
 		MessageBox(L"network Initialize failed");
 	else{
@@ -193,30 +193,30 @@ void Ctest_network_srvDlg::RecvMsg(PVOID sMsg, DWORD dwMsgLen, CString strIP, DW
 	strMsg.Format(L"server:port:%d Msg:%s", port, sMsg);
 	int num = m_listCtrl.GetCount();
 	m_listCtrl.InsertString(num, strMsg);
-	m_pNetwork->SendMsg(sMsg, dwMsgLen, strIP.GetBuffer(), port);
+	m_pNetwork->SendMsg(sMsg, dwMsgLen, CStringA(strIP).GetBuffer(), port);
 }
 
-void CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, wchar_t* strPcName){
+void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName){
 	Ctest_network_srvDlg* pDlg = (Ctest_network_srvDlg*)pThis;
-	pDlg->ShowMessage(strIP, dwPort, strPcName);
+	pDlg->ShowMessage(CString(strIP), dwPort, CString(strPcName));
 }
 
-void DISCONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort){
+void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
 	Ctest_network_srvDlg* pDlg = (Ctest_network_srvDlg*)pThis;
-	pDlg->Disconnect(strIP, dwPort);
+	pDlg->Disconnect(CString(strIP), dwPort);
 }
 
-void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, wchar_t* strIP, DWORD dwPort){
+void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort){
 	Ctest_network_srvDlg* pDlg = (Ctest_network_srvDlg*)pThis;
 // 	TCHAR* pBuf = new TCHAR[dwMsgLen/sizeof(TCHAR)];
 // 	memcpy(pBuf, pMsg, dwMsgLen);
-	pDlg->RecvMsg(pMsg, dwMsgLen, strIP, dwPort);
+	pDlg->RecvMsg(pMsg, dwMsgLen, CString(strIP), dwPort);
 }
 
-void PREAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort){
+void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
 
 }
 
-void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, BOOL bOK){
+void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK){
 
 }

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CNetComm.h"
 #include "BufferPool.h"
+#include <process.h>
 
 // #ifdef _DEBUG
 // #pragma comment(lib,"../lib/HPSocket_D.lib")
@@ -33,7 +34,7 @@ void CNetComm::Release(){
 BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* strIp){//需要提供Server服务
 	m_pSrvListen->RegCallBack(callback);
 
-	m_pServer = HP_Create_TcpServer(m_pSrvListen);
+	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
 		return FALSE;
 
@@ -42,10 +43,12 @@ BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* s
 	char cIP[64] = {0};
 	/*memcpy(cIP, strIp.GetBuffer(), 64);*/
 	strcpy_s(cIP, strIp);
-	if (m_pServer->Start(cIP, dwPort)){
-		if (!m_pSrvListen->StartDataThread()){
-			return FALSE;
-		}
+	if (!m_pServer->Start(cIP, dwPort))
+	{
+		return FALSE;
+// 		if (!m_pSrvListen->StartDataThread()){
+// 			return FALSE;
+// 		}
 	}
 		
 	if (!m_pServer->HasStarted())
@@ -54,7 +57,7 @@ BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* s
 }
 
 BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback){//不需要提供Server服务
-	m_pClient = HP_Create_TcpClient(m_pClientListen);
+	m_pClient = HP_Create_TcpPackClient(m_pClientListen);
 	m_pClientListen->RegCallBack(callback);
 	if (!m_pClient)
 		return FALSE;
@@ -85,8 +88,8 @@ BOOL CNetComm::ConnectTo(char* pIP, USHORT uPort, BOOL bAutoReconnect/* = TRUE*/
 	else if (!m_pClient || !m_pClient->Start(pIP, uPort, FALSE))
 		return FALSE;
 	
-	if (!m_pClientListen->StartDataThread())
-		return FALSE;	
+// 	if (!m_pClientListen->StartDataThread())
+// 		return FALSE;	
 	return TRUE;	
 }
 
@@ -115,25 +118,25 @@ int CNetComm::Disconnect(char* pIP, USHORT uPort){
 }
 
 int CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, char* pIP, USHORT uPort, DWORD dwWay /*= SEND_ASYN*/){
-	PacketHead head;
-	head.DataSize = dwMsgLen;
-	head.DataType = 1;
-	BYTE* pTmp = new BYTE[sizeof(head) + dwMsgLen];
-	memset(pTmp, 0, sizeof(head)+dwMsgLen);
- 	memcpy(pTmp, &head, sizeof(head));
-	memcpy(pTmp + sizeof(head), pMsg, dwMsgLen);
+// 	PacketHead head;
+// 	head.DataSize = dwMsgLen;
+// 	head.DataType = 1;
+// 	BYTE* pTmp = new BYTE[sizeof(head) + dwMsgLen];
+// 	memset(pTmp, 0, sizeof(head)+dwMsgLen);
+//  	memcpy(pTmp, &head, sizeof(head));
+// 	memcpy(pTmp + sizeof(head), pMsg, dwMsgLen);
 	
 	BOOL bSend = FALSE;
 	if (m_pServer && m_pServer->HasStarted()){
 		CONNID id = m_pSrvListen->FindConnID(pIP, strlen(pIP), uPort);		
-		bSend = m_pServer->Send(id, (BYTE*)pTmp, sizeof(head) + dwMsgLen);
+		bSend = m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen);
 	}
 
 	if (m_pClient && m_pClient->HasStarted()){
-		bSend = m_pClient->Send((BYTE*)pTmp, sizeof(head) + dwMsgLen);
+		bSend = m_pClient->Send((BYTE*)pMsg, dwMsgLen);
 	}
 
-	delete[] pTmp;
+//	delete[] pTmp;
 
 	return bSend;
 }

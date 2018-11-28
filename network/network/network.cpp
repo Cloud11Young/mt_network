@@ -1,10 +1,6 @@
-// network.cpp : 定义 DLL 的初始化例程。
+// network.cpp : 定义 DLL 应用程序的导出函数。
 //
 
 #include "stdafx.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
 
 

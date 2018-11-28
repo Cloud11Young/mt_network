@@ -45,9 +45,9 @@ private:
 	CButton m_btnSend;
 public:
 	DWORD GetPortIP(CString& strIP);
-	void RecvMsg(LPVOID pMsg, DWORD dwMsgLen, CString strIP, DWORD dwPort);
-	void ConnectMsg(CString strIP, DWORD port, CString strPcName);
-	void DisConnectMsg(CString strIP, DWORD port);
+	void RecvMsg(LPVOID pMsg, DWORD dwMsgLen, CString strIP, USHORT dwPort);
+	void ConnectMsg(CString strIP, USHORT port, CString strPcName);
+	void DisConnectMsg(CString strIP, USHORT port);
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();

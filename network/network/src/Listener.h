@@ -2,7 +2,7 @@
 #define LISTENER_H_
 
 #include "../public/SocketInterface.h"
-#include "../public/CriticalSection.h"
+//#include "../public/CriticalSection.h"
 #include "DataType.h"
 #include "INetComm.h"
 #include <deque>
@@ -25,15 +25,15 @@ public:
 	CONNID FindConnID(char* sIP, int IPLen, USHORT usPort);
 	void DeleteRemoteAddr(CONNID dwConnID);	
 	void RegCallBack(PUSER_CB callback);
-	BOOL StartDataThread();
+//	BOOL StartDataThread();
 private:
 	void ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID);
 	void ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID);
-	static UINT WINAPI ReceiveThread(LPVOID pVoid);
+//	static UINT WINAPI ReceiveThread(LPVOID pVoid);
 private:
 	std::map<CONNID, RemoteAddress*> m_vAddr;
 	PUSER_CB m_pCallBack;
-	CInterCriSec m_extractlock;
+//	CInterCriSec m_extractlock;
 };
 
 class ClientListener :public CTcpClientListener{
@@ -53,16 +53,16 @@ public:
 	CONNID FindConnID(TCHAR* sIP, int IPLen, USHORT usPort);
 	void DeleteRemoteAddr(CONNID dwConnID);	
 	void RegCallBack(PUSER_CB callback);
-	BOOL StartDataThread();
+//	BOOL StartDataThread();
 
 private:
 	void ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID);
 	void ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID);
-	static UINT WINAPI ReceiveThread(LPVOID pVoid);
+//	static UINT WINAPI ReceiveThread(LPVOID pVoid);
 private:
 	std::map<CONNID, RemoteAddress*> m_vAddr;
 	PUSER_CB m_pCallBack;
-	CInterCriSec m_extractlock;
+//	CInterCriSec m_extractlock;
 	RemoteAddress* m_remoteaddr;
 };
 

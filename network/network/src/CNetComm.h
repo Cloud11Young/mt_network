@@ -1,13 +1,13 @@
 #ifndef CNETCOMM_H_
 #define CNETCOMM_H_
 
-#include <afxstr.h>
+//#include <afxstr.h>
 #include "INetComm.h"
 
 #include "../public/HPSocket.h"
 #include "../public/HPTypeDef.h"
 #include "../public/SocketInterface.h"
-#include "../public/CriticalSection.h"
+//#include "../public/CriticalSection.h"
 #include "Listener.h"
 #include "DataType.h"
 
@@ -33,14 +33,14 @@ private:
 	int StartConnectThread(const char* IP, USHORT port);
 	static UINT WINAPI ConnectThread(LPVOID p);
 private:
-	ITcpServer* m_pServer;
-	ITcpClient* m_pClient;
+	ITcpPackServer* m_pServer;
+	ITcpPackClient* m_pClient;
 	PUSER_CB    m_pServerCtrl;
 	PUSER_CB    m_pClientCtrl;
 	int		m_bAutoReconnect;
 	ServerListener* m_pSrvListen;
 	ClientListener* m_pClientListen;
-	CMTX     m_extractlock;
+//	CMTX     m_extractlock;
 	char     m_conIP[IP_LEN];
 	USHORT   m_conPort;
 	int      m_bConStart;

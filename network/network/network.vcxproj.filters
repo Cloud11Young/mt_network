@@ -13,46 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{ec4c89a7-6206-4ee5-ad6d-a5961c35d549}</UniqueIdentifier>
-    </Filter>
     <Filter Include="public">
-      <UniqueIdentifier>{1575e541-e5ae-4790-b949-f9058cf0c3f9}</UniqueIdentifier>
+      <UniqueIdentifier>{462e467b-f566-419a-9e87-3f53f1192ea6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{cb610ecb-a9d0-4b6f-87c7-bc781ecf8337}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="network.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CNetComm.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\INetComm.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Listener.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BufferPool.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="network.def">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="res\network.rc2">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -60,15 +29,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\INetComm.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CNetComm.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="public\HPSocket.h">
       <Filter>public</Filter>
@@ -79,22 +39,43 @@
     <ClInclude Include="public\SocketInterface.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="src\Listener.h">
+    <ClInclude Include="src\BufferPool.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNetComm.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\DataType.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\BufferPool.h">
+    <ClInclude Include="src\INetComm.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="public\CriticalSection.h">
-      <Filter>public</Filter>
+    <ClInclude Include="src\Listener.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="network.rc">
-      <Filter>资源文件</Filter>
-    </ResourceCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="network.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BufferPool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CNetComm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\INetComm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Listener.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

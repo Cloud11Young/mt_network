@@ -117,7 +117,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../lib/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>network_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>network.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

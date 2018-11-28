@@ -4,6 +4,7 @@
 #include "BufferPool.h"
 #include <winsock2.h>
 #include "../public/HPSocket.h"
+#include <process.h>
 
 static char* GetLastErrorToString(DWORD errorCode)
 {
@@ -13,7 +14,7 @@ static char* GetLastErrorToString(DWORD errorCode)
 	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		text, 0, NULL);
+		(char*)&text, 0, NULL);
 //	std::string str = WideToMultiByte(text);
 	//	CStringA result(text);    //½á¹û
 	char* ptmp = new char[strlen(text) + 1];
@@ -75,13 +76,24 @@ EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, i
 }
 
 EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength){
-	Buffer* pBuf = new Buffer;
-	pBuf->copy(pData, iLength);
+// 	Buffer* pBuf = new Buffer;
+// 	pBuf->copy(pData, iLength);
+// 
+// 	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
+// 	pQueue->push_back(pBuf);
+// 
+// 	ExtractBuffer(pQueue, dwConnID);
 
-	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
-	pQueue->push_back(pBuf);
+	RemoteAddress remoteaddr;
+	remoteaddr.dwConnID = dwConnID;
+	remoteaddr.iAddressLen = sizeof(remoteaddr.pAddress) / sizeof(char);
+	BOOL bGet = pSender->GetRemoteAddress(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
 
-	ExtractBuffer(pQueue, dwConnID);
+	if (m_pCallBack->lpRecvMsgCB != NULL)
+	{
+		m_pCallBack->lpRecvMsgCB(m_pCallBack->lpCallBackData, (void*)pData, iLength,
+			remoteaddr.pAddress, remoteaddr.usPort);
+	}
 
 	return HR_OK;
 }
@@ -136,117 +148,117 @@ CONNID ServerListener::FindConnID(char* sIP, int IPLen, USHORT usPort){
 	return 0;
 }
 
-void ServerListener::ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID){
-	BYTE* pTmpData = pBuf->pData;
+// void ServerListener::ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID){
+// 	BYTE* pTmpData = pBuf->pData;
+// 
+// 	PacketHead* pHead = (PacketHead*)pBuf->pData;
+// 	unsigned int Datasize = pHead->DataSize;
+// 	int len = pBuf->used;
+// 
+// 	int left = 0;
+// 	while ((left = len - sizeof(*pHead) - Datasize) >= 0){
+// 		Buffer* pCombinData = new Buffer;
+// 		pCombinData->pAddr = FindRemoteAddr(dwConnID);		
+// 		pCombinData->copy(pTmpData + sizeof(*pHead), Datasize);	
+// 		CCriSecLock lock(m_extractlock);
+// 		pComplete->push_back(pCombinData);	
+// 
+// 		len = left;
+// 		if (left < sizeof(*pHead))
+// 			break;
+// 
+// 		pTmpData += sizeof(*pHead) + Datasize;
+// 		pHead = (PacketHead*)(pTmpData);
+// 		Datasize = pHead->DataSize;
+// 		if (left < (sizeof(*pHead) + Datasize))
+// 			break;
+// 	}
+// 
+// 	pBuf->TrunFront(pBuf->used - left);
+// }
 
-	PacketHead* pHead = (PacketHead*)pBuf->pData;
-	unsigned int Datasize = pHead->DataSize;
-	int len = pBuf->used;
-
-	int left = 0;
-	while ((left = len - sizeof(*pHead) - Datasize) >= 0){
-		Buffer* pCombinData = new Buffer;
-		pCombinData->pAddr = FindRemoteAddr(dwConnID);		
-		pCombinData->copy(pTmpData + sizeof(*pHead), Datasize);	
-		CCriSecLock lock(m_extractlock);
-		pComplete->push_back(pCombinData);	
-
-		len = left;
-		if (left < sizeof(*pHead))
-			break;
-
-		pTmpData += sizeof(*pHead) + Datasize;
-		pHead = (PacketHead*)(pTmpData);
-		Datasize = pHead->DataSize;
-		if (left < (sizeof(*pHead) + Datasize))
-			break;
-	}
-
-	pBuf->TrunFront(pBuf->used - left);
-}
-
-void ServerListener::ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID){
-	std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
-	Buffer* leftbuf = BufferPool::Instance()->GetLeftBuffer(dwConnID);
-
-	while (pBufs->size() > 0){
-		Buffer* pBuf = pBufs->front();
-
-		leftbuf->Append(pBuf, pBuf->used);
-		if (leftbuf->used < sizeof(PacketHead)){
-			goto del;
-		}
- 
-		PacketHead* head = (PacketHead*)leftbuf->pData;
-		if (leftbuf->used < (sizeof(*head) + head->DataSize))
-			goto del;
- 		ExtractData(leftbuf, pComplete, dwConnID);	
-
-	del:
-		if (pBuf)
-			delete pBuf;
-		pBufs->pop_front();
-	}
-}
+// void ServerListener::ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID){
+// 	std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
+// 	Buffer* leftbuf = BufferPool::Instance()->GetLeftBuffer(dwConnID);
+// 
+// 	while (pBufs->size() > 0){
+// 		Buffer* pBuf = pBufs->front();
+// 
+// 		leftbuf->Append(pBuf, pBuf->used);
+// 		if (leftbuf->used < sizeof(PacketHead)){
+// 			goto del;
+// 		}
+//  
+// 		PacketHead* head = (PacketHead*)leftbuf->pData;
+// 		if (leftbuf->used < (sizeof(*head) + head->DataSize))
+// 			goto del;
+//  		ExtractData(leftbuf, pComplete, dwConnID);	
+// 
+// 	del:
+// 		if (pBuf)
+// 			delete pBuf;
+// 		pBufs->pop_front();
+// 	}
+// }
 
 void ServerListener::RegCallBack(PUSER_CB callback){
 	m_pCallBack = callback;
 }
 
-BOOL ServerListener::StartDataThread(){
-	BOOL isOK = TRUE;
-
-	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, ReceiveThread, (LPVOID)this, 0, nullptr);
-
-	if (!hDataThread)
-	{
-		//SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ::GetLastError());
-		isOK = FALSE;
-	}
-	CloseHandle(hDataThread);
-
-	return isOK;
-}
-
-UINT WINAPI ServerListener::ReceiveThread(LPVOID pVoid)
-{
-	ServerListener* pListen = (ServerListener*)pVoid;
-	while (TRUE)
-	{
-		Buffer* pBuffer = NULL;
-		{
-			CCriSecLock lock(pListen->m_extractlock);
-			std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
-			if (pComplete->size() > 0)
-			{
-				pBuffer = pComplete->front();
-				pComplete->pop_front();
-			}
-		}
-
-		if (pBuffer != NULL)
-		{
-			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
-	 					pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
-			delete pBuffer;
-			pBuffer = NULL;
-		}
-
-// 		while (pComplete && pComplete->size() > 0)
-// 		{			
-// 			CCriSecLock lock(pListen->m_extractlock);
+// BOOL ServerListener::StartDataThread(){
+// 	BOOL isOK = TRUE;
 // 
-// 			Buffer* pBuffer = pComplete->front();
-// 			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
-// 					pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
-// 			
-// 			delete pBuffer;
-// 			pComplete->pop_front();
+// 	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, ReceiveThread, (LPVOID)this, 0, nullptr);
+// 
+// 	if (!hDataThread)
+// 	{
+// 		//SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ::GetLastError());
+// 		isOK = FALSE;
+// 	}
+// 	CloseHandle(hDataThread);
+// 
+// 	return isOK;
+// }
+
+// UINT WINAPI ServerListener::ReceiveThread(LPVOID pVoid)
+// {
+// 	ServerListener* pListen = (ServerListener*)pVoid;
+// 	while (TRUE)
+// 	{
+// 		Buffer* pBuffer = NULL;
+// 		{
+// 			CCriSecLock lock(pListen->m_extractlock);
+// 			std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
+// 			if (pComplete->size() > 0)
+// 			{
+// 				pBuffer = pComplete->front();
+// 				pComplete->pop_front();
+// 			}
 // 		}
-		Sleep(10);
-	}
-	return 0;
-}
+// 
+// 		if (pBuffer != NULL)
+// 		{
+// 			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
+// 	 					pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
+// 			delete pBuffer;
+// 			pBuffer = NULL;
+// 		}
+// 
+// // 		while (pComplete && pComplete->size() > 0)
+// // 		{			
+// // 			CCriSecLock lock(pListen->m_extractlock);
+// // 
+// // 			Buffer* pBuffer = pComplete->front();
+// // 			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
+// // 					pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
+// // 			
+// // 			delete pBuffer;
+// // 			pComplete->pop_front();
+// // 		}
+// 		Sleep(10);
+// 	}
+// 	return 0;
+// }
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -312,13 +324,21 @@ EnHandleResult ClientListener::OnReceive(ITcpClient* pSender, CONNID dwConnID, i
 }
 
 EnHandleResult ClientListener::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength){
-	Buffer* pBuf = new Buffer;
-	pBuf->copy(pData, iLength);
+// 	Buffer* pBuf = new Buffer;
+// 	pBuf->copy(pData, iLength);
+// 
+// 	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
+// 	pQueue->push_back(pBuf);
+// 
+// 	ExtractBuffer(pQueue, dwConnID);
+//	RemoteAddress remoteaddr;
+//	BOOL bGet = pSender->GetRemoteHost(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
 
-	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
-	pQueue->push_back(pBuf);
-
-	ExtractBuffer(pQueue, dwConnID);
+	if (m_pCallBack->lpRecvMsgCB != NULL)
+	{
+		m_pCallBack->lpRecvMsgCB(m_pCallBack->lpCallBackData, (void*)pData, iLength,
+			m_remoteaddr->pAddress, m_remoteaddr->usPort);
+	}
 
 	return HR_OK;
 }
@@ -372,114 +392,114 @@ CONNID ClientListener::FindConnID(TCHAR* sIP, int IPLen, USHORT usPort){
 	return 0;
 }
 
-void ClientListener::ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID){
-	BYTE* pTmpData = pBuf->pData;
+// void ClientListener::ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID){
+// 	BYTE* pTmpData = pBuf->pData;
+// 
+// 	PacketHead* pHead = (PacketHead*)pBuf->pData;
+// 	unsigned int Datasize = pHead->DataSize;
+// 	int len = pBuf->used;
+// 
+// 	int left = 0;
+// 	while ((left = len - sizeof(*pHead) - Datasize) >= 0){
+// 		CCriSecLock lock(m_extractlock);
+// 		Buffer* pCombinData = new Buffer;
+// 		pCombinData->pAddr = FindRemoteAddr(dwConnID);
+// 		pCombinData->copy(pTmpData + sizeof(*pHead), Datasize);
+// 		pComplete->push_back(pCombinData);
+// 
+// 		len = left;
+// 		if (left < sizeof(*pHead))
+// 			break;
+// 
+// 		pTmpData += sizeof(*pHead) + Datasize;
+// 		pHead = (PacketHead*)(pTmpData);
+// 		Datasize = pHead->DataSize;
+// 		if (left < (sizeof(*pHead) + Datasize))
+// 			break;
+// 	}
+// 
+// 	pBuf->TrunFront(pBuf->used - left);
+// }
 
-	PacketHead* pHead = (PacketHead*)pBuf->pData;
-	unsigned int Datasize = pHead->DataSize;
-	int len = pBuf->used;
-
-	int left = 0;
-	while ((left = len - sizeof(*pHead) - Datasize) >= 0){
-		CCriSecLock lock(m_extractlock);
-		Buffer* pCombinData = new Buffer;
-		pCombinData->pAddr = FindRemoteAddr(dwConnID);
-		pCombinData->copy(pTmpData + sizeof(*pHead), Datasize);
-		pComplete->push_back(pCombinData);
-
-		len = left;
-		if (left < sizeof(*pHead))
-			break;
-
-		pTmpData += sizeof(*pHead) + Datasize;
-		pHead = (PacketHead*)(pTmpData);
-		Datasize = pHead->DataSize;
-		if (left < (sizeof(*pHead) + Datasize))
-			break;
-	}
-
-	pBuf->TrunFront(pBuf->used - left);
-}
-
-void ClientListener::ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID){
-	std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
-	Buffer* leftbuf = BufferPool::Instance()->GetLeftBuffer(dwConnID);
-
-	while (pBufs->size() > 0){
-		Buffer* pBuf = pBufs->front();
-
-		leftbuf->Append(pBuf, pBuf->used);
-		if (leftbuf->used < sizeof(PacketHead)){
-			goto del;
-		}
-
-		PacketHead* head = (PacketHead*)leftbuf->pData;
-		if (leftbuf->used < (sizeof(*head) + head->DataSize))
-			goto del;
-		ExtractData(leftbuf, pComplete, dwConnID);
-
-	del:
-		if (pBuf)
-			delete pBuf;
-		pBufs->pop_front();
-	}
-}
+// void ClientListener::ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID){
+// 	std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
+// 	Buffer* leftbuf = BufferPool::Instance()->GetLeftBuffer(dwConnID);
+// 
+// 	while (pBufs->size() > 0){
+// 		Buffer* pBuf = pBufs->front();
+// 
+// 		leftbuf->Append(pBuf, pBuf->used);
+// 		if (leftbuf->used < sizeof(PacketHead)){
+// 			goto del;
+// 		}
+// 
+// 		PacketHead* head = (PacketHead*)leftbuf->pData;
+// 		if (leftbuf->used < (sizeof(*head) + head->DataSize))
+// 			goto del;
+// 		ExtractData(leftbuf, pComplete, dwConnID);
+// 
+// 	del:
+// 		if (pBuf)
+// 			delete pBuf;
+// 		pBufs->pop_front();
+// 	}
+// }
 
 void ClientListener::RegCallBack(PUSER_CB callback){
 	m_pCallBack = callback;
 }
 
-BOOL ClientListener::StartDataThread(){
-	BOOL isOK = TRUE;
-
-	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, ReceiveThread, (LPVOID)this, 0, nullptr);
-
-	if (!hDataThread)
-	{
-		//SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ::GetLastError());
-		isOK = FALSE;
-	}
-	CloseHandle(hDataThread);
-
-	return isOK;
-}
-
-
-UINT WINAPI ClientListener::ReceiveThread(LPVOID pVoid){
-	ClientListener* pListen = (ClientListener*)pVoid;
-
-	while (TRUE)
-	{
-		Buffer* pBuffer = NULL;
-		{
-			CCriSecLock lock(pListen->m_extractlock);
-			std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
-			if (pComplete->size() > 0)
-			{
-				pBuffer = pComplete->front();
-				pComplete->pop_front();
-			}
-		}
-
-		if (pBuffer != NULL)
-		{
-			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
-				pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
-			delete pBuffer;
-			pBuffer = NULL;
-		}
-// 		std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();		
-// 		while (pComplete && pComplete->size() > 0){
-// 			CCriSecLock lock(pListen->m_extractlock);
-// 			Buffer* pBuffer = pComplete->front();
+// BOOL ClientListener::StartDataThread(){
+// 	BOOL isOK = TRUE;
 // 
+// 	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, ReceiveThread, (LPVOID)this, 0, nullptr);
+// 
+// 	if (!hDataThread)
+// 	{
+// 		//SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ::GetLastError());
+// 		isOK = FALSE;
+// 	}
+// 	CloseHandle(hDataThread);
+// 
+// 	return isOK;
+// }
+
+
+// UINT WINAPI ClientListener::ReceiveThread(LPVOID pVoid){
+// 	ClientListener* pListen = (ClientListener*)pVoid;
+// 
+// 	while (TRUE)
+// 	{
+// 		Buffer* pBuffer = NULL;
+// 		{
+// 			CCriSecLock lock(pListen->m_extractlock);
+// 			std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();
+// 			if (pComplete->size() > 0)
+// 			{
+// 				pBuffer = pComplete->front();
+// 				pComplete->pop_front();
+// 			}
+// 		}
+// 
+// 		if (pBuffer != NULL)
+// 		{
 // 			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
 // 				pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
-// 
 // 			delete pBuffer;
-// 			pComplete->pop_front();
+// 			pBuffer = NULL;
 // 		}
-		Sleep(10);
-	}
-	return 0;
-}
+// // 		std::deque<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers();		
+// // 		while (pComplete && pComplete->size() > 0){
+// // 			CCriSecLock lock(pListen->m_extractlock);
+// // 			Buffer* pBuffer = pComplete->front();
+// // 
+// // 			pListen->m_pCallBack->lpRecvMsgCB(pListen->m_pCallBack->lpCallBackData, pBuffer->pData, pBuffer->used,
+// // 				pBuffer->pAddr->pAddress, pBuffer->pAddr->usPort);
+// // 
+// // 			delete pBuffer;
+// // 			pComplete->pop_front();
+// // 		}
+// 		Sleep(10);
+// 	}
+// 	return 0;
+// }

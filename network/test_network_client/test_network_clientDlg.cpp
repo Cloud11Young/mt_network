@@ -13,11 +13,11 @@
 
 //#pragma comment(lib,"../lib/network_d.lib")
 
-static void CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, wchar_t* strPcName);
-static void DISCONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort);
-static void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, wchar_t* strIP, DWORD dwPort);
-static void PREAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort);
-static void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, BOOL bOK);
+static void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName);
+static void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
+static void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
+static void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
+static void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK);
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -180,26 +180,26 @@ HCURSOR Ctest_network_clientDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, wchar_t* strPcName){
+void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
-	pDlg->ConnectMsg(strIP, dwPort, strPcName);
+	pDlg->ConnectMsg(CString(strIP), dwPort, CString(strPcName));
 }
 
-void DISCONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort){
+void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
-	pDlg->DisConnectMsg(strIP, dwPort);
+	pDlg->DisConnectMsg(CString(strIP), dwPort);
 }
 
-void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, wchar_t* strIP, DWORD dwPort){
+void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
-	pDlg->RecvMsg(pMsg, dwMsgLen, strIP, dwPort);
+	pDlg->RecvMsg(pMsg, dwMsgLen, CString(strIP), dwPort);
 }
 
-void PREAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort){
+void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
 
 }
 
-void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, wchar_t* strIP, DWORD dwPort, BOOL bOK){
+void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK){
 
 }
 
@@ -208,7 +208,7 @@ void Ctest_network_clientDlg::OnBnClickedButton1()
 	CString strIP;	
 	DWORD port = GetPortIP(strIP);
 
-	BOOL bCon = m_pNetWork->ConnectTo(strIP.GetBuffer(), port);
+	BOOL bCon = m_pNetWork->ConnectTo(CStringA(strIP).GetBuffer(), port);
 	
 // 	int num = m_listbox.GetCount();
 // 	if (bCon)		
@@ -238,7 +238,7 @@ void Ctest_network_clientDlg::OnBnClickedButton3()
 		file.Open(filename, CFile::modeRead);
 		CString txt;
 		while (file.ReadString(txt)){
-			bSend = m_pNetWork->SendMsg(txt.GetBuffer(), (txt.GetLength()+1)*sizeof(TCHAR), strIP.GetBuffer(), port);
+			bSend = m_pNetWork->SendMsg(txt.GetBuffer(), (txt.GetLength()+1)*sizeof(TCHAR), CStringA(strIP).GetBuffer(), port);
 		}
 		file.Close();
 // 		CStringA filenameA(filename);
@@ -258,14 +258,14 @@ void Ctest_network_clientDlg::OnBnClickedButton3()
 		for (int i = 0; i < 3000000; i++){
 			CString sNo;
 			sNo.Format(L"%d: %s", i, txt);
-			bSend = m_pNetWork->SendMsg(sNo.GetBuffer(), (sNo.GetLength() + 1)*sizeof(TCHAR), _T(""), 0);
+			bSend = m_pNetWork->SendMsg(sNo.GetBuffer(), (sNo.GetLength() + 1)*sizeof(TCHAR), "", 0);
 		}
 	}
 	else{
 		CString strData,strIP;
 		m_SendData.GetWindowText(strData);
 		DWORD port = GetPortIP(strIP);
-		bSend=m_pNetWork->SendMsg(strData.GetBuffer(), sizeof(TCHAR) * (strData.GetLength()+1), strIP.GetBuffer(), port);
+		bSend=m_pNetWork->SendMsg(strData.GetBuffer(), sizeof(TCHAR) * (strData.GetLength()+1), CStringA(strIP).GetBuffer(), port);
 	}
 	if (!bSend){
 		m_listbox.InsertString(m_listbox.GetCount(), L"send failed");
@@ -281,7 +281,7 @@ DWORD Ctest_network_clientDlg::GetPortIP(CString& strIP){
 	return port;
 }
 
-void Ctest_network_clientDlg::RecvMsg(LPVOID pMsg, DWORD dwMsgLen, CString strIP, DWORD dwPort){
+void Ctest_network_clientDlg::RecvMsg(LPVOID pMsg, DWORD dwMsgLen, CString strIP, USHORT dwPort){
 	TCHAR* pBuf = new TCHAR[dwMsgLen / sizeof(TCHAR)];
 	memcpy(pBuf, pMsg, dwMsgLen);
 	CString msg;
@@ -289,13 +289,13 @@ void Ctest_network_clientDlg::RecvMsg(LPVOID pMsg, DWORD dwMsgLen, CString strIP
 	m_listbox.InsertString(m_listbox.GetCount(), msg);
 }
 
-void Ctest_network_clientDlg::ConnectMsg(CString strIP,DWORD port,CString strPcName){
+void Ctest_network_clientDlg::ConnectMsg(CString strIP, USHORT port, CString strPcName){
 	CString msg;
 	msg.Format(L"connected %s:%d name=%s", strIP, port, strPcName);
 	m_listbox.InsertString(m_listbox.GetCount(), msg);
 }
 
-void Ctest_network_clientDlg::DisConnectMsg(CString strIP, DWORD port){
+void Ctest_network_clientDlg::DisConnectMsg(CString strIP, USHORT port){
 	CString msg;
 	msg.Format(L"disconnected %s:%d", strIP, port);
 	m_listbox.InsertString(m_listbox.GetCount(), msg);
