@@ -220,9 +220,9 @@ void ServerListener::RegCallBack(PUSER_CB callback){
 // 	return isOK;
 // }
 
-// UINT WINAPI ServerListener::ReceiveThread(LPVOID pVoid)
+// UINT WINAPI ServerListener::ReceiveThread(LPVOID void*)
 // {
-// 	ServerListener* pListen = (ServerListener*)pVoid;
+// 	ServerListener* pListen = (ServerListener*)void*;
 // 	while (TRUE)
 // 	{
 // 		Buffer* pBuffer = NULL;
@@ -465,8 +465,8 @@ void ClientListener::RegCallBack(PUSER_CB callback){
 // }
 
 
-// UINT WINAPI ClientListener::ReceiveThread(LPVOID pVoid){
-// 	ClientListener* pListen = (ClientListener*)pVoid;
+// UINT WINAPI ClientListener::ReceiveThread(LPVOID void*){
+// 	ClientListener* pListen = (ClientListener*)void*;
 // 
 // 	while (TRUE)
 // 	{

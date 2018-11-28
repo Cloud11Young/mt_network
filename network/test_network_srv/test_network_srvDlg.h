@@ -33,7 +33,7 @@ protected:
 public:
 	void ShowMessage(CString strIP, DWORD port, CString strPcName);
 	void Disconnect(CString strIP, DWORD port);
-	void RecvMsg(PVOID sMsg, DWORD dwMsgLen, CString strIP, DWORD port);
+	void RecvMsg(void* sMsg, DWORD dwMsgLen, CString strIP, DWORD port);
 public:
 	CListBox m_listCtrl;
 private:

@@ -56,14 +56,14 @@ public:
 	virtual void SetKeepAliveInterval	(DWORD dwKeepAliveInterval)		{m_dwKeepAliveInterval	= dwKeepAliveInterval;}
 	virtual void SetFreeBufferPoolSize	(DWORD dwFreeBufferPoolSize)	{m_dwFreeBufferPoolSize = dwFreeBufferPoolSize;}
 	virtual void SetFreeBufferPoolHold	(DWORD dwFreeBufferPoolHold)	{m_dwFreeBufferPoolHold = dwFreeBufferPoolHold;}
-	virtual void SetExtra				(PVOID pExtra)					{m_pExtra				= pExtra;}						
+	virtual void SetExtra				(void* pExtra)					{m_pExtra				= pExtra;}						
 
 	virtual DWORD GetSocketBufferSize	()	{return m_dwSocketBufferSize;}
 	virtual DWORD GetKeepAliveTime		()	{return m_dwKeepAliveTime;}
 	virtual DWORD GetKeepAliveInterval	()	{return m_dwKeepAliveInterval;}
 	virtual DWORD GetFreeBufferPoolSize	()	{return m_dwFreeBufferPoolSize;}
 	virtual DWORD GetFreeBufferPoolHold	()	{return m_dwFreeBufferPoolHold;}
-	virtual PVOID GetExtra				()	{return m_pExtra;}
+	virtual void* GetExtra				()	{return m_pExtra;}
 
 protected:
 	virtual EnHandleResult FirePrepareConnect(SOCKET socket)
@@ -113,8 +113,8 @@ protected:
 		{return pClient->DoSendPackets(pBuffers, iCount);}
 
 protected:
-	void SetReserved	(PVOID pReserved)	{m_pReserved = pReserved;}						
-	PVOID GetReserved	()					{return m_pReserved;}
+	void SetReserved	(void* pReserved)	{m_pReserved = pReserved;}						
+	void* GetReserved	()					{return m_pReserved;}
 	int GetRemoteHost	(char** lpszHost, USHORT* pusPort = nullptr);
 
 private:
@@ -198,8 +198,8 @@ private:
 	volatile EnServiceState	m_enState;
 	EnSocketError		m_enLastError;
 
-	PVOID				m_pExtra;
-	PVOID				m_pReserved;
+	void*				m_pExtra;
+	void*				m_pReserved;
 
 	CBufferPtr			m_rcBuffer;
 

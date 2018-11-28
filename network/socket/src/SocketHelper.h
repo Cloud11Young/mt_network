@@ -444,9 +444,9 @@ struct TSocketObjBase
 
 	CONNID		connID;
 	HP_SOCKADDR	remoteAddr;
-	PVOID		extra;
-	PVOID		reserved;
-	PVOID		reserved2;
+	void*		extra;
+	void*		reserved;
+	void*		reserved2;
 	int		valid;
 
 	union
@@ -697,7 +697,7 @@ ULONGLONG NToH64(ULONGLONG value);
 ULONGLONG HToN64(ULONGLONG value);
 
 /* 获取 Socket 的某个扩展函数的指针 */
-PVOID GetExtensionFuncPtr					(SOCKET sock, GUID guid);
+void* GetExtensionFuncPtr					(SOCKET sock, GUID guid);
 /* 获取 AcceptEx 扩展函数指针 */
 LPFN_ACCEPTEX Get_AcceptEx_FuncPtr			(SOCKET sock);
 /* 获取 GetAcceptExSockaddrs 扩展函数指针 */

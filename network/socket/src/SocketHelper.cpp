@@ -419,10 +419,10 @@ ULONGLONG HToN64(ULONGLONG value)
 	return (((ULONGLONG)htonl((u_long)((value << 32) >> 32))) << 32) | htonl((u_long)(value >> 32));
 }
 
-PVOID GetExtensionFuncPtr(SOCKET sock, GUID guid)
+void* GetExtensionFuncPtr(SOCKET sock, GUID guid)
 {
 	DWORD dwBytes;
-	PVOID pfn = nullptr;
+	void* pfn = nullptr;
 
 	::WSAIoctl	(
 					sock,

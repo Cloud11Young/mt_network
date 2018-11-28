@@ -29,7 +29,7 @@ public:
 private:
 	void ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID);
 	void ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID);
-//	static UINT WINAPI ReceiveThread(LPVOID pVoid);
+//	static UINT WINAPI ReceiveThread(LPVOID void*);
 private:
 	std::map<CONNID, RemoteAddress*> m_vAddr;
 	PUSER_CB m_pCallBack;
@@ -58,7 +58,7 @@ public:
 private:
 	void ExtractBuffer(std::deque<Buffer*>* pBufs, CONNID dwConnID);
 	void ExtractData(Buffer* pBuf, std::deque<Buffer*>* pComplete, CONNID dwConnID);
-//	static UINT WINAPI ReceiveThread(LPVOID pVoid);
+//	static UINT WINAPI ReceiveThread(LPVOID void*);
 private:
 	std::map<CONNID, RemoteAddress*> m_vAddr;
 	PUSER_CB m_pCallBack;

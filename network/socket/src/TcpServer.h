@@ -40,8 +40,8 @@ public:
 public:
 	virtual int IsSecure				() {return FALSE;}
 
-	virtual int SetConnectionExtra(CONNID dwConnID, PVOID pExtra);
-	virtual int GetConnectionExtra(CONNID dwConnID, PVOID* ppExtra);
+	virtual int SetConnectionExtra(CONNID dwConnID, void* pExtra);
+	virtual int GetConnectionExtra(CONNID dwConnID, void** ppExtra);
 
 	virtual void SetSendPolicy				(EnSendPolicy enSendPolicy)		{m_enSendPolicy				= enSendPolicy;}
 	virtual void SetMaxConnectionCount		(unsigned long dwMaxConnectionCount)	{m_dwMaxConnectionCount		= dwMaxConnectionCount;}
@@ -131,16 +131,16 @@ private:
 	EnHandleResult TriggerFireClose(TSocketObj* pSocketObj, EnSocketOperation enOperation, int iErrorCode);
 
 protected:
-	int SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra);
-	int GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra);
-	int SetConnectionReserved(CONNID dwConnID, PVOID pReserved);
-	int GetConnectionReserved(CONNID dwConnID, PVOID* ppReserved);
-	int SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved);
-	int GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved);
-	int SetConnectionReserved2(CONNID dwConnID, PVOID pReserved2);
-	int GetConnectionReserved2(CONNID dwConnID, PVOID* ppReserved2);
-	int SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2);
-	int GetConnectionReserved2(TSocketObj* pSocketObj, PVOID* ppReserved2);
+	int SetConnectionExtra(TSocketObj* pSocketObj, void* pExtra);
+	int GetConnectionExtra(TSocketObj* pSocketObj, void** ppExtra);
+	int SetConnectionReserved(CONNID dwConnID, void* pReserved);
+	int GetConnectionReserved(CONNID dwConnID, void** ppReserved);
+	int SetConnectionReserved(TSocketObj* pSocketObj, void* pReserved);
+	int GetConnectionReserved(TSocketObj* pSocketObj, void** ppReserved);
+	int SetConnectionReserved2(CONNID dwConnID, void* pReserved2);
+	int GetConnectionReserved2(CONNID dwConnID, void** ppReserved2);
+	int SetConnectionReserved2(TSocketObj* pSocketObj, void* pReserved2);
+	int GetConnectionReserved2(TSocketObj* pSocketObj, void** ppReserved2);
 
 private:
 	int CheckStarting();

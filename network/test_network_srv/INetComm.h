@@ -22,12 +22,12 @@ using namespace std;
 #define SEND_ASYN 1  // 异步
 
 
-typedef void(__stdcall *LPCONNECT_CALLBACK)(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName);
-typedef void(__stdcall *LPDISCONNECT_CALLBACK)(PVOID pThis, char* strIP, USHORT dwPort);
-typedef void(__stdcall *LPRECVMSG_CALLBACK)(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
-typedef void(__stdcall *LPPREAUTO_CONNECT_CALLBACK)(PVOID pThis, char* strIP, USHORT dwPort);
-typedef void(__stdcall *LPPOSTAUTO_CONNECT_CALLBACK)(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK);
-typedef void(__stdcall *LPERROR_CALLBACK)(PVOID pThis, char* strIP, USHORT dwPort, const char* msg);
+typedef void(__stdcall *LPCONNECT_CALLBACK)(void* pThis, char* strIP, USHORT dwPort, char* strPcName);
+typedef void(__stdcall *LPDISCONNECT_CALLBACK)(void* pThis, char* strIP, USHORT dwPort);
+typedef void(__stdcall *LPRECVMSG_CALLBACK)(void* pThis, void* pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
+typedef void(__stdcall *LPPREAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, USHORT dwPort);
+typedef void(__stdcall *LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, USHORT dwPort, BOOL bOK);
+typedef void(__stdcall *LPERROR_CALLBACK)(void* pThis, char* strIP, USHORT dwPort, const char* msg);
 
 typedef struct _USER_CB
 {
@@ -40,7 +40,7 @@ typedef struct _USER_CB
 	LPRECVMSG_CALLBACK		lpRecvMsgCB;
 	LPPREAUTO_CONNECT_CALLBACK lpPreAutoConnectCB;
 	LPPOSTAUTO_CONNECT_CALLBACK lpPostAutoConnectCB;
-	PVOID					lpCallBackData;
+	void*					lpCallBackData;
 	LPERROR_CALLBACK        lpErrorCB;
 }USER_CB, *PUSER_CB;
 
@@ -50,8 +50,8 @@ public:
 	static BOOL CreateInstance(INetComm **ppINetComm);
 	virtual void Release() =0;
 
-	virtual BOOL Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* strIp) = 0;//需要提供Server服务
-	virtual BOOL Initialize(PVOID pThis, PUSER_CB callback) = 0;//不需要提供Server服务
+	virtual BOOL Initialize(void* pThis, PUSER_CB callback, USHORT dwPort, char* strIp) = 0;//需要提供Server服务
+	virtual BOOL Initialize(void* pThis, PUSER_CB callback) = 0;//不需要提供Server服务
 	virtual BOOL GetStatus(BOOL &bIsServer, BOOL &bIsClient) = 0;
 	virtual BOOL ConnectTo(char* pIP, USHORT uPort, BOOL bAutoReconnect = TRUE) = 0;
 	virtual BOOL Disconnect(char* pIP, USHORT uPort) = 0;

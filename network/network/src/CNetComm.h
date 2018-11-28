@@ -19,18 +19,18 @@ public:
 	virtual ~CNetComm();
 	virtual void Release();
 
-	virtual int Initialize(void* pThis, PUSER_CB callback, USHORT dwPort, char* strIp);//需要提供Server服务
+	virtual int Initialize(void* pThis, PUSER_CB callback, unsigned short dwPort, char* strIp);//需要提供Server服务
 	virtual int Initialize(void* pThis, PUSER_CB callback);//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient);
-	virtual int ConnectTo(char* pIP, USHORT uPort, BOOL bAutoReconnect = TRUE);
-	virtual int Disconnect(char* pIP, USHORT uPort);
+	virtual int ConnectTo(char* pIP, unsigned short uPort, int bAutoReconnect = TRUE);
+	virtual int Disconnect(char* pIP, unsigned short uPort);
 
-	virtual int SendMsg(void* pMsg, DWORD dwMsgLen, char* pIP, USHORT uPort, DWORD dwWay = SEND_ASYN);
-	virtual int GetSocket(char* pIP, USHORT uPort, list<HANDLE> SocketList);
+	virtual int SendMsg(void* pMsg, unsigned long dwMsgLen, char* pIP, unsigned short uPort, unsigned long dwWay = SEND_ASYN);
+//	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList);
 
 	virtual int Uninitialize();
 private:
-	int StartConnectThread(const char* IP, USHORT port);
+	int StartConnectThread(const char* IP, unsigned short port);
 	static UINT WINAPI ConnectThread(LPVOID p);
 private:
 	ITcpPackServer* m_pServer;
@@ -41,9 +41,9 @@ private:
 	ServerListener* m_pSrvListen;
 	ClientListener* m_pClientListen;
 //	CMTX     m_extractlock;
-	char     m_conIP[IP_LEN];
-	USHORT   m_conPort;
-	int      m_bConStart;
+	char			m_conIP[IP_LEN];
+	unsigned short  m_conPort;
+	int				m_bConStart;
 };
 
 #endif

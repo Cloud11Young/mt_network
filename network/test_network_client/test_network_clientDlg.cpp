@@ -13,11 +13,11 @@
 
 //#pragma comment(lib,"../lib/network_d.lib")
 
-static void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName);
-static void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
-static void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
-static void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort);
-static void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK);
+static void CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort, char* strPcName);
+static void DISCONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort);
+static void RECVMSG_CALLBACK(void* pThis, void* pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort);
+static void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort);
+static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort, BOOL bOK);
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -180,26 +180,26 @@ HCURSOR Ctest_network_clientDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, char* strPcName){
+void CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort, char* strPcName){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
 	pDlg->ConnectMsg(CString(strIP), dwPort, CString(strPcName));
 }
 
-void DISCONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
+void DISCONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
 	pDlg->DisConnectMsg(CString(strIP), dwPort);
 }
 
-void RECVMSG_CALLBACK(PVOID pThis, PVOID pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort){
+void RECVMSG_CALLBACK(void* pThis, void* pMsg, DWORD dwMsgLen, char* strIP, USHORT dwPort){
 	Ctest_network_clientDlg* pDlg = (Ctest_network_clientDlg*)pThis;
 	pDlg->RecvMsg(pMsg, dwMsgLen, CString(strIP), dwPort);
 }
 
-void PREAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort){
+void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort){
 
 }
 
-void POSTAUTO_CONNECT_CALLBACK(PVOID pThis, char* strIP, USHORT dwPort, BOOL bOK){
+void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, USHORT dwPort, BOOL bOK){
 
 }
 

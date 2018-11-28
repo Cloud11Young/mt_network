@@ -31,7 +31,7 @@ void CNetComm::Release(){
 
 }
 
-BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* strIp){//需要提供Server服务
+BOOL CNetComm::Initialize(void* pThis, PUSER_CB callback, USHORT dwPort, char* strIp){//需要提供Server服务
 	m_pSrvListen->RegCallBack(callback);
 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
@@ -56,7 +56,7 @@ BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback, USHORT dwPort, char* s
 	return TRUE;
 }
 
-BOOL CNetComm::Initialize(PVOID pThis, PUSER_CB callback){//不需要提供Server服务
+BOOL CNetComm::Initialize(void* pThis, PUSER_CB callback){//不需要提供Server服务
 	m_pClient = HP_Create_TcpPackClient(m_pClientListen);
 	m_pClientListen->RegCallBack(callback);
 	if (!m_pClient)
@@ -141,10 +141,10 @@ int CNetComm::SendMsg(LPVOID pMsg, DWORD dwMsgLen, char* pIP, USHORT uPort, DWOR
 	return bSend;
 }
 
-int CNetComm::GetSocket(char* pIP, USHORT uPort, list<HANDLE> SocketList){
-
-	return FALSE;
-}
+// int CNetComm::GetSocket(char* pIP, USHORT uPort, std::list<HANDLE> SocketList){
+// 
+// 	return FALSE;
+// }
 
 int CNetComm::Uninitialize(){
 	int isOK = FALSE;

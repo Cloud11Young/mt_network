@@ -36,7 +36,7 @@ protected:
 	virtual EnHandleResult DoFireReceive(TSocketObj* pSocketObj, const BYTE* pData, int iLength)
 	{
 		TBufferPackInfo* pInfo = nullptr;
-		GetConnectionReserved(pSocketObj, (PVOID*)&pInfo);
+		GetConnectionReserved(pSocketObj, (void**)&pInfo);
 		ASSERT(pInfo);
 
 		TBuffer* pBuffer = (TBuffer*)pInfo->pBuffer;
@@ -50,7 +50,7 @@ protected:
 		EnHandleResult result = __super::DoFireClose(pSocketObj, enOperation, iErrorCode);
 
 		TBufferPackInfo* pInfo = nullptr;
-		GetConnectionReserved(pSocketObj, (PVOID*)&pInfo);
+		GetConnectionReserved(pSocketObj, (void**)&pInfo);
 		ASSERT(pInfo);
 
 		if(pInfo != nullptr)

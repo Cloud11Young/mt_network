@@ -103,7 +103,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败（无效的连接 ID）
 	*/
-	virtual int SetConnectionExtra		(CONNID dwConnID, PVOID pExtra)			= 0;
+	virtual int SetConnectionExtra		(CONNID dwConnID, void* pExtra)			= 0;
 
 	/*
 	* 名称：获取连接的附加数据
@@ -114,7 +114,7 @@ public:
 	* 返回值：	TRUE	-- 成功
 	*			FALSE	-- 失败（无效的连接 ID）
 	*/
-	virtual int GetConnectionExtra			(CONNID dwConnID, PVOID* ppExtra)	= 0;
+	virtual int GetConnectionExtra			(CONNID dwConnID, void** ppExtra)	= 0;
 
 	/* 检测是否为安全连接（SSL/HTTPS） */
 	virtual int IsSecure				()									= 0;
@@ -534,10 +534,10 @@ public:
 	/***************************** 属性访问方法 *****************************/
 
 	/* 设置连接的附加数据 */
-	virtual void SetExtra					(PVOID pExtra)										= 0;
+	virtual void SetExtra					(void* pExtra)										= 0;
 
 	/* 获取连接的附加数据 */
-	virtual PVOID GetExtra					()													= 0;
+	virtual void* GetExtra					()													= 0;
 
 	/* 检测是否为安全连接（SSL/HTTPS） */
 	virtual int IsSecure					()													= 0;

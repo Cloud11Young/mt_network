@@ -519,13 +519,13 @@ int CTcpServer::GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAddr
 	return FALSE;
 }
 
-int CTcpServer::SetConnectionExtra(CONNID dwConnID, PVOID pExtra)
+int CTcpServer::SetConnectionExtra(CONNID dwConnID, void* pExtra)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionExtra(pSocketObj, pExtra);
 }
 
-int CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra)
+int CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, void* pExtra)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -536,13 +536,13 @@ int CTcpServer::SetConnectionExtra(TSocketObj* pSocketObj, PVOID pExtra)
 	return FALSE;
 }
 
-int CTcpServer::GetConnectionExtra(CONNID dwConnID, PVOID* ppExtra)
+int CTcpServer::GetConnectionExtra(CONNID dwConnID, void** ppExtra)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionExtra(pSocketObj, ppExtra);
 }
 
-int CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra)
+int CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, void** ppExtra)
 {
 	ASSERT(ppExtra != nullptr);
 
@@ -555,13 +555,13 @@ int CTcpServer::GetConnectionExtra(TSocketObj* pSocketObj, PVOID* ppExtra)
 	return FALSE;
 }
 
-int CTcpServer::SetConnectionReserved(CONNID dwConnID, PVOID pReserved)
+int CTcpServer::SetConnectionReserved(CONNID dwConnID, void* pReserved)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionReserved(pSocketObj, pReserved);
 }
 
-int CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved)
+int CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, void* pReserved)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -572,13 +572,13 @@ int CTcpServer::SetConnectionReserved(TSocketObj* pSocketObj, PVOID pReserved)
 	return FALSE;
 }
 
-int CTcpServer::GetConnectionReserved(CONNID dwConnID, PVOID* ppReserved)
+int CTcpServer::GetConnectionReserved(CONNID dwConnID, void** ppReserved)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionReserved(pSocketObj, ppReserved);
 }
 
-int CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved)
+int CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, void** ppReserved)
 {
 	ASSERT(ppReserved != nullptr);
 
@@ -591,13 +591,13 @@ int CTcpServer::GetConnectionReserved(TSocketObj* pSocketObj, PVOID* ppReserved)
 	return FALSE;
 }
 
-int CTcpServer::SetConnectionReserved2(CONNID dwConnID, PVOID pReserved2)
+int CTcpServer::SetConnectionReserved2(CONNID dwConnID, void* pReserved2)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return SetConnectionReserved2(pSocketObj, pReserved2);
 }
 
-int CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2)
+int CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, void* pReserved2)
 {
 	if(TSocketObj::IsExist(pSocketObj))
 	{
@@ -608,13 +608,13 @@ int CTcpServer::SetConnectionReserved2(TSocketObj* pSocketObj, PVOID pReserved2)
 	return FALSE;
 }
 
-int CTcpServer::GetConnectionReserved2(CONNID dwConnID, PVOID* ppReserved2)
+int CTcpServer::GetConnectionReserved2(CONNID dwConnID, void** ppReserved2)
 {
 	TSocketObj* pSocketObj = FindSocketObj(dwConnID);
 	return GetConnectionReserved2(pSocketObj, ppReserved2);
 }
 
-int CTcpServer::GetConnectionReserved2(TSocketObj* pSocketObj, PVOID* ppReserved2)
+int CTcpServer::GetConnectionReserved2(TSocketObj* pSocketObj, void** ppReserved2)
 {
 	ASSERT(ppReserved2 != nullptr);
 
