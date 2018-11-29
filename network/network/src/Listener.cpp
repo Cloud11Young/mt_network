@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include "../public/HPSocket.h"
 #include <process.h>
+#include "log4cpp/Category.hh"
 
 static char* GetLastErrorToString(DWORD errorCode)
 {
@@ -21,6 +22,26 @@ static char* GetLastErrorToString(DWORD errorCode)
 	strcpy_s(ptmp, strlen(text) + 1,text);
 	LocalFree(text);
 	return ptmp;
+}
+
+static const char* GetMapOpertor(EnSocketOperation oper)
+{
+	switch (oper)
+	{
+	case SO_ACCEPT:
+		return "so_accept";
+	case SO_CLOSE:
+		return "so_close";
+	case SO_CONNECT:
+		return "so_connect";
+	case SO_RECEIVE:
+		return "so_receive";
+	case SO_SEND:
+		return "so_send";
+	case SO_UNKNOWN:
+		return "so_unknown";
+	}
+	return "so_unknown";
 }
 
 
@@ -115,12 +136,19 @@ EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnS
 
 	if (m_pCallBack)
 	{
+		char* sErr = GetLastErrorToString(iErrorCode);
+		const char* sOper = GetMapOpertor(enOperation);
+		char err[512] = { 0 };
+		sprintf(err, "socket operator %s, error %s", sOper, sErr);
+		log4cpp::Category::getInstance("network").error("%s:%d] server client close info = \"%s\"",
+			__FILE__, __LINE__, err);
+		delete[] sErr;
+
 		if (m_pCallBack->lpErrorCB)
-		{
-			char* sErr = GetLastErrorToString(iErrorCode); 
-			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort, sErr);
-			delete[] sErr;
+		{			
+			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort, err);			
 		}
+	
 
 		if (m_pCallBack->lpDisconnectCB)
 			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort);
@@ -359,12 +387,18 @@ EnHandleResult ClientListener::OnClose(ITcpClient* pSender, CONNID dwConnID, EnS
 //	if (m_pCallBack)	m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort);
 	if (m_pCallBack)
 	{
+		char* sErr = GetLastErrorToString(iErrorCode);
+		const char* sOper = GetMapOpertor(enOperation);
+		char err[512] = { 0 };
+		sprintf(err, "socket operator %s, error %s", sOper, sErr);
+		log4cpp::Category::getInstance("network").error("%s:%d] client close info = \"%s\"",
+			__FILE__, __LINE__, err);
+
 		if (m_pCallBack->lpErrorCB)
-		{
-			char* sErr = GetLastErrorToString(iErrorCode);
-			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, sErr);
-			delete[] sErr;
+		{			
+			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, err);			
 		}
+		delete[] sErr;
 
 		if (m_pCallBack->lpDisconnectCB)
 			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort);

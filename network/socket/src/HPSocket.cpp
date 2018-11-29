@@ -490,7 +490,3 @@ SOCKET_API ULONGLONG SYS_HToN64(ULONGLONG value)
 // 	return ::UrlEncode(lpszSrc, dwSrcLen, lpszDest, dwDestLen);
 // }
 
-// SOCKET_API int SYS_UrlDecode(BYTE* lpszSrc, DWORD dwSrcLen, BYTE* lpszDest, DWORD& dwDestLen)
-// {
-// 	return ::UrlDecode(lpszSrc, dwSrcLen, lpszDest, dwDestLen);
-// }

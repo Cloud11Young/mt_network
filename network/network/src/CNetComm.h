@@ -44,6 +44,9 @@ private:
 	char			m_conIP[IP_LEN];
 	unsigned short  m_conPort;
 	int				m_bConStart;
+
+	HANDLE m_pthread;
+	HANDLE m_hExit;
 };
 
 #endif

@@ -13,11 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="public">
-      <UniqueIdentifier>{462e467b-f566-419a-9e87-3f53f1192ea6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{cb610ecb-a9d0-4b6f-87c7-bc781ecf8337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pubilc">
+      <UniqueIdentifier>{dfee697c-d2d2-4a23-8769-77501f50d594}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,15 +29,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="public\HPSocket.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="public\HPTypeDef.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="public\SocketInterface.h">
-      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="src\BufferPool.h">
       <Filter>src</Filter>
@@ -53,6 +44,15 @@
     </ClInclude>
     <ClInclude Include="src\Listener.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HPSocket.h">
+      <Filter>pubilc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HPTypeDef.h">
+      <Filter>pubilc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SocketInterface.h">
+      <Filter>pubilc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

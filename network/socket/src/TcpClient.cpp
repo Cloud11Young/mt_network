@@ -1,37 +1,70 @@
-/*
- * Copyright: JessMA Open Source (ldcsaa@gmail.com)
- *
- * Version	: 5.0.2
- * Author	: Bruce Liang
- * Website	: http://www.jessma.org
- * Project	: https://github.com/ldcsaa
- * Blog		: http://www.cnblogs.com/ldcsaa
- * Wiki		: http://www.oschina.net/p/hp-socket
- * QQ Group	: 75375912, 44636872
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- 
 #include "stdafx.h"
 #include "TcpClient.h"
 //#include "../Common/Src/WaitFor.h"
-
 #include <process.h>
+
+#include "mtHelper.h"
+#include "log4cpp/Category.hh"
+#include "log4cpp/RollingFileAppender.hh"
+#include "log4cpp/PatternLayout.hh"
+
+#pragma comment(lib,"../lib/log4cppD.lib")
+
+static int IsDirExist(const char* path){
+	DWORD dwAttri = GetFileAttributesA(path);
+	return INVALID_FILE_ATTRIBUTES != dwAttri && 0 != (dwAttri&FILE_ATTRIBUTE_DIRECTORY);
+}
+
+static void Initlog()
+{
+	char path[MAX_PATH];
+	char cfgPath[MAX_PATH] = { 0 };
+	char filePath[MAX_PATH] = { 0 };
+	GetPathExeA(path, MAX_PATH);
+
+	sprintf_s(filePath, "%s\\log", path);
+
+	if (!IsDirExist(filePath))
+	{
+		CreateDirectoryA(filePath, NULL);
+	}
+
+	time_t t;
+	time(&t);
+	struct tm* timeinfo;
+	timeinfo = localtime(&t);
+	char stm[255] = { 0 };
+	strftime(stm, sizeof(stm), "\\client_%y_%m_%d %H_%M_%S.txt", timeinfo);
+	sprintf_s(filePath, "%s\\log\\%s", path, stm);
+	sprintf_s(cfgPath, "%s\\config\\log4cpp.property", path);
+
+	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("default", filePath);
+	if (RollAppender == NULL)	return;
+
+	RollAppender->setMaximumFileSize(100 * 1024 * 1024);
+	RollAppender->setMaxBackupIndex(10);
+
+	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
+	if (layout == NULL)	return;
+
+	layout->setConversionPattern("[%d %p %t %m %n");
+	RollAppender->setLayout(layout);
+
+	log4cpp::Category& root = log4cpp::Category::getRoot();
+	root.addAppender(RollAppender);
+
+	log4cpp::Category& netlog = root.getInstance("client");
+	root.setRootPriority(log4cpp::Priority::ERROR);
+
+	netlog.setPriority(log4cpp::Priority::INFO);
+}
 
 const CInitSocket CTcpClient::sm_wsSocket;
 
 int CTcpClient::Start(const char* lpszRemoteAddress, USHORT usPort, int bAsyncConnect, const char* lpszBindAddress)
 {
+	Initlog();
+
 	if(!CheckParams() || !CheckStarting())
 		return FALSE;
 
@@ -54,19 +87,38 @@ int CTcpClient::Start(const char* lpszRemoteAddress, USHORT usPort, int bAsyncCo
 					if(CreateWorkerThread())
 						isOK = TRUE;
 					else
+					{
 						SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ERROR_CREATE_FAILED);
+						log4cpp::Category::getInstance("client").error("%s:%d] create worker thread failed", __FILE__, __LINE__);
+					}
+						
 				}
 				else
+				{
 					SetLastError(SE_CONNECT_SERVER, __FUNCTION__, ::WSAGetLastError());
+					log4cpp::Category::getInstance("client").error("%s:%d] connect to server failed", __FILE__, __LINE__);
+				}
+					
 			}
 			else
+			{
 				SetLastError(SE_SOCKET_PREPARE, __FUNCTION__, ERROR_CANCELLED);
+				log4cpp::Category::getInstance("client").error("%s:%d] prepare connect failed", __FILE__, __LINE__);
+			}
+				
 		}
 		else
+		{
 			SetLastError(SE_SOCKET_BIND, __FUNCTION__, ::WSAGetLastError());
+			log4cpp::Category::getInstance("client").error("%s:%d] bind socket failed", __FILE__, __LINE__);
+		}
+			
 	}
 	else
+	{
 		SetLastError(SE_SOCKET_CREATE, __FUNCTION__, ::WSAGetLastError());
+		log4cpp::Category::getInstance("client").error("%s:%d] create socket failed", __FILE__, __LINE__);
+	}	
 
 	if(!isOK)
 	{
@@ -227,6 +279,8 @@ int CTcpClient::CreateWorkerThread()
 UINT WINAPI CTcpClient::WorkerThreadProc(LPVOID pv)
 {
 	TRACE("---------------> Client Worker Thread 0x%08X started <---------------\n", ::GetCurrentThreadId());
+	log4cpp::Category::getInstance("client").info("%s:%d] ---------------> Client Worker Thread 0x%08X started <---------------", 
+		__FILE__, __LINE__,	::GetCurrentThreadId());
 
 	int bCallStop		= TRUE;
 	CTcpClient* pClient	= (CTcpClient*)pv;
@@ -268,6 +322,8 @@ UINT WINAPI CTcpClient::WorkerThreadProc(LPVOID pv)
 		pClient->Stop();
 
 	TRACE("---------------> Client Worker Thread 0x%08X stoped <---------------\n", ::GetCurrentThreadId());
+	log4cpp::Category::getInstance("client").info("%s:%d] ---------------> Client Worker Thread 0x%08X stoped <---------------",
+		__FILE__, __LINE__, ::GetCurrentThreadId());
 
 	return 0;
 }
@@ -403,6 +459,8 @@ int CTcpClient::ReadData()
 			if(FireReceive(m_rcBuffer, rc) == HR_ERROR)
 			{
 				TRACE("<C-CNNID: %Iu> OnReceive() event return 'HR_ERROR', connection will be closed !\n", m_dwConnID);
+				log4cpp::Category::getInstance("client").error("%s:%d] <C-CNNID: %Iu> OnReceive() event return 'HR_ERROR', connection will be closed !",
+					__FILE__, __LINE__, m_dwConnID);
 
 				m_ccContext.Reset(TRUE, SO_RECEIVE, ERROR_CANCELLED);
 				return FALSE;
@@ -499,6 +557,9 @@ int CTcpClient::DoSendData(TItem* pItem)
 			if(FireSend(pItem->Ptr(), rc) == HR_ERROR)
 			{
 				TRACE("<C-CNNID: %Iu> OnSend() event should not return 'HR_ERROR' !!\n", m_dwConnID);
+				log4cpp::Category::getInstance("client").error("%s:%d] <C-CNNID: %Iu> OnSend() event should not return 'HR_ERROR' !!",
+					__FILE__, __LINE__, m_dwConnID);
+
 				ASSERT(FALSE);
 			}
 
@@ -678,6 +739,8 @@ int CTcpClient::SendSmallFile(const char* lpszFileName, const LPWSABUF pHead, co
 void CTcpClient::SetLastError(EnSocketError code, LPCSTR func, int ec)
 {
 	TRACE("%s --> Error: %d, EC: %d\n", func, code, ec);
+	log4cpp::Category::getInstance("client").error("%s:%d] %s --> Error: %d, EC: %d",
+		__FILE__, __LINE__, func, code, ec);
 
 	m_enLastError = code;
 	::SetLastError(ec);

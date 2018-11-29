@@ -36,14 +36,8 @@
     <ClInclude Include="src\SocketHelper.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\SocketInterface.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Src\WaitFor.h">
       <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HPSocket.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\TcpClient.h">
       <Filter>src</Filter>
@@ -62,6 +56,15 @@
     </ClInclude>
     <ClInclude Include="Common\Src\SysHelper.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HPSocket.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HPTypeDef.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SocketInterface.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

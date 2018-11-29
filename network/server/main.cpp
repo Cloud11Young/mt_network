@@ -25,7 +25,17 @@ int main(int argc, char** argv)
 	userCB.lpErrorCB = ErrorCB;
 	userCB.lpCallBackData = pNet;
 
-	pNet->Initialize(NULL, &userCB, 8080, "127.0.0.1");
+	char tmp[64] = { 0 };
+	char ip[32] = { 0 };
+	unsigned short port = 8800;
+	printf("please input server ip and port:");
+	scanf("%s%d", &tmp,&port);
+//	sscanf(tmp, "%s%d", ip, &port);
+
+	if (pNet->Initialize(NULL, &userCB, port, ip) != 0)
+	{
+		printf("server start success\n");
+	}
 
 	while (true)
 	{

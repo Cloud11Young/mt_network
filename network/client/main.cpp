@@ -15,7 +15,7 @@ static void ErrorCB(void* pThis, char* strIP, unsigned short dwPort, const char*
 unsigned int __stdcall workthread(void* pVoid)
 {
 	INetComm* pNet = (INetComm*)pVoid;
-	pNet->ConnectTo("127.0.0.1", 8080);
+	pNet->ConnectTo("192.168.101.108", 8800);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
 	printf("thread %d input send msg:",GetCurrentThreadId());
@@ -25,7 +25,7 @@ unsigned int __stdcall workthread(void* pVoid)
 	strcat(tmp, "end");
 	while (true)
 	{
-		pNet->SendMsg(tmp, strlen(tmp) + 1, "127.0.0.1", 8080);
+		pNet->SendMsg(tmp, strlen(tmp) + 1, "192.168.101.108", 8800);
 		Sleep(100);
 	}
 }

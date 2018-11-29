@@ -21,11 +21,13 @@
 #define SEND_SYN  0  // Õ¨≤Ω
 #define SEND_ASYN 1  // “Ï≤Ω
 
+typedef unsigned short ushort;
+typedef unsigned long  ulong;
 
 typedef void (*LPCONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, char* strPcName);
 typedef void (*LPDISCONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort);
 typedef void (*LPRECVMSG_CALLBACK)(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort);
-typedef void (*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort);
+typedef void(*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort);
 typedef void (*LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, int bOK);
 typedef void (*LPERROR_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, const char* msg);
 
