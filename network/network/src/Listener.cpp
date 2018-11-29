@@ -139,7 +139,7 @@ EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnS
 		char* sErr = GetLastErrorToString(iErrorCode);
 		const char* sOper = GetMapOpertor(enOperation);
 		char err[512] = { 0 };
-		sprintf(err, "socket operator %s, error %s", sOper, sErr);
+		sprintf_s(err, "socket operator %s, error %s", sOper, sErr);
 		log4cpp::Category::getInstance("network").error("%s:%d] server client close info = \"%s\"",
 			__FILE__, __LINE__, err);
 		delete[] sErr;
@@ -390,7 +390,7 @@ EnHandleResult ClientListener::OnClose(ITcpClient* pSender, CONNID dwConnID, EnS
 		char* sErr = GetLastErrorToString(iErrorCode);
 		const char* sOper = GetMapOpertor(enOperation);
 		char err[512] = { 0 };
-		sprintf(err, "socket operator %s, error %s", sOper, sErr);
+		sprintf_s(err, "socket operator %s, error %s", sOper, sErr);
 		log4cpp::Category::getInstance("network").error("%s:%d] client close info = \"%s\"",
 			__FILE__, __LINE__, err);
 
