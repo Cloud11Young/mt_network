@@ -96,7 +96,10 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, unsigned short dwPort, 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
 	{
-//		log4cpp::Category::getInstance("network").error("%s:%d] create server object failed", __FILE__, __LINE__);
+		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+		{
+			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, "server Create object failed");
+		}
 		return 0;
 	}	
 
