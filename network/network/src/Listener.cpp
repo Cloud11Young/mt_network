@@ -5,24 +5,24 @@
 #include <winsock2.h>
 #include "../public/HPSocket.h"
 #include <process.h>
-#include "log4cpp/Category.hh"
+//#include "log4cpp/Category.hh"
 
-static char* GetLastErrorToString(DWORD errorCode)
-{
-	//因为FORMAT_MESSAGE_ALLOCATE_BUFFER标志，这个函数帮你分配内存，所以需要LocalFree来释放
-
-	char *text=NULL;
-	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(char*)&text, 0, NULL);
-//	std::string str = WideToMultiByte(text);
-	//	CStringA result(text);    //结果
-	char* ptmp = new char[strlen(text) + 1];
-	strcpy_s(ptmp, strlen(text) + 1,text);
-	LocalFree(text);
-	return ptmp;
-}
+// static char* GetLastErrorToString(DWORD errorCode)
+// {
+// 	//因为FORMAT_MESSAGE_ALLOCATE_BUFFER标志，这个函数帮你分配内存，所以需要LocalFree来释放
+// 
+// 	char *text=NULL;
+// 	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+// 		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode,
+// 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+// 		(char*)&text, 0, NULL);
+// //	std::string str = WideToMultiByte(text);
+// 	//	CStringA result(text);    //结果
+// 	char* ptmp = new char[strlen(text) + 1];
+// 	strcpy_s(ptmp, strlen(text) + 1,text);
+// 	LocalFree(text);
+// 	return ptmp;
+// }
 
 static const char* GetMapOpertor(EnSocketOperation oper)
 {
@@ -129,29 +129,27 @@ EnHandleResult ServerListener::OnShutdown(ITcpServer* pSender){
 }
 
 EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode){
-	RemoteAddress* pRemoteAddr = FindRemoteAddr(dwConnID);
-	if (dwConnID != pRemoteAddr->dwConnID)	return HR_ERROR;
-	DeleteRemoteAddr(dwConnID);
-	BufferPool::Instance()->RemoveLeftBuffer(dwConnID);
+// 	RemoteAddress* pRemoteAddr = FindRemoteAddr(dwConnID);
+// 	if (dwConnID != pRemoteAddr->dwConnID)	return HR_ERROR;
+ 	DeleteRemoteAddr(dwConnID);
+// 	BufferPool::Instance()->RemoveLeftBuffer(dwConnID);
+
+	RemoteAddress remoteaddr;
+	remoteaddr.dwConnID = dwConnID;
+	remoteaddr.iAddressLen = sizeof(remoteaddr.pAddress) / sizeof(char);
+	BOOL bGet = pSender->GetRemoteAddress(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
 
 	if (m_pCallBack)
 	{
-		char* sErr = GetLastErrorToString(iErrorCode);
-		const char* sOper = GetMapOpertor(enOperation);
 		char err[512] = { 0 };
-		sprintf_s(err, "socket operator %s, error %s", sOper, sErr);
-		log4cpp::Category::getInstance("network").error("%s:%d] server client close info = \"%s\"",
-			__FILE__, __LINE__, err);
-		delete[] sErr;
+		const char* sOper = GetMapOpertor(enOperation);		
+		sprintf_s(err, "socket operator %s, error desc %s, code %d", sOper, pSender->GetLastErrorDesc(), iErrorCode);
 
-		if (m_pCallBack->lpErrorCB)
-		{			
-			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort, err);			
-		}
-	
+		if (m_pCallBack->lpErrorCB)			
+			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, remoteaddr.pAddress, remoteaddr.usPort, err);	
 
 		if (m_pCallBack->lpDisconnectCB)
-			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, pRemoteAddr->pAddress, pRemoteAddr->usPort);
+			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, remoteaddr.pAddress, remoteaddr.usPort);
 	}
 
 	return HR_OK;
@@ -379,26 +377,21 @@ EnHandleResult ClientListener::OnShutdown(ITcpClient* pSender){
 	return HR_IGNORE;
 }
 
-EnHandleResult ClientListener::OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode){
+EnHandleResult ClientListener::OnClose(ITcpClient* pClient, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode){
 // 	RemoteAddress* pRemoteAddr = FindRemoteAddr(dwConnID);
 // 	if (dwConnID != pRemoteAddr->dwConnID)	return HR_ERROR;
-	BufferPool::Instance()->RemoveLeftBuffer(dwConnID);
+//	BufferPool::Instance()->RemoveLeftBuffer(dwConnID);
 
-//	if (m_pCallBack)	m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort);
 	if (m_pCallBack)
 	{
-		char* sErr = GetLastErrorToString(iErrorCode);
 		const char* sOper = GetMapOpertor(enOperation);
 		char err[512] = { 0 };
-		sprintf_s(err, "socket operator %s, error %s", sOper, sErr);
-		log4cpp::Category::getInstance("network").error("%s:%d] client close info = \"%s\"",
-			__FILE__, __LINE__, err);
+		sprintf_s(err, "socket operator %s, error desc %s, code %d", sOper, pClient->GetLastErrorDesc(),iErrorCode);
 
 		if (m_pCallBack->lpErrorCB)
 		{			
 			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, err);			
 		}
-		delete[] sErr;
 
 		if (m_pCallBack->lpDisconnectCB)
 			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort);

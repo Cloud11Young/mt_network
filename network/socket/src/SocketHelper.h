@@ -79,9 +79,9 @@
 /* TCP Pack 包长度位数 */
 #define TCP_PACK_LENGTH_BITS					22
 /* TCP Pack 包长度掩码 */
-#define TCP_PACK_LENGTH_MASK					0x3FFFFF
+#define TCP_PACK_LENGTH_MASK					0x3FFFFFF
 /* TCP Pack 包最大长度硬限制 */
-#define TCP_PACK_MAX_SIZE_LIMIT					0x3FFFFF
+#define TCP_PACK_MAX_SIZE_LIMIT					0x3FFFFFF
 /* TCP Pack 包默认最大长度 */
 #define TCP_PACK_DEFAULT_MAX_SIZE				0x040000
 /* TCP Pack 包头标识值硬限制 */

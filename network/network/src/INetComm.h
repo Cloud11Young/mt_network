@@ -24,12 +24,12 @@
 typedef unsigned short ushort;
 typedef unsigned long  ulong;
 
-typedef void (*LPCONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, char* strPcName);
-typedef void (*LPDISCONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort);
-typedef void (*LPRECVMSG_CALLBACK)(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort);
-typedef void(*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort);
-typedef void (*LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, int bOK);
-typedef void (*LPERROR_CALLBACK)(void* pThis, char* strIP, unsigned short dwPort, const char* msg);
+typedef void(*LPCONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, const char* strPcName);
+typedef void(*LPDISCONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort);
+typedef void(*LPRECVMSG_CALLBACK)(void* pThis, void* pMsg, ulong dwMsgLen, const char* strIP, ushort dwPort);
+typedef void(*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort);
+typedef void(*LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, int bOK);
+typedef void(*LPERROR_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, const char* msg);
 
 typedef struct _USER_CB
 {
@@ -52,13 +52,13 @@ public:
 	static int CreateInstance(INetComm **ppINetComm);
 	virtual void Release() =0;
 
-	virtual int Initialize(void* pThis, PUSER_CB callback, unsigned short dwPort, char* strIp) = 0;//需要提供Server服务
+	virtual int Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp) = 0;//需要提供Server服务
 	virtual int Initialize(void* pThis, PUSER_CB callback) = 0;//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient) = 0;
-	virtual int ConnectTo(char* pIP, unsigned short uPort, int bAutoReconnect = 1) = 0;
-	virtual int Disconnect(char* pIP, unsigned short uPort) = 0;
+	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = 1) = 0;
+	virtual int Disconnect(const char* pIP, ushort uPort) = 0;
 
-	virtual int SendMsg(void* pMsg, unsigned long dwMsgLen, char* pIP, unsigned short uPort, unsigned long dwWay = SEND_ASYN) = 0;
+	virtual int SendMsg(void* pMsg, ulong dwMsgLen, const char* pIP, ushort uPort, ulong dwWay = SEND_ASYN) = 0;
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList) = 0;
 
 	virtual int Uninitialize() = 0;

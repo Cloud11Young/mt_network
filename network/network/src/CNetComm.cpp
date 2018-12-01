@@ -65,6 +65,7 @@ CNetComm::CNetComm() :m_pServer(NULL), m_pClient(NULL), m_pthread(NULL)
 	m_pClientListen = new ClientListener;
 	m_bConStart = FALSE;
 	memset(m_conIP, 0, sizeof(*m_conIP)*IP_LEN);
+	memset(m_srvIP, 0, sizeof(*m_srvIP)*IP_LEN);
 
 	m_hExit = CreateEvent(NULL, TRUE, FALSE, NULL);
 //	Initlog();
@@ -88,10 +89,12 @@ void CNetComm::Release(){
 }
 
 //需要提供Server服务
-int CNetComm::Initialize(void* pThis, PUSER_CB callback, unsigned short dwPort, char* strIp)
+int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
 {
 	m_pServerCtrl = callback;
 	m_pSrvListen->RegCallBack(callback);
+	strcpy_s(m_srvIP, strIp);
+	m_srvPort = dwPort;
 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
@@ -102,13 +105,16 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, unsigned short dwPort, 
 		}
 		return 0;
 	}	
+	m_pServer->SetMaxPackSize(0x3FFFFFF);
 
 	if (!m_pServer->Start(strIp, dwPort))
 	{
 		const char* err = m_pServer->GetLastErrorDesc();
-		m_pServer->GetLastError();
-//		log4cpp::Category::getInstance("network").error("%s:%d] server start error = \"%s\", ip = %s, port = %d",
-//			__FILE__, __LINE__, err, strIp, dwPort);
+//		m_pServer->GetLastError();
+		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+		{
+			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, err);
+		}
 		return 0;
 	}
 		
@@ -127,9 +133,15 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 	m_pClient = HP_Create_TcpPackClient(m_pClientListen);	
 	if (!m_pClient)
 	{
+		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+		{
+			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, NULL, 0, "create client object failed");
+		}
 //		log4cpp::Category::getInstance("network").error("%s:%d] create client object failed", __FILE__, __LINE__);
 		return 0;
 	}	
+
+	m_pClient->SetMaxPackSize(0x3FFFFFF);
 
 	return 1;
 }
@@ -143,7 +155,7 @@ int CNetComm::GetStatus(int &bIsServer, int &bIsClient)
 	return TRUE;
 }
 
-int CNetComm::ConnectTo(char* pIP, unsigned short uPort, int bAutoReconnect/* = TRUE*/)
+int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnect/* = TRUE*/)
 {
 	m_bAutoReconnect = bAutoReconnect;
 //	m_conIP = pIP;
@@ -162,6 +174,11 @@ int CNetComm::ConnectTo(char* pIP, unsigned short uPort, int bAutoReconnect/* = 
 		{
 			const char* err = m_pClient->GetLastErrorDesc();
 			m_pClient->GetLastError();
+
+			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			{
+				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+			}
 //			log4cpp::Category::getInstance("network").error("%s:%d] client start error = \"%s\", ip = %s, port = %d",
 //				__FILE__, __LINE__, err, pIP, uPort);
 		}
@@ -171,76 +188,137 @@ int CNetComm::ConnectTo(char* pIP, unsigned short uPort, int bAutoReconnect/* = 
 	return 1;	
 }
 
-int CNetComm::Disconnect(char* pIP, unsigned short uPort)
+int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 {
 	if (m_pClient)
-		return m_pClient->Stop();
+	{
+		if (m_pClient->Stop() == 0)
+		{
+			const char* err = m_pClient->GetLastErrorDesc();
+			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			{
+				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+			}
+			return 0;
+		}
+		return 1;
+	}
 
 	if (m_pServer)
 	{
-		DWORD nConnected = m_pServer->GetConnectionCount();
-		CONNID* IDs = new CONNID[nConnected];
-		CONNID destID;
-		m_pServer->GetAllConnectionIDs(IDs, nConnected);
-		
-		for (int i = 0; i < nConnected; i++)
-		{
-			RemoteAddress* pAddr = m_pSrvListen->FindRemoteAddr(IDs[i]);
-			if (pAddr->pAddress == pIP && pAddr->usPort == uPort)
-			{
-				destID = pAddr->dwConnID;
-				m_pSrvListen->DeleteRemoteAddr(pAddr->dwConnID);
-				break;
-			}
-		}
-
-		delete[] IDs;
-		return m_pServer->Disconnect(destID);
+// 		DWORD nConnected = m_pServer->GetConnectionCount();
+// 		CONNID* IDs = new CONNID[nConnected];
+// 		CONNID destID;
+// 		m_pServer->GetAllConnectionIDs(IDs, nConnected);
+// 		
+// 		for (int i = 0; i < nConnected; i++)
+// 		{
+// 			RemoteAddress* pAddr = m_pSrvListen->FindRemoteAddr(IDs[i]);
+// 			if (pAddr->pAddress == pIP && pAddr->usPort == uPort)
+// 			{
+// 				destID = pAddr->dwConnID;
+// 				m_pSrvListen->DeleteRemoteAddr(pAddr->dwConnID);
+// 				break;
+// 			}
+// 		}
+// 
+// 		delete[] IDs;
+// 		return m_pServer->Disconnect(destID);
 	}		
 	return FALSE;
 }
 
-int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/){
-	int bSend = FALSE;
-	if (m_pServer && m_pServer->HasStarted()){
-		CONNID id = m_pSrvListen->FindConnID(pIP, strlen(pIP), uPort);		
-		bSend = m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen);
+int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/){
+//	int bSend = FALSE;
+	if (m_pServer && m_pServer->HasStarted())
+	{
+		char tmpIP[IP_LEN] = { 0 };
+		strcpy_s(tmpIP, pIP);
+		CONNID id = m_pSrvListen->FindConnID(tmpIP, strlen(tmpIP), uPort);
+		if (m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen) == 0)
+		{
+			DWORD errCode = GetLastError();
+			char tmp[512] = { 0 };
+			sprintf_s(tmp, "server send msg error, error code = %d", errCode);
+			if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+			{
+				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, pIP, uPort, tmp);
+			}
+		}
+		return 1;
 	}
 
-	if (m_pClient && m_pClient->HasStarted()){
-		bSend = m_pClient->Send((BYTE*)pMsg, dwMsgLen);
+	if (m_pClient && m_pClient->HasStarted())
+	{
+		if (m_pClient->Send((BYTE*)pMsg, dwMsgLen)==0)
+		{
+			DWORD errCode = GetLastError();
+			char tmp[512] = { 0 };
+			sprintf_s(tmp, "client send msg error, error code = %d", errCode);
+			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			{
+				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, tmp);
+			}
+		}
+		return 1;
 	}
 
-	return bSend;
+	return 0;
 }
 
 int CNetComm::Uninitialize(){
-	int isOK = FALSE;
+	int isOK = 0;
 	if (m_pServer)
 	{
 		isOK = m_pServer->Stop();		
+		if (isOK == 0)
+		{
+			DWORD errCode = GetLastError();
+			char tmp[512] = { 0 };
+			sprintf_s(tmp, "server stop error, error code = %d", errCode);
+			if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+			{
+				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, m_srvIP, m_srvPort, tmp);
+			}
+		}
 	}
 	if (m_pClient)
 	{
 		SetEvent(m_hExit);
 		WaitForSingleObject(m_pthread, INFINITE);
-		isOK = m_pClient->Stop();		
+		isOK = m_pClient->Stop();	
+		if (isOK == 0)
+		{
+			DWORD errCode = GetLastError();
+			char tmp[512] = { 0 };
+			sprintf_s(tmp, "client stop error, error code = %d", errCode);
+			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			{
+				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
+			}
+		}
 	}
 	return isOK;
 }
 
 int CNetComm::StartConnectThread(const char* IP, unsigned short port){
-	int isOK = TRUE;
 
 	ResetEvent(m_hExit);
 	m_pthread = (HANDLE)_beginthreadex(nullptr, 0, ConnectThread, (LPVOID)this, 0, nullptr);
 
 	if (!m_pthread)
 	{
-		isOK = FALSE;
+		DWORD errCode = GetLastError();
+		char tmp[512] = { 0 };
+		sprintf_s(tmp, "client start reconnect thread error", errCode);
+		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+		{
+			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
+		}
+		return 0;
 	}
 //	CloseHandle(hDataThread);
-	return isOK;
+	return 1;
 }
 
 UINT WINAPI CNetComm::ConnectThread(LPVOID p)
@@ -255,7 +333,7 @@ UINT WINAPI CNetComm::ConnectThread(LPVOID p)
 				pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
 			}
 		}
-		Sleep(100);
+		Sleep(50);
 	}
 	ResetEvent(pNet->m_hExit);
 	pNet->m_bConStart = FALSE;
