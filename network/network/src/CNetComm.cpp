@@ -93,8 +93,8 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 {
 	m_pServerCtrl = callback;
 	m_pSrvListen->RegCallBack(callback);
-	strcpy_s(m_srvIP, strIp);
-	m_srvPort = dwPort;
+// 	strcpy_s(m_srvIP, strIp);
+// 	m_srvPort = dwPort;
 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
@@ -117,6 +117,9 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 		}
 		return 0;
 	}
+
+	int len = IP_LEN;
+	m_pServer->GetListenAddress(m_srvIP, len, m_srvPort);
 		
 	if (!m_pServer->HasStarted())
 		return 0;

@@ -4,12 +4,12 @@
 
 #pragma comment(lib,"../lib/network.lib")
 
-static void ConnectCB(void* pThis, char* strIP, unsigned short dwPort, char* strPcName);
-static void DisconnectCB(void* pThis, char* strIP, unsigned short dwPort);
-static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort);
+static void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName);
+static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
+static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort);
 //static void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort);
 //static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort, int bOK);
-static void ErrorCB(void* pThis, char* strIP, unsigned short dwPort, const char* msg);
+static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
 
 int main(int argc, char** argv)
 {
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	scanf("%s%d", &tmp,&port);
 //	sscanf(tmp, "%s%d", ip, &port);
 
-	if (pNet->Initialize(NULL, &userCB, port, ip) != 0)
+	if (pNet->Initialize(NULL, &userCB, port, NULL) != 0)
 	{
 		printf("server start success\n");
 	}
@@ -45,18 +45,18 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void ConnectCB(void* pThis, char* strIP, unsigned short dwPort, char* strPcName)
+void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName)
 {
 	printf("client [%s:%d] connected\n", strIP, dwPort);
 }
 
-void DisconnectCB(void* pThis, char* strIP, unsigned short dwPort)
+void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
 {
 	printf("client [%s:%d] disconnected\n", strIP, dwPort);
 
 }
 
-void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort)
+void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort)
 {
 //	printf("client [%s:%d] recv msg = \"%s\", length = %d\n", strIP, dwPort,(char*)pMsg,dwMsgLen);
 	char s[6] = { 0 };
@@ -72,7 +72,7 @@ void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsign
 	pNet->SendMsg(pMsg, dwMsgLen, strIP, dwPort);
 }
 
-void ErrorCB(void* pThis, char* strIP, unsigned short dwPort, const char* msg)
+void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)
 {
 	printf("client [%s:%d] error = \"%s\"\n", strIP, dwPort,msg);
 }

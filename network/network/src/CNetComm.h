@@ -42,7 +42,7 @@ private:
 	ClientListener* m_pClientListen;
 //	CMTX     m_extractlock;
 	char            m_srvIP[IP_LEN];
-	char            m_srvPort;
+	ushort          m_srvPort;
 	char			m_conIP[IP_LEN];
 	unsigned short  m_conPort;
 	int				m_bConStart;

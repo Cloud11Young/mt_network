@@ -5,27 +5,29 @@
 
 #pragma comment(lib,"../lib/network.lib")
 
-static void ConnectCB(void* pThis, char* strIP, unsigned short dwPort, char* strPcName);
-static void DisconnectCB(void* pThis, char* strIP, unsigned short dwPort);
-static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort);
+static void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName);
+static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
+static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort);
 //static void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort);
 //static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort, int bOK);
-static void ErrorCB(void* pThis, char* strIP, unsigned short dwPort, const char* msg);
+static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
 
 unsigned int __stdcall workthread(void* pVoid)
 {
 	INetComm* pNet = (INetComm*)pVoid;
-	pNet->ConnectTo("192.168.101.108", 8800);
+	pNet->ConnectTo("127.0.0.1", 8800);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
-	printf("thread %d input send msg:",GetCurrentThreadId());
-	scanf("%s", &msg);
-	strcpy_s(tmp, "start");
-	strcat(tmp, msg);
-	strcat(tmp, "end");
+	
 	while (true)
 	{
-		pNet->SendMsg(tmp, strlen(tmp) + 1, "192.168.101.108", 8800);
+		printf("thread %d input send msg:", GetCurrentThreadId());
+		scanf("%s", &msg);
+		strcpy_s(tmp, "start");
+		strcat(tmp, msg);
+		strcat(tmp, "end");
+
+		pNet->SendMsg(tmp, strlen(tmp) + 1, "127.0.0.1", 8800);
 		Sleep(100);
 	}
 }
@@ -45,7 +47,7 @@ int main(int argc, char** argv)
 
 	INetComm* Nets[16] = { 0 };
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		INetComm::CreateInstance(&Nets[i]);
 		Nets[i]->Initialize(NULL, &userCB);
@@ -61,24 +63,24 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void ConnectCB(void* pThis, char* strIP, unsigned short dwPort, char* strPcName)
+void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName)
 {
 	printf("client [%s:%d] connect to server success\n", strIP, dwPort);
 }
 
-void DisconnectCB(void* pThis, char* strIP, unsigned short dwPort)
+void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
 {
 	printf("client [%s:%d] disconnected\n", strIP, dwPort);
 
 }
 
-void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, char* strIP, unsigned short dwPort)
+void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort)
 {
 	printf("client [%s:%d] recv msg = \"%s\", length = %d\n", strIP, dwPort, (char*)pMsg, dwMsgLen);
 
 }
 
-void ErrorCB(void* pThis, char* strIP, unsigned short dwPort, const char* msg)
+void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)
 {
 	printf("client [%s:%d] error = \"%s\"\n", strIP, dwPort, msg);
 }
