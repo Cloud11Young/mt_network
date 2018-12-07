@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <process.h>
 #include "../network/src/INetComm.h"
 
 #pragma comment(lib,"../lib/network.lib")
@@ -11,9 +12,31 @@ static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* 
 //static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort, int bOK);
 static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
 
+INetComm* pNet = NULL;
+static char ip[32] = { 0 };
+static ushort port = 0;
+
+unsigned int __stdcall SendThread(void* pvoid)
+{
+	char c[1];
+	int len = 0;
+	printf("input send msg :");
+	scanf("%s", &c);
+
+	len = GetCurrentThreadId();
+	char* tmp = new char[5*1024*1024];
+	memset(tmp, c[0], len);
+	tmp[len] = '\0';
+	while (true)
+	{
+		pNet->SendMsg(tmp, 5 * 1024 * 1024, ip, port);
+		Sleep(500);
+	}
+}
+
 int main(int argc, char** argv)
 {
-	INetComm* pNet = NULL;
+	
 	INetComm::CreateInstance(&pNet);
 	if (pNet == NULL)
 		return -1;
@@ -36,7 +59,7 @@ int main(int argc, char** argv)
 	{
 		printf("server start success\n");
 	}
-
+	
 	while (true)
 	{
 		Sleep(20);
@@ -48,6 +71,13 @@ int main(int argc, char** argv)
 void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName)
 {
 	printf("client [%s:%d] connected\n", strIP, dwPort);
+	port = dwPort;
+	strcpy(ip, strIP);
+
+// 	for (int i = 0; i < 8; i++)
+// 	{
+// 		_beginthreadex(NULL, 0, SendThread, pNet, 0, NULL);
+// 	}
 }
 
 void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)

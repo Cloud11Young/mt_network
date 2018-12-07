@@ -120,6 +120,20 @@ EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, c
 }
 
 EnHandleResult ServerListener::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength){
+// 	RemoteAddress remoteaddr;
+// 	remoteaddr.dwConnID = dwConnID;
+// 	remoteaddr.iAddressLen = sizeof(remoteaddr.pAddress) / sizeof(char);
+// 	BOOL bGet = pSender->GetRemoteAddress(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
+// 
+// 	if (m_pCallBack != NULL)
+// 	{
+// 		if (m_pCallBack->lpErrorCB != NULL)
+// 		{
+// 			char msg[512] = { 0 };
+// 			sprintf_s(msg, "send to client msg success length = %d", iLength);
+// 			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, remoteaddr.pAddress, remoteaddr.usPort, msg);
+// 		}
+// 	}
 	return HR_IGNORE;
 }
 

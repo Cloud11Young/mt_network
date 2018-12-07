@@ -5,6 +5,65 @@
 #include <malloc.h>
 #include <process.h>
 
+#include "log4cpp/Category.hh"
+#include "log4cpp/RollingFileAppender.hh"
+#include "log4cpp/PatternLayout.hh"
+#include "log4cpp/PropertyConfigurator.hh"
+#include "mtHelper.h"
+
+#ifdef _DEBUG
+#pragma comment(lib,"../lib/log4cpp.lib")
+#else
+#pragma comment(lib,"../libR/log4cpp.lib")
+#endif
+
+static int IsDirExist(const char* path){
+	DWORD dwAttri = GetFileAttributesA(path);
+	return INVALID_FILE_ATTRIBUTES != dwAttri && 0 != (dwAttri&FILE_ATTRIBUTE_DIRECTORY);
+}
+
+static void Initlog()
+{
+	char path[MAX_PATH];
+	char cfgPath[MAX_PATH] = { 0 };
+	char filePath[MAX_PATH] = { 0 };
+	GetPathExeA(path, MAX_PATH);
+
+	sprintf_s(filePath, "%s\\log", path);
+	if (!IsDirExist(filePath))
+	{
+		CreateDirectoryA(filePath, NULL);
+	}
+
+	time_t t;
+	time(&t);
+	struct tm* timeinfo;
+	timeinfo = localtime(&t);
+	char stm[255] = { 0 };
+	strftime(stm, sizeof(stm), "\\net_%y_%m_%d %H_%M_%S.txt", timeinfo);
+	sprintf_s(filePath, "%s\\log\\%s", path, stm);
+
+	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("default", filePath);
+	if (RollAppender == NULL)	return;
+
+	RollAppender->setMaximumFileSize(100 * 1024 * 1024);
+	RollAppender->setMaxBackupIndex(10);
+
+	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
+	if (layout == NULL)	return;
+
+	layout->setConversionPattern("[%d %p %t %m %n");
+	RollAppender->setLayout(layout);
+
+	log4cpp::Category& root = log4cpp::Category::getRoot();
+	root.addAppender(RollAppender);
+
+	log4cpp::Category& mvslog = root.getInstance("network");
+	root.setRootPriority(log4cpp::Priority::ERROR);
+
+	mvslog.setPriority(log4cpp::Priority::INFO);
+}
+
 const CInitSocket CTcpServer::sm_wsSocket;
 
 EnHandleResult CTcpServer::TriggerFireAccept(TSocketObj* pSocketObj)
@@ -60,6 +119,7 @@ void CTcpServer::SetLastError(EnSocketError code, LPCSTR func, int ec)
 
 int CTcpServer::Start(const char* lpszBindAddress, unsigned short usPort)
 {
+	Initlog();
 	if(!CheckParams() || !CheckStarting())
 		return FALSE;
 
@@ -1352,6 +1412,9 @@ int CTcpServer::SendItem(TSocketObj* pSocketObj)
 
 		pSocketObj->pending	   -= iBufferSize;
 		::InterlockedExchangeAdd(&pSocketObj->sndCount, iBufferSize);
+
+		log4cpp::Category::getInstance("network").info("%s:%d] pBufferObj = %p, client = %d,sndbuf.size = %d,ov->Internal = %d,ov->InternalHigh = %d",
+			__FILE__, __LINE__, pBufferObj, pBufferObj->client, pSocketObj->sndBuff.Size(),pBufferObj->ov.Internal,pBufferObj->ov.InternalHigh);
 
 		result = ::PostSendNotCheck(pSocketObj, pBufferObj);
 
