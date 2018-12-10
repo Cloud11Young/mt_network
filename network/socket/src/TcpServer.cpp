@@ -43,7 +43,7 @@ static void Initlog()
 	strftime(stm, sizeof(stm), "\\net_%y_%m_%d %H_%M_%S.txt", timeinfo);
 	sprintf_s(filePath, "%s\\log\\%s", path, stm);
 
-	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("default", filePath);
+	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("network", filePath);
 	if (RollAppender == NULL)	return;
 
 	RollAppender->setMaximumFileSize(100 * 1024 * 1024);
@@ -56,12 +56,12 @@ static void Initlog()
 	RollAppender->setLayout(layout);
 
 	log4cpp::Category& root = log4cpp::Category::getRoot();
-	root.addAppender(RollAppender);
-
-	log4cpp::Category& mvslog = root.getInstance("network");
+//	root.addAppender(RollAppender);
 	root.setRootPriority(log4cpp::Priority::ERROR);
 
-	mvslog.setPriority(log4cpp::Priority::INFO);
+	log4cpp::Category& netlog = root.getInstance("network");
+	netlog.addAppender(RollAppender);
+	netlog.setPriority(log4cpp::Priority::INFO);
 }
 
 const CInitSocket CTcpServer::sm_wsSocket;

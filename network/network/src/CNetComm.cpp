@@ -209,26 +209,28 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 
 	if (m_pServer)
 	{
-// 		DWORD nConnected = m_pServer->GetConnectionCount();
-// 		CONNID* IDs = new CONNID[nConnected];
-// 		CONNID destID;
-// 		m_pServer->GetAllConnectionIDs(IDs, nConnected);
-// 		
-// 		for (int i = 0; i < nConnected; i++)
-// 		{
-// 			RemoteAddress* pAddr = m_pSrvListen->FindRemoteAddr(IDs[i]);
-// 			if (pAddr->pAddress == pIP && pAddr->usPort == uPort)
-// 			{
-// 				destID = pAddr->dwConnID;
-// 				m_pSrvListen->DeleteRemoteAddr(pAddr->dwConnID);
-// 				break;
-// 			}
-// 		}
-// 
-// 		delete[] IDs;
-// 		return m_pServer->Disconnect(destID);
+		DWORD nConnected = m_pServer->GetConnectionCount();
+		if (nConnected == 0) return 1;
+		CONNID* IDs = new CONNID[nConnected];
+		CONNID destID;
+		m_pServer->GetAllConnectionIDs(IDs, nConnected);
+		
+		for (int i = 0; i < nConnected; i++)
+		{
+			RemoteAddress remAddr;
+			remAddr.iAddressLen = 50;
+			m_pServer->GetRemoteAddress(IDs[i], remAddr.pAddress, remAddr.iAddressLen, remAddr.usPort);
+			if (!strcmp(remAddr.pAddress, pIP) && remAddr.usPort == uPort)
+			{
+				destID = IDs[i];
+				break;
+			}
+		}
+
+		delete[] IDs;
+		return m_pServer->Disconnect(destID);
 	}		
-	return FALSE;
+	return 0;
 }
 
 int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/){
@@ -336,7 +338,7 @@ UINT WINAPI CNetComm::ConnectThread(LPVOID p)
 				pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
 			}
 		}
-		Sleep(50);
+		Sleep(5000);
 	}
 	ResetEvent(pNet->m_hExit);
 	pNet->m_bConStart = FALSE;

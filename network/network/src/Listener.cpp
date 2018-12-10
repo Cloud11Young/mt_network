@@ -142,7 +142,7 @@ EnHandleResult ServerListener::OnShutdown(ITcpServer* pSender){
 	return HR_IGNORE;
 }
 
-EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode){
+EnHandleResult ServerListener::OnClose(ITcpServer* pServer, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode){
 // 	RemoteAddress* pRemoteAddr = FindRemoteAddr(dwConnID);
 // 	if (dwConnID != pRemoteAddr->dwConnID)	return HR_ERROR;
  	DeleteRemoteAddr(dwConnID);
@@ -151,13 +151,13 @@ EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnS
 	RemoteAddress remoteaddr;
 	remoteaddr.dwConnID = dwConnID;
 	remoteaddr.iAddressLen = sizeof(remoteaddr.pAddress) / sizeof(char);
-	BOOL bGet = pSender->GetRemoteAddress(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
+	BOOL bGet = pServer->GetRemoteAddress(dwConnID, remoteaddr.pAddress, remoteaddr.iAddressLen, remoteaddr.usPort);
 
 	if (m_pCallBack)
 	{
 		char err[512] = { 0 };
 		const char* sOper = GetMapOpertor(enOperation);		
-		sprintf_s(err, "socket operator %s, error desc %s, code %d", sOper, pSender->GetLastErrorDesc(), iErrorCode);
+		sprintf_s(err, "socket operator %s, error desc %s, code %d", sOper, pServer->GetLastErrorDesc(), iErrorCode);
 
 		if (m_pCallBack->lpErrorCB)			
 			m_pCallBack->lpErrorCB(m_pCallBack->lpCallBackData, remoteaddr.pAddress, remoteaddr.usPort, err);	
@@ -165,6 +165,8 @@ EnHandleResult ServerListener::OnClose(ITcpServer* pSender, CONNID dwConnID, EnS
 		if (m_pCallBack->lpDisconnectCB)
 			m_pCallBack->lpDisconnectCB(m_pCallBack->lpCallBackData, remoteaddr.pAddress, remoteaddr.usPort);
 	}
+
+	pServer->Disconnect(dwConnID, 1);
 
 	return HR_OK;
 }
