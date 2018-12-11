@@ -513,6 +513,7 @@ TBufferObj* CTcpServer::GetFreeBufferObj(int iLen)
 void CTcpServer::AddFreeBufferObj(TBufferObj* pBufferObj)
 {
 	m_bfObjPool.PutFreeItem(pBufferObj);
+	log4cpp::Category::getInstance("network").info("buffer %p release", pBufferObj);
 }
 
 void CTcpServer::ReleaseFreeBuffer()
@@ -1412,9 +1413,6 @@ int CTcpServer::SendItem(TSocketObj* pSocketObj)
 
 		pSocketObj->pending	   -= iBufferSize;
 		::InterlockedExchangeAdd(&pSocketObj->sndCount, iBufferSize);
-
-		log4cpp::Category::getInstance("network").info("%s:%d] pBufferObj = %p, client = %d,sndbuf.size = %d,ov->Internal = %d,ov->InternalHigh = %d",
-			__FILE__, __LINE__, pBufferObj, pBufferObj->client, pSocketObj->sndBuff.Size(),pBufferObj->ov.Internal,pBufferObj->ov.InternalHigh);
 
 		result = ::PostSendNotCheck(pSocketObj, pBufferObj);
 

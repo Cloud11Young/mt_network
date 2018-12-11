@@ -342,8 +342,8 @@ private:
 };
 
 template<class T> const DWORD CNodePoolT<T>::DEFAULT_ITEM_CAPACITY	= TItem::DEFAULT_ITEM_CAPACITY;
-template<class T> const DWORD CNodePoolT<T>::DEFAULT_POOL_SIZE		= 300;
-template<class T> const DWORD CNodePoolT<T>::DEFAULT_POOL_HOLD		= 1200;
+template<class T> const DWORD CNodePoolT<T>::DEFAULT_POOL_SIZE		= 600;
+template<class T> const DWORD CNodePoolT<T>::DEFAULT_POOL_HOLD		= 1600;
 
 typedef CNodePoolT<TItem>	CItemPool;
 

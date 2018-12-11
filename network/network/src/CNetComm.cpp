@@ -249,8 +249,8 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			{
 				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, pIP, uPort, tmp);
 			}
+			return 0;
 		}
-		return 1;
 	}
 
 	if (m_pClient && m_pClient->HasStarted())
@@ -264,11 +264,11 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			{
 				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, tmp);
 			}
+			return 0;
 		}
-		return 1;
 	}
 
-	return 0;
+	return 1;
 }
 
 int CNetComm::Uninitialize(){

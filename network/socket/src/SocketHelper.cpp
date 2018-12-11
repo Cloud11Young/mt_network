@@ -27,6 +27,8 @@
 #include "../Common/Src/SysHelper.h"
 #include "SocketHelper.h"
 
+#include "log4cpp/Category.hh"
+
 #include <mstcpip.h>
 #pragma comment(lib, "ws2_32")
 
@@ -786,6 +788,9 @@ int PostSendNotCheck(TSocketObj* pSocketObj, TBufferObj* pBufferObj)
 	DWORD dwBytes			= 0;
 	pBufferObj->client		= pSocketObj->socket;
 	pBufferObj->operation	= SO_SEND;
+
+	log4cpp::Category::getInstance("network").info("%s:%d] pBufferObj = %p, client = %d,sndbuf.size = %d,ov address %p, ov->Internal = %d,ov->InternalHigh = %d",
+		__FILE__, __LINE__, pBufferObj, pBufferObj->client, pSocketObj->sndBuff.Size(), &pBufferObj->ov, pBufferObj->ov.Internal, pBufferObj->ov.InternalHigh);
 
 	if(::WSASend(
 					pBufferObj->client,
