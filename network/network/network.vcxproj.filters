@@ -42,9 +42,6 @@
     <ClInclude Include="src\INetComm.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Listener.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\HPSocket.h">
       <Filter>pubilc</Filter>
     </ClInclude>
@@ -72,9 +69,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\INetComm.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Listener.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
