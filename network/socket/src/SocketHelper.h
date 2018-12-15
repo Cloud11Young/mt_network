@@ -46,7 +46,7 @@
 /* Server/Agent 默认内存块缓存池大小 */
 #define DEFAULT_FREE_BUFFEROBJ_POOL				300
 /* Server/Agent 默认内存块缓存池回收阀值 */
-#define DEFAULT_FREE_BUFFEROBJ_HOLD				1200
+#define DEFAULT_FREE_BUFFEROBJ_HOLD				4096/*1200*/
 /* Client 默认内存块缓存池大小 */
 #define DEFAULT_CLIENT_FREE_BUFFER_POOL_SIZE	10
 /* Client 默认内存块缓存池回收阀值 */

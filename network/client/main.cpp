@@ -79,7 +79,7 @@ void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
 
 void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort)
 {
-	printf("client [%s:%d] recv msg = \"%s\", length = %d\n", strIP, dwPort, (char*)pMsg, dwMsgLen);
+	printf("client [%s:%d] recv msg, length = %d\n", strIP, dwPort, dwMsgLen);
 
 }
 
