@@ -224,8 +224,8 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 
 	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
-	m_srvBase = event_base_new_with_config(cfg);
-	if (m_srvBase == NULL)
+	m_clientBase = event_base_new_with_config(cfg);
+	if (m_clientBase == NULL)
 	{
 		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
 		{
