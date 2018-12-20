@@ -234,14 +234,14 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 		}
 	}
 
-	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, BEV_OPT_THREADSAFE | BEV_OPT_CLOSE_ON_FREE);
+	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, /*BEV_OPT_THREADSAFE | */BEV_OPT_CLOSE_ON_FREE);
 
 	bufferevent_setcb(m_clientEventbuf, NULL, NULL/*conn_writecb*/, NULL/*conn_eventcb*/, NULL);
 
-	struct event* ev = event_new(m_srvBase, 1, 1, timer_cb, NULL);
+	struct event* ev = event_new(m_clientBase, 1, 1, timer_cb, NULL);
 	evtimer_set(ev, timer_cb, NULL);
 
-	event_base_set(m_srvBase, ev);
+	event_base_set(m_clientBase, ev);
 
 // 	memset(&sin, 0, sizeof(sin));
 // 	sin.sin_family = AF_INET;
@@ -250,7 +250,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 // 	m_pListener = evconnlistener_new_bind(m_srvBase, listener_cb, m_srvBase,
 // 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&sin, sizeof(sin));
 
-	event_base_dispatch(m_srvBase);
+//	event_base_dispatch(m_clientBase);
 // 	m_pClientListen->RegCallBack(callback);
 // 
 // 	m_pClient = HP_Create_TcpPackClient(m_pClientListen);	
@@ -286,7 +286,7 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 	sin.sin_family = AF_INET;
 
 	m_bAutoReconnect = bAutoReconnect;
-//	m_conIP = pIP;
+
 	if (pIP == NULL || strlen(pIP) == 0)	return 0;
 	strcpy_s(m_conIP, pIP);
 	m_conPort = uPort;
@@ -301,31 +301,7 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 	}
 	bufferevent_enable(m_clientEventbuf, EV_READ | EV_WRITE);
 
-	event_base_dispatch(m_clientBase);
-
-// 	if (m_bAutoReconnect)
-// 	{
-// 		if (!m_pClient->HasStarted() && !m_bConStart)
-// 			m_bConStart = StartConnectThread(pIP, uPort);
-// 	}
-// 	else if (!m_pClient || !m_pClient->Start(pIP, uPort, FALSE))
-// 	{
-// 		if (!m_pClient)
-// 		{
-// 			const char* err = m_pClient->GetLastErrorDesc();
-// 			m_pClient->GetLastError();
-// 
-// 			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
-// 			{
-// 				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
-// 			}
-// //			log4cpp::Category::getInstance("network").error("%s:%d] client start error = \"%s\", ip = %s, port = %d",
-// //				__FILE__, __LINE__, err, pIP, uPort);
-// 		}
-// 		return 0;
-// 	}		
-	
-	return 1;	
+	return event_base_dispatch(m_clientBase);		
 }
 
 int CNetComm::Disconnect(const char* pIP, unsigned short uPort)

@@ -92,7 +92,7 @@ extern "C" {
  * locking.   It's used to tell evthread_set_lock_callbacks() how to use
  * locking on this platform.
  */
-struct evthread_lock_callbacks {
+struct   {
 	/** The current version of the locking API.  Set this to
 	 * EVTHREAD_LOCK_API_VERSION */
 	int lock_api_version;
