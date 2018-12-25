@@ -84,13 +84,15 @@ CNetComm::~CNetComm()
 		delete m_pClientListen;	
 }
 
-void CNetComm::Release(){
+void CNetComm::Release()
+{
 
 }
 
 //需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
 {
+	if (m_pServer != NULL)		return FALSE;
 	m_pServerCtrl = callback;
 	m_pSrvListen->RegCallBack(callback);
 // 	strcpy_s(m_srvIP, strIp);
@@ -130,6 +132,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 //不需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
+	if (m_pClient != NULL)	return FALSE;
 	m_pClientCtrl = callback;
 	m_pClientListen->RegCallBack(callback);
 
@@ -171,21 +174,22 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 		if (!m_pClient->HasStarted() && !m_bConStart)
 			m_bConStart = StartConnectThread(pIP, uPort);
 	}
-	else if (!m_pClient || !m_pClient->Start(pIP, uPort, FALSE))
+	else if (m_pClient)
 	{
-		if (!m_pClient)
+		if (!m_pClient->HasStarted())
 		{
-			const char* err = m_pClient->GetLastErrorDesc();
-			m_pClient->GetLastError();
-
-			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			if (!m_pClient->Start(pIP, uPort, FALSE))
 			{
-				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+				const char* err = m_pClient->GetLastErrorDesc();
+				m_pClient->GetLastError();
+
+				if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+				{
+					m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+				}
+				return 0;
 			}
-//			log4cpp::Category::getInstance("network").error("%s:%d] client start error = \"%s\", ip = %s, port = %d",
-//				__FILE__, __LINE__, err, pIP, uPort);
 		}
-		return 0;
 	}		
 	
 	return 1;	
@@ -286,6 +290,8 @@ int CNetComm::Uninitialize(){
 				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, m_srvIP, m_srvPort, tmp);
 			}
 		}
+		HP_Destroy_TcpPackServer(m_pServer);
+		m_pServer = NULL;
 	}
 	if (m_pClient)
 	{
@@ -302,6 +308,8 @@ int CNetComm::Uninitialize(){
 				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
 			}
 		}
+		HP_Destroy_TcpPackClient(m_pClient);
+		m_pClient = NULL;
 	}
 	return isOK;
 }
@@ -322,7 +330,6 @@ int CNetComm::StartConnectThread(const char* IP, unsigned short port){
 		}
 		return 0;
 	}
-//	CloseHandle(hDataThread);
 	return 1;
 }
 
@@ -331,11 +338,15 @@ UINT WINAPI CNetComm::ConnectThread(LPVOID p)
 	CNetComm* pNet = (CNetComm*)p;
 	while (WaitForSingleObject(pNet->m_hExit, 50) != WAIT_OBJECT_0)
 	{
-		if (!pNet->m_pClient->HasStarted() && !pNet->m_pClient->Start(pNet->m_conIP, pNet->m_conPort, FALSE))
+		if (pNet->m_pClient && !pNet->m_pClient->HasStarted())
 		{
-			if (pNet->m_pClientCtrl != NULL && pNet->m_pClientCtrl->lpErrorCB)
+			pNet->m_pClient->Stop();
+			if (!pNet->m_pClient->Start(pNet->m_conIP, pNet->m_conPort, FALSE))
 			{
-				pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
+				if (pNet->m_pClientCtrl != NULL && pNet->m_pClientCtrl->lpErrorCB)
+				{
+					pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
+				}
 			}
 		}
 		Sleep(5000);
