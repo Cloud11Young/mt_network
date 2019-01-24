@@ -107,7 +107,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 		}
 		return 0;
 	}	
-	m_pServer->SetMaxPackSize(0x3FFFFFF);
+	m_pServer->SetMaxPackSize(0x7FFFFFF);
 
 	if (!m_pServer->Start(strIp, dwPort))
 	{
@@ -147,7 +147,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 		return 0;
 	}	
 
-	m_pClient->SetMaxPackSize(0x3FFFFFF);
+	m_pClient->SetMaxPackSize(0x7FFFFFF);
 
 	return 1;
 }

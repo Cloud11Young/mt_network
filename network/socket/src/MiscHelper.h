@@ -123,6 +123,7 @@ template<class T, class B, class S> EnHandleResult ParsePack(T* pThis, TPackInfo
 				}
 			}
 
+			int b = sizeof(DWORD);
 			DWORD len = header & TCP_PACK_LENGTH_MASK;
 
 			if(len > dwMaxPackSize)
