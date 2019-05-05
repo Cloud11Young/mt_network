@@ -13,52 +13,6 @@
 // #include "log4cpp/PatternLayout.hh"
 
 
-// static void Initlog()
-// {
-// 	char path[MAX_PATH];
-// 	char cfgPath[MAX_PATH] = { 0 };
-// 	char filePath[MAX_PATH] = { 0 };
-// 	GetPathExeA(path, MAX_PATH);
-// 
-// 	//	strcat(path, "\\log");
-// 	sprintf_s(filePath, "%s\\log", path);
-// 
-// 	if (!IsDirExist(filePath))
-// 	{
-// 		CreateDirectoryA(filePath, NULL);
-// 	}
-// 
-// 	time_t t;
-// 	time(&t);
-// 	struct tm* timeinfo;
-// 	timeinfo = localtime(&t);
-// 	char stm[255] = { 0 };
-// 	strftime(stm, sizeof(stm), "\\net_%y_%m_%d %H_%M_%S.txt", timeinfo);
-// 	sprintf_s(filePath, "%s\\log\\%s", path, stm);
-// 	sprintf_s(cfgPath, "%s\\config\\log4cpp.property", path);
-// 
-// 	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("default", filePath);
-// 	if (RollAppender == NULL)	return;
-// 
-// 	RollAppender->setMaximumFileSize(100 * 1024 * 1024);
-// 	RollAppender->setMaxBackupIndex(10);
-// 
-// 	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
-// 	if (layout == NULL)	return;
-// 
-// 	layout->setConversionPattern("[%d %p %t %m %n");
-// 	RollAppender->setLayout(layout);
-// 
-// 	log4cpp::Category& root = log4cpp::Category::getRoot();
-// 	root.addAppender(RollAppender);
-// 
-// 	log4cpp::Category& netlog = root.getInstance("network");
-// 	root.setRootPriority(log4cpp::Priority::ERROR);
-// 
-// 	netlog.setPriority(log4cpp::Priority::INFO);
-// //	mvslog.setPriority((log4cpp::Priority::Value)IAoiConfig()->GetLogLv());
-// 
-// }
 
 static void timer_cb(evutil_socket_t, short, void *){
 	printf("timer_cb callback\n");
@@ -92,6 +46,11 @@ static void socket_read_cb(bufferevent *bev, void *arg)
 	}
 }
 
+static void socket_write_cb(bufferevent* bev, void* arg)
+{
+
+}
+
 static void socket_event_cb(bufferevent *bev, short events, void *arg)
 {
 	if (events & BEV_EVENT_EOF)
@@ -101,6 +60,21 @@ static void socket_event_cb(bufferevent *bev, short events, void *arg)
 
 	//这将自动close套接字和free读写缓冲区  
 	bufferevent_free(bev);
+}
+
+static void conn_read_cb(bufferevent* bev, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
+}
+
+static void conn_write_cb(bufferevent* bev, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
+}
+
+static void conn_event_cb(bufferevent* bev, short events, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
 }
 
 static void listener_cb(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
@@ -222,9 +196,12 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
 	m_pClientCtrl = callback;
 
-	struct event_config* cfg = event_config_new();
+//	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
-	m_clientBase = event_base_new_with_config(cfg);
+//	m_clientBase = event_base_new_with_config(cfg);
+
+	m_clientBase = event_base_new();
+
 	if (m_clientBase == NULL)
 	{
 		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
@@ -234,9 +211,11 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 		}
 	}
 
-	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, /*BEV_OPT_THREADSAFE | */BEV_OPT_CLOSE_ON_FREE);
+	evthread_use_windows_threads();
 
-	bufferevent_setcb(m_clientEventbuf, NULL, NULL/*conn_writecb*/, NULL/*conn_eventcb*/, NULL);
+	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, BEV_OPT_THREADSAFE | BEV_OPT_CLOSE_ON_FREE);
+
+	bufferevent_setcb(m_clientEventbuf, conn_read_cb, conn_write_cb, conn_event_cb, NULL);
 
 	struct event* ev = event_new(m_clientBase, 1, 1, timer_cb, NULL);
 	evtimer_set(ev, timer_cb, NULL);
@@ -282,7 +261,7 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 {
 	struct sockaddr_in sin;
 	sin.sin_addr.S_un.S_addr = inet_addr(pIP);
-	sin.sin_port = uPort;
+	sin.sin_port = htons(uPort);
 	sin.sin_family = AF_INET;
 
 	m_bAutoReconnect = bAutoReconnect;
