@@ -6,17 +6,8 @@
 #include <WinSock2.h>
 #include "event2/thread.h"
 #include "event2/listener.h"
-/*#include "include/event.h"*/
-// #include "mtHelper.h"
-// #include "log4cpp/Category.hh"
-// #include "log4cpp/RollingFileAppender.hh"
-// #include "log4cpp/PatternLayout.hh"
 
 
-
-static void timer_cb(evutil_socket_t, short, void *){
-	printf("timer_cb callback\n");
-}
 
 static void socket_read_cb(bufferevent *bev, void *arg)
 {
@@ -62,45 +53,20 @@ static void socket_event_cb(bufferevent *bev, short events, void *arg)
 	bufferevent_free(bev);
 }
 
-static void conn_read_cb(bufferevent* bev, void* arg)
-{
-	printf("%s:\n", __FUNCTION__);
-}
 
-static void conn_write_cb(bufferevent* bev, void* arg)
-{
-	printf("%s:\n", __FUNCTION__);
-}
-
-static void conn_event_cb(bufferevent* bev, short events, void* arg)
-{
-	printf("%s:\n", __FUNCTION__);
-}
-
-static void listener_cb(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
-{
-	char Buffer[256];
-	sockaddr_in* addr = (sockaddr_in*)sock;
-	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, Buffer, sizeof(Buffer));
-	printf("accept a client %d,IP:%s\n", fd, Buffer);
-
-	event_base *base = (event_base*)user_data;
-
-	//为这个客户端分配一个bufferevent  
-	bufferevent *bev = bufferevent_socket_new(base, fd,
-		BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
-
-	bufferevent_setcb(bev, socket_read_cb, NULL, socket_event_cb, NULL);
-	bufferevent_enable(bev, EV_READ | EV_PERSIST);
-}
 
 const CInitWinSocket CNetComm::m_initSocket;
+CNetComm* CNetComm::m_pNetComm = NULL;
 
 CNetComm::CNetComm() :m_srvBase(NULL), m_clientBase(NULL), m_pListener(NULL)
 {
 	m_bConStart = 0;
 	memset(m_conIP, 0, sizeof(*m_conIP)*IP_LEN);
 	memset(m_srvIP, 0, sizeof(*m_srvIP)*IP_LEN);
+
+	evthread_use_windows_threads();
+
+	m_pNetComm = this;
 
 //	m_hExit = CreateEvent(NULL, TRUE, FALSE, NULL);
 //	Initlog();
@@ -128,25 +94,23 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 {
 	struct sockaddr_in sin;
 
-	m_pServerCtrl = callback;
-// 	strcpy_s(m_srvIP, strIp);
+	m_ServerCallback.SetCallback(callback);
  	m_srvPort = dwPort;
 
-	evthread_use_windows_threads();
 	struct event_config* cfg = event_config_new();
 	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
 	m_srvBase = event_base_new_with_config(cfg);
 	if (m_srvBase == NULL)
 	{
-		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
-		{
-			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, "server create event_base failed");
+//		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+//		{
+//			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, "server create event_base failed");
 			return Ret_failed;
-		}
+//		}
 	}
 
-	struct event* ev = event_new(m_srvBase, 1, 1, timer_cb, NULL);
-	evtimer_set(ev, timer_cb, NULL);
+	struct event* ev = event_new(m_srvBase, 1, 1, TimerCallback, NULL);
+	evtimer_set(ev, TimerCallback, NULL);
 
 	event_base_set(m_srvBase, ev);
 
@@ -154,7 +118,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(dwPort);
 
-	m_pListener = evconnlistener_new_bind(m_srvBase, listener_cb, m_srvBase,
+	m_pListener = evconnlistener_new_bind(m_srvBase, ListenerCallback, m_srvBase,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&sin, sizeof(sin));
 
 	event_base_dispatch(m_srvBase);
@@ -194,8 +158,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 //不需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
-	m_pClientCtrl = callback;
-
+	m_ClientCallback.SetCallback(callback);
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
 //	m_clientBase = event_base_new_with_config(cfg);
@@ -204,21 +167,19 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 
 	if (m_clientBase == NULL)
 	{
-		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
-		{
-			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, "", 0, "client create event_base failed");
+//		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+//		{
+//			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, "", 0, "client create event_base failed");
 			return Ret_failed;
-		}
+//		}
 	}
-
-	evthread_use_windows_threads();
 
 	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, BEV_OPT_THREADSAFE | BEV_OPT_CLOSE_ON_FREE);
 
-	bufferevent_setcb(m_clientEventbuf, conn_read_cb, conn_write_cb, conn_event_cb, NULL);
+	bufferevent_setcb(m_clientEventbuf, CClientCallback::EventReadCallback, CClientCallback::EventWriteCallback, CClientCallback::EventCallback, NULL);
 
-	struct event* ev = event_new(m_clientBase, 1, 1, timer_cb, NULL);
-	evtimer_set(ev, timer_cb, NULL);
+	struct event* ev = event_new(m_clientBase, 1, 1, TimerCallback, NULL);
+	evtimer_set(ev, TimerCallback, NULL);
 
 	event_base_set(m_clientBase, ev);
 
@@ -272,10 +233,10 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 
 	if (-1 == bufferevent_socket_connect(m_clientEventbuf, (struct sockaddr*)&sin, sizeof(sin)))
 	{
-		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
-		{
-			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, "client connect to server failed");
-		}
+//		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+//		{
+//			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, "client connect to server failed");
+//		}
 		return Ret_failed;
 	}
 	bufferevent_enable(m_clientEventbuf, EV_READ | EV_WRITE);
@@ -441,4 +402,46 @@ unsigned int __stdcall CNetComm::ConnectThread(void* p)
 // 	pNet->m_bConStart = FALSE;
 
 	return 0;
+}
+
+void CNetComm::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
+{
+	char Buffer[256];
+	sockaddr_in* addr = (sockaddr_in*)sock;
+	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, Buffer, sizeof(Buffer));
+	printf("accept a client %d,IP:%s\n", fd, Buffer);
+
+	event_base *base = (event_base*)user_data;
+
+	//为这个客户端分配一个bufferevent  
+	bufferevent *bev = bufferevent_socket_new(base, fd,
+		BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
+
+	bufferevent_setcb(bev, socket_read_cb, NULL, socket_event_cb, NULL);
+	bufferevent_enable(bev, EV_READ | EV_PERSIST);
+}
+
+
+void CNetComm::EventReadCallback(bufferevent* bev, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
+//	m_pNetComm->m_pClientCtrl->lpConnectCB()
+}
+
+void CNetComm::EventWriteCallback(bufferevent* bev, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
+}
+
+void CNetComm::EventCallback(bufferevent* bev, short events, void* arg)
+{
+	printf("%s:\n", __FUNCTION__);
+	if (events & BEV_EVENT_CONNECTED)
+	{
+
+	}
+}
+
+void CNetComm::TimerCallback(evutil_socket_t, short, void *){
+	printf("timer_cb callback\n");
 }

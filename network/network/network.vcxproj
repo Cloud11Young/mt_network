@@ -157,6 +157,7 @@
     <ClInclude Include="..\public\HPTypeDef.h" />
     <ClInclude Include="..\public\SocketInterface.h" />
     <ClInclude Include="src\BufferPool.h" />
+    <ClInclude Include="src\Callback.h" />
     <ClInclude Include="src\CNetComm.h" />
     <ClInclude Include="src\DataType.h" />
     <ClInclude Include="src\INetComm.h" />
@@ -181,8 +182,10 @@
     </ClCompile>
     <ClCompile Include="network.cpp" />
     <ClCompile Include="src\BufferPool.cpp" />
+    <ClCompile Include="src\ClientCallback.cpp" />
     <ClCompile Include="src\CNetComm.cpp" />
     <ClCompile Include="src\INetComm.cpp" />
+    <ClCompile Include="src\ServerCallback.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

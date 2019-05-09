@@ -5,6 +5,7 @@
 #include "INetComm.h"
 #include "NetHelper.h"
 #include "event.h"
+#include "Callback.h"
 
 // #include "../public/HPSocket.h"
 // #include "../public/HPTypeDef.h"
@@ -35,18 +36,27 @@ public:
 
 	virtual int SendMsg(void* pMsg, ulong dwMsgLen, const char* pIP, ushort uPort, ulong dwWay = SEND_ASYN);
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList);
-
 	virtual int Uninitialize();
+
+	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
+	static void EventReadCallback(bufferevent* bev, void* arg);
+	static void EventWriteCallback(bufferevent* bev, void* arg);
+	static void EventCallback(bufferevent* bev, short events, void* arg);
+	static void TimerCallback(evutil_socket_t, short, void *);
+
 private:
 	int StartConnectThread(const char* IP, unsigned short port);
 	static unsigned int __stdcall ConnectThread(void* p);
 private:
 	static const CInitWinSocket m_initSocket;
-private:
+	static CNetComm* m_pNetComm;
+
+	CServerCallback m_ServerCallback;
+	CClientCallback m_ClientCallback;
 //	ITcpPackServer* m_pServer;
 //	ITcpPackClient* m_pClient;
-	PUSER_CB    m_pServerCtrl;
-	PUSER_CB    m_pClientCtrl;
+//	PUSER_CB    m_pServerCtrl;
+//	PUSER_CB    m_pClientCtrl;
 	int		m_bAutoReconnect;
 //	ServerListener* m_pSrvListen;
 //	ClientListener* m_pClientListen;

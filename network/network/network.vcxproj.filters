@@ -54,6 +54,9 @@
     <ClInclude Include="src\NetHelper.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Callback.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -72,6 +75,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\INetComm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ClientCallback.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServerCallback.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
