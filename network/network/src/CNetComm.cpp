@@ -67,6 +67,11 @@ CNetComm::CNetComm() :m_srvBase(NULL), m_clientBase(NULL), m_pListener(NULL)
 	evthread_use_windows_threads();
 
 	m_pNetComm = this;
+	m_NetType = 0;
+
+#ifdef _DEBUG
+	event_enable_debug_mode();
+#endif
 
 //	m_hExit = CreateEvent(NULL, TRUE, FALSE, NULL);
 //	Initlog();
@@ -118,11 +123,11 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(dwPort);
 
-	m_pListener = evconnlistener_new_bind(m_srvBase, ListenerCallback, m_srvBase,
+	m_pListener = evconnlistener_new_bind(m_srvBase, CServerCallback::ListenerCallback, m_srvBase,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&sin, sizeof(sin));
 
-	event_base_dispatch(m_srvBase);
-	
+	m_NetType = NET_TYPE_SERVER;
+	event_base_dispatch(m_srvBase);	
 
 //	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 // 	if (!m_pServer)
@@ -158,6 +163,8 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 //不需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
+	m_NetType = NET_TYPE_CLIENT;
+
 	m_ClientCallback.SetCallback(callback);
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
@@ -286,8 +293,18 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 	return 0;
 }
 
-int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/){
-//	int bSend = FALSE;
+int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/)
+{
+	if (m_NetType == NET_TYPE_CLIENT)
+	{
+//		bufferevent* bev=
+//		bufferevent_write(bev, pMsg, dwMsgLen);
+	}
+	else
+	{
+//		bufferevent
+	}
+	//	int bSend = FALSE;
 // 	if (m_pServer && m_pServer->HasStarted())
 // 	{
 // 		char tmpIP[IP_LEN] = { 0 };
@@ -404,7 +421,7 @@ unsigned int __stdcall CNetComm::ConnectThread(void* p)
 	return 0;
 }
 
-void CNetComm::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
+/*void CNetComm::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
 {
 	char Buffer[256];
 	sockaddr_in* addr = (sockaddr_in*)sock;
@@ -440,7 +457,7 @@ void CNetComm::EventCallback(bufferevent* bev, short events, void* arg)
 	{
 
 	}
-}
+}*/
 
 void CNetComm::TimerCallback(evutil_socket_t, short, void *){
 	printf("timer_cb callback\n");

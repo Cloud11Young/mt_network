@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "Callback.h"
+#include "event2/buffer.h"
 
 CClientCallback::CClientCallback()
 {
@@ -21,7 +22,13 @@ void CClientCallback::SetCallback(_USER_CB* pCallback)
 void CClientCallback::EventReadCallback(bufferevent* bev, void* arg)
 {
 	std::cout << __FUNCTION__ << ": ";
-
+	evbuffer* evb = bufferevent_get_input(bev);
+	size_t len = evbuffer_get_length(evb);
+	char* data = new char[len + 1];
+	memset(data, 0, len + 1);
+	evbuffer_copyout(evb, data, len);
+	printf("read msg %s", data);
+	delete[] data;
 }
 
 void CClientCallback::EventWriteCallback(bufferevent* bev, void* arg)

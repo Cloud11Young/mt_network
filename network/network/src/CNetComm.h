@@ -16,11 +16,15 @@
 
 #define IP_LEN 32
 
+#define NET_TYPE_CLIENT 0x01
+#define NET_TYPE_SERVER 0x02
+
 typedef enum NetRet
 {
 	Ret_failed = 0,
 	Ret_ok = 1
 };
+
 
 class CNetComm :public INetComm{
 public:
@@ -38,10 +42,10 @@ public:
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList);
 	virtual int Uninitialize();
 
-	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
-	static void EventReadCallback(bufferevent* bev, void* arg);
-	static void EventWriteCallback(bufferevent* bev, void* arg);
-	static void EventCallback(bufferevent* bev, short events, void* arg);
+//	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
+//	static void EventReadCallback(bufferevent* bev, void* arg);
+//	static void EventWriteCallback(bufferevent* bev, void* arg);
+//	static void EventCallback(bufferevent* bev, short events, void* arg);
 	static void TimerCallback(evutil_socket_t, short, void *);
 
 private:
@@ -71,6 +75,8 @@ private:
 	struct event_base* m_clientBase;
 	struct evconnlistener* m_pListener;
 	struct bufferevent* m_clientEventbuf;
+
+	unsigned char m_NetType;
 };
 
 #endif

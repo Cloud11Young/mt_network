@@ -18,19 +18,19 @@ unsigned int __stdcall workthread(void* pVoid)
 	pNet->ConnectTo("192.168.101.13", 9995);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
-	printf("thread %d input send msg:", GetCurrentThreadId());
-	scanf("%s", &msg);
+//	printf("thread %d input send msg:", GetCurrentThreadId());
+//	scanf("%s", &msg);
 
 	while (true)
 	{		
 		strcpy_s(tmp, "start");
 		strcat(tmp, msg);
 		strcat(tmp, "end");
-		char* lmsg = new char[10 * 1024 * 1024];
-		memset(lmsg, 1, 10 * 1024 * 1024);
+//		char* lmsg = new char[10 * 1024 * 1024];
+//		memset(lmsg, 1, 10 * 1024 * 1024);
 
-		pNet->SendMsg(msg, strlen(msg)+1, "127.0.0.1", 5001);
-		delete[] lmsg;
+		pNet->SendMsg("hi, server!!!", 14, "127.0.0.1", 5001);
+//		delete[] lmsg;
 		Sleep(3000);
 	}
 }
