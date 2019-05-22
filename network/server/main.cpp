@@ -50,9 +50,9 @@ int main(int argc, char** argv)
 
 	char tmp[64] = { 0 };
 	char ip[32] = { 0 };
-	unsigned short port = 8800;
-	printf("please input server ip and port:");
-	scanf("%s%d", &tmp,&port);
+	unsigned short port = 9995;
+//	printf("please input server ip and port:");
+//	scanf("%s%d", &tmp,&port);
 //	sscanf(tmp, "%s%d", ip, &port);
 
 	if (pNet->Initialize(NULL, &userCB, port, NULL) != 0)
@@ -93,11 +93,12 @@ void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, 
 	char e[4] = { 0 };
 	memcpy(s, pMsg, 5);
 	memcpy(e, (char*)pMsg + dwMsgLen - 4, 4);
-	if (strcmp(s, "start") != 0 || strcmp(e, "end") != 0)
-	{
-		printf("recv wrong data, length = %d\n", dwMsgLen);
-	}
+//	if (strcmp(s, "start") != 0 || strcmp(e, "end") != 0)
+//	{
+//		printf("recv wrong data, length = %d\n", dwMsgLen);
+//	}
 
+	printf("recieve client IP:%s,PORT:%d, msg: %s\n", strIP, dwPort, (char*)pMsg);
 	INetComm* pNet = (INetComm*)pThis;
 	pNet->SendMsg(pMsg, dwMsgLen, strIP, dwPort);
 }

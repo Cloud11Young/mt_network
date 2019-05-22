@@ -42,28 +42,19 @@ public:
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList);
 	virtual int Uninitialize();
 
-//	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
-//	static void EventReadCallback(bufferevent* bev, void* arg);
-//	static void EventWriteCallback(bufferevent* bev, void* arg);
-//	static void EventCallback(bufferevent* bev, short events, void* arg);
 	static void TimerCallback(evutil_socket_t, short, void *);
 
 private:
 	int StartConnectThread(const char* IP, unsigned short port);
 	static unsigned int __stdcall ConnectThread(void* p);
+	static unsigned int __stdcall LoopThread(void* p);
 private:
 	static const CInitWinSocket m_initSocket;
 	static CNetComm* m_pNetComm;
 
 	CServerCallback m_ServerCallback;
 	CClientCallback m_ClientCallback;
-//	ITcpPackServer* m_pServer;
-//	ITcpPackClient* m_pClient;
-//	PUSER_CB    m_pServerCtrl;
-//	PUSER_CB    m_pClientCtrl;
 	int		m_bAutoReconnect;
-//	ServerListener* m_pSrvListen;
-//	ClientListener* m_pClientListen;
 //	CMTX     m_extractlock;
 	char            m_srvIP[IP_LEN];
 	ushort          m_srvPort;
@@ -77,6 +68,7 @@ private:
 	struct bufferevent* m_clientEventbuf;
 
 	unsigned char m_NetType;
+	HANDLE m_pThread[2];
 };
 
 #endif

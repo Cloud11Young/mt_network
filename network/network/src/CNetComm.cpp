@@ -99,11 +99,11 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 {
 	struct sockaddr_in sin;
 
-	m_ServerCallback.SetCallback(callback);
+	m_ServerCallback.SetCallback(callback,this);
  	m_srvPort = dwPort;
 
 	struct event_config* cfg = event_config_new();
-	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
+//	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
 	m_srvBase = event_base_new_with_config(cfg);
 	if (m_srvBase == NULL)
 	{
@@ -127,7 +127,11 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&sin, sizeof(sin));
 
 	m_NetType = NET_TYPE_SERVER;
-	event_base_dispatch(m_srvBase);	
+
+	m_pThread[0] = (HANDLE)_beginthreadex(NULL, 0, LoopThread, m_srvBase, 0, NULL);
+
+	return m_pThread[0] != NULL;
+
 
 //	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 // 	if (!m_pServer)
@@ -165,7 +169,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
 	m_NetType = NET_TYPE_CLIENT;
 
-	m_ClientCallback.SetCallback(callback);
+	m_ClientCallback.SetCallback(callback,this);
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
 //	m_clientBase = event_base_new_with_config(cfg);
@@ -248,7 +252,9 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 	}
 	bufferevent_enable(m_clientEventbuf, EV_READ | EV_WRITE);
 
-	return event_base_dispatch(m_clientBase);		
+	m_pThread[1] = (HANDLE)_beginthreadex(NULL, 0, LoopThread, m_clientBase, 0, NULL);
+
+	return m_pThread[1] != NULL;
 }
 
 int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
@@ -297,12 +303,20 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 {
 	if (m_NetType == NET_TYPE_CLIENT)
 	{
-//		bufferevent* bev=
-//		bufferevent_write(bev, pMsg, dwMsgLen);
+		bufferevent* bev = m_ClientCallback.GetBufferevent();
+		if (bev == NULL)
+			return false;
+		bufferevent_write(bev, pMsg, dwMsgLen);
 	}
 	else
 	{
-//		bufferevent
+		bufferevent* bev = m_ServerCallback.FindBufferevent(pIP, uPort);
+		if (!bev)
+		{
+			printf("Can't find IP:%s,PORT:%d Client Info", pIP, uPort);
+			return 0;
+		}
+		bufferevent_write(bev, pMsg, dwMsgLen);
 	}
 	//	int bSend = FALSE;
 // 	if (m_pServer && m_pServer->HasStarted())
@@ -461,4 +475,12 @@ void CNetComm::EventCallback(bufferevent* bev, short events, void* arg)
 
 void CNetComm::TimerCallback(evutil_socket_t, short, void *){
 	printf("timer_cb callback\n");
+}
+
+unsigned int __stdcall CNetComm::LoopThread(void* p)
+{
+	event_base* base = (event_base*)p;
+	event_base_dispatch(base);
+
+	return 0;
 }

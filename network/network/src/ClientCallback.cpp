@@ -4,9 +4,10 @@
 #include "Callback.h"
 #include "event2/buffer.h"
 
+bufferevent* CClientCallback::m_ClientEvent = NULL;
 CClientCallback::CClientCallback()
 {
-
+	m_pNetComm = NULL;
 }
 
 CClientCallback::~CClientCallback()
@@ -14,9 +15,15 @@ CClientCallback::~CClientCallback()
 
 }
 
-void CClientCallback::SetCallback(_USER_CB* pCallback)
+void CClientCallback::SetCallback(_USER_CB* pCallback, INetComm* pNetComm)
 {
 	m_pCallback = pCallback;
+	m_pNetComm = pNetComm;
+}
+
+bufferevent* CClientCallback::GetBufferevent()
+{
+	return m_ClientEvent;
 }
 
 void CClientCallback::EventReadCallback(bufferevent* bev, void* arg)
@@ -42,6 +49,8 @@ void CClientCallback::EventCallback(bufferevent* bev, short events, void* arg)
 	if (events & BEV_EVENT_CONNECTED)
 	{
 		std::cout << "Connect server success" << std::endl;
+		bufferevent_incref(bev);
+		m_ClientEvent = bev;
 	}
 	else if (events & BEV_EVENT_ERROR)
 	{
