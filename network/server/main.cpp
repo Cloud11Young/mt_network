@@ -100,7 +100,8 @@ void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, 
 
 	printf("recieve client IP:%s,PORT:%d, msg: %s\n", strIP, dwPort, (char*)pMsg);
 	INetComm* pNet = (INetComm*)pThis;
-	pNet->SendMsg(pMsg, dwMsgLen, strIP, dwPort);
+	char srvMsg[] = "hi,client!!!\n";
+	pNet->SendMsg(srvMsg, strlen(srvMsg) + 1, strIP, dwPort);
 }
 
 void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)

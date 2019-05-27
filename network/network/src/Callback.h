@@ -8,6 +8,16 @@
 struct _USER_CB;
 class INetComm;
 
+#define addr_size 16
+struct event_connection
+{
+	evutil_socket_t fd;
+	bufferevent* bufev;
+
+	char address[addr_size];
+	ev_uint16_t port;
+};
+
 class CServerCallback
 {
 public:
@@ -26,7 +36,7 @@ private:
 	_USER_CB* m_pCallback;
 	INetComm* m_pNetComm;
 	static CServerCallback* m_ServerCallback;
-	std::map<std::string, bufferevent*> m_mapClient;
+	std::map<std::string, event_connection*> m_mapClient;
 };
 
 class CClientCallback

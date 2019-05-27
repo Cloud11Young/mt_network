@@ -7,7 +7,11 @@
 #include "event2/thread.h"
 #include "event2/listener.h"
 
-
+struct message_buffer
+{
+	int header;
+	char buffer[1];
+};
 
 static void socket_read_cb(bufferevent *bev, void *arg)
 {
@@ -316,6 +320,11 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			printf("Can't find IP:%s,PORT:%d Client Info", pIP, uPort);
 			return 0;
 		}
+
+		char* msgBuffer = new char[sizeof(message_buffer) + dwMsgLen];
+		message_buffer* buf = (message_buffer*)msgBuffer;
+		buf->header = dwMsgLen;
+		buf->buffer
 		bufferevent_write(bev, pMsg, dwMsgLen);
 	}
 	//	int bSend = FALSE;

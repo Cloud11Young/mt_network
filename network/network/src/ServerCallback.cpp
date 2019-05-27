@@ -29,14 +29,14 @@ bufferevent* CServerCallback::FindBufferevent(std::string IP, unsigned short por
 	std::string key = IP + ":" + std::to_string(port);
 	if (m_mapClient.find(key) != m_mapClient.end())
 	{
-		return m_mapClient[key];
+		return m_mapClient[key]->bufev;
 	}
 	return NULL;
 }
 
 void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
 {
-	char ClientIP[256];
+	char ClientIP[addr_size];
 	
 	sockaddr_in* addr = (sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
@@ -57,8 +57,13 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	bufferevent_setcb(bev, EventReadCallback, EventWriteCallback, EventCallback, NULL);
 	bufferevent_enable(bev, EV_READ | EV_WRITE | EV_PERSIST);
 
+	event_connection* evcon = new event_connection;
+	evcon->fd = fd;
+	evcon->bufev = bev;
+	strcpy(evcon->address, ClientIP);
+	evcon->port = port;
 	std::string key = ClientIP + std::string(":") + std::to_string(port);
-	m_ServerCallback->m_mapClient[key] = bev;
+	m_ServerCallback->m_mapClient[key] = evcon;
 }
 
 void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
@@ -69,17 +74,18 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 	memset(msg, 0, msglen);
 	evbuffer_copyout(evb, msg, msglen);
 
+//	event_connection* evcon = CONTAINING_RECORD(&bev, event_connection, bufev);
 	evutil_socket_t fd = bufferevent_getfd(bev);
 	sockaddr_in ClientAddr;
 	int namelen = sizeof(ClientAddr);
 	getpeername(fd, (sockaddr*)&ClientAddr, &namelen);
-	char clientIP[256] = { 0 };
+	char address[addr_size] = { 0 };
 	int port = ntohs(ClientAddr.sin_port);
-	evutil_inet_ntop(ClientAddr.sin_family, &ClientAddr.sin_addr, clientIP, sizeof(clientIP));
+	evutil_inet_ntop(ClientAddr.sin_family, &ClientAddr.sin_addr, address, sizeof(address));
 
 	if (m_ServerCallback->m_pCallback && m_ServerCallback->m_pCallback->lpRecvMsgCB)
 	{
-		m_ServerCallback->m_pCallback->lpRecvMsgCB(m_ServerCallback->m_pNetComm, msg, msglen, clientIP, port);
+		m_ServerCallback->m_pCallback->lpRecvMsgCB(m_ServerCallback->m_pNetComm, msg, msglen, address, port);
 	}
 
 	delete[] msg;
@@ -87,12 +93,19 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 
 void CServerCallback::EventWriteCallback(bufferevent* bev, void* arg)
 {
-
+	printf("%s", __FUNCTION__);
 }
 
 void CServerCallback::EventCallback(bufferevent* bev, short events, void* arg)
 {
-
+	if (events & BEV_EVENT_EOF)
+	{
+		std::cout << "one connection closed!!!" << std::endl;
+	}
+	else if (events & BEV_EVENT_ERROR)
+	{
+		std::cout << "Got an error on the connection: " << strerror(errno) << std::endl;
+	}
 }
 
 void CServerCallback::TimerCallback(evutil_socket_t, short, void *)
