@@ -303,6 +303,11 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 	return 0;
 }
 
+void evbuf_ref_cleanup_cb(const void *data, size_t datalen, void *extra)
+{
+	printf("%s\n", __FUNCTION__);
+}
+
 int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/)
 {
 	if (m_NetType == NET_TYPE_CLIENT)
@@ -321,11 +326,13 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			return 0;
 		}
 
-		char* msgBuffer = new char[sizeof(message_buffer) + dwMsgLen];
-		message_buffer* buf = (message_buffer*)msgBuffer;
-		buf->header = dwMsgLen;
-		buf->buffer
-		bufferevent_write(bev, pMsg, dwMsgLen);
+		//char* msgBuffer = new char[sizeof(message_buffer) + dwMsgLen];
+		//message_buffer* buf = (message_buffer*)msgBuffer;
+		//buf->header = dwMsgLen;
+		evbuffer* evbuf = evbuffer_new();
+		evbuffer_add_reference(evbuf, pMsg, dwMsgLen, evbuf_ref_cleanup_cb, evbuf);
+		bufferevent_write_buffer(bev, evbuf);
+		evbuffer_free(evbuf);
 	}
 	//	int bSend = FALSE;
 // 	if (m_pServer && m_pServer->HasStarted())

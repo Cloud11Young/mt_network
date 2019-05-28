@@ -93,12 +93,16 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 
 void CServerCallback::EventWriteCallback(bufferevent* bev, void* arg)
 {
-	printf("%s", __FUNCTION__);
+	printf("%s\n", __FUNCTION__);
 }
 
 void CServerCallback::EventCallback(bufferevent* bev, short events, void* arg)
 {
-	if (events & BEV_EVENT_EOF)
+	if (events & BEV_EVENT_CONNECTED)
+	{
+		std::cout << "client connected!!!" << std::endl;
+	}
+	else if (events & BEV_EVENT_EOF)
 	{
 		std::cout << "one connection closed!!!" << std::endl;
 	}
@@ -110,5 +114,5 @@ void CServerCallback::EventCallback(bufferevent* bev, short events, void* arg)
 
 void CServerCallback::TimerCallback(evutil_socket_t, short, void *)
 {
-
+	printf("%s\n", __FUNCTION__);
 }
