@@ -30,12 +30,13 @@ typedef void(*LPRECVMSG_CALLBACK)(void* pThis, void* pMsg, ulong dwMsgLen, const
 typedef void(*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort);
 typedef void(*LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, int bOK);
 typedef void(*LPERROR_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, const char* msg);
+typedef void(*LPLOG_CALLBACK)(int severity, const char* msg);
 
 typedef struct _USER_CB
 {
 	_USER_CB() :lpConnectCB(NULL), lpDisconnectCB(NULL), lpRecvMsgCB(NULL),
 	lpPreAutoConnectCB(NULL), lpPostAutoConnectCB(NULL), lpCallBackData(NULL),
-	lpErrorCB(NULL)
+	lpErrorCB(NULL), lpLogCB(NULL)
 	{}
 	LPCONNECT_CALLBACK		lpConnectCB;
 	LPDISCONNECT_CALLBACK	lpDisconnectCB;
@@ -44,6 +45,7 @@ typedef struct _USER_CB
 	LPPOSTAUTO_CONNECT_CALLBACK lpPostAutoConnectCB;
 	void*					lpCallBackData;
 	LPERROR_CALLBACK        lpErrorCB;
+	LPLOG_CALLBACK			lpLogCB;
 }USER_CB, *PUSER_CB;
 
 class NET_CLASS INetComm

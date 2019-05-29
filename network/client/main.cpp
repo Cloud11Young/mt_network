@@ -29,7 +29,7 @@ unsigned int __stdcall workthread(void* pVoid)
 //		char* lmsg = new char[10 * 1024 * 1024];
 //		memset(lmsg, 1, 10 * 1024 * 1024);
 
-		pNet->SendMsg("hi, server!!!", 14, "192.168.101.13", 9995);
+//		pNet->SendMsg("hi, server!!!", 14, "192.168.101.13", 9995);
 //		delete[] lmsg;
 		Sleep(3000);
 	}

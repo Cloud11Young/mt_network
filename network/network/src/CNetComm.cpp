@@ -101,10 +101,10 @@ void CNetComm::Release(){
 //需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
 {
-	struct sockaddr_in sin;
-
 	m_ServerCallback.SetCallback(callback,this);
  	m_srvPort = dwPort;
+
+	event_set_log_callback(callback->lpLogCB);
 
 	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
@@ -123,6 +123,7 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 
 	event_base_set(m_srvBase, ev);
 
+	struct sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(dwPort);
@@ -172,8 +173,9 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 {
 	m_NetType = NET_TYPE_CLIENT;
-
 	m_ClientCallback.SetCallback(callback,this);
+	event_set_log_callback(callback->lpLogCB);
+
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
 //	m_clientBase = event_base_new_with_config(cfg);
@@ -191,7 +193,8 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 
 	m_clientEventbuf = bufferevent_socket_new(m_clientBase, -1, BEV_OPT_THREADSAFE | BEV_OPT_CLOSE_ON_FREE);
 
-	bufferevent_setcb(m_clientEventbuf, CClientCallback::EventReadCallback, CClientCallback::EventWriteCallback, CClientCallback::EventCallback, NULL);
+	bufferevent_setcb(m_clientEventbuf, CClientCallback::EventReadCallback, CClientCallback::EventWriteCallback, 
+		CClientCallback::EventCallback, m_clientEventbuf);
 
 	struct event* ev = event_new(m_clientBase, 1, 1, TimerCallback, NULL);
 	evtimer_set(ev, TimerCallback, NULL);

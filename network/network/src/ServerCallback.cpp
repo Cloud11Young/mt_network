@@ -24,6 +24,11 @@ void CServerCallback::SetCallback(_USER_CB* pCallback, INetComm* pNetComm)
 	m_pNetComm = pNetComm;
 }
 
+_USER_CB* CServerCallback::GetCBFunction()
+{
+	return m_pCallback;
+}
+
 bufferevent* CServerCallback::FindBufferevent(std::string IP, unsigned short port)
 {
 	std::string key = IP + ":" + std::to_string(port);
@@ -41,7 +46,7 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	sockaddr_in* addr = (sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
 	int port = ntohs(addr->sin_port);
-	printf("accept a client %d,IP:%s,PORT:%d\n", fd, ClientIP, port);
+//	printf("accept a client %d,IP:%s,PORT:%d\n", fd, ClientIP, port);
 
 	event_base *base = (event_base*)user_data;
 
@@ -50,6 +55,7 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	if (!bev)
 	{
 		printf("Create Client bufferevent failed.\n");
+		event_errx("");
 		event_base_loopbreak(base);
 		return;
 	}
@@ -93,7 +99,12 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 
 void CServerCallback::EventWriteCallback(bufferevent* bev, void* arg)
 {
-	printf("%s\n", __FUNCTION__);
+	printf("%s: ", __FUNCTION__);
+	evbuffer* output = bufferevent_get_output(bev);
+	size_t buflen = evbuffer_get_length(output);
+	char buf[512] = { 0 };
+	evbuffer_copyout(output, buf, 512);
+	printf("output buf: %s\n", buf);
 }
 
 void CServerCallback::EventCallback(bufferevent* bev, short events, void* arg)

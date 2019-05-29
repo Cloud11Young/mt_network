@@ -25,6 +25,7 @@ public:
 	~CServerCallback();
 
 	void SetCallback(_USER_CB* pCallback, INetComm* pNetComm);
+	_USER_CB* GetCBFunction();
 	bufferevent* FindBufferevent(std::string IP, unsigned short port);
 	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
 	static void EventReadCallback(bufferevent* bev, void* arg);
@@ -47,6 +48,7 @@ public:
 
 	bufferevent* GetBufferevent();
 	void SetCallback(_USER_CB* pCallback, INetComm* pNetComm);
+	_USER_CB* GetCBFunction();
 	static void EventReadCallback(bufferevent* bev, void* arg);
 	static void EventWriteCallback(bufferevent* bev, void* arg);
 	static void EventCallback(bufferevent* bev, short events, void* arg);

@@ -21,6 +21,12 @@ void CClientCallback::SetCallback(_USER_CB* pCallback, INetComm* pNetComm)
 	m_pNetComm = pNetComm;
 }
 
+_USER_CB* CClientCallback::GetCBFunction()
+{
+	return m_pCallback;
+}
+
+
 bufferevent* CClientCallback::GetBufferevent()
 {
 	return m_ClientEvent;

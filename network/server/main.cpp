@@ -11,6 +11,7 @@ static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* 
 //static void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort);
 //static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort, int bOK);
 static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
+static void LogCB(int severity, const char* msg);
 
 INetComm* pNet = NULL;
 static char ip[32] = { 0 };
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
 	userCB.lpRecvMsgCB = RecvCB;
 	userCB.lpErrorCB = ErrorCB;
 	userCB.lpCallBackData = pNet;
+	userCB.lpLogCB = LogCB;
 
 	char tmp[64] = { 0 };
 	char ip[32] = { 0 };
@@ -74,10 +76,9 @@ void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char
 	port = dwPort;
 	strcpy(ip, strIP);
 
-// 	for (int i = 0; i < 8; i++)
-// 	{
-// 		_beginthreadex(NULL, 0, SendThread, pNet, 0, NULL);
-// 	}
+	INetComm* pNet = (INetComm*)pThis;
+	char srvMsg[] = "hi,client!!!\n";
+	pNet->SendMsg(srvMsg, strlen(srvMsg) + 1, strIP, dwPort);
 }
 
 void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
@@ -107,4 +108,9 @@ void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, 
 void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)
 {
 	printf("client [%s:%d] error = \"%s\"\n", strIP, dwPort,msg);
+}
+
+void LogCB(int severity, const char* msg)
+{
+	printf("severity = %d, msg = %s\n", severity, msg);
 }
