@@ -39,6 +39,14 @@ bufferevent* CServerCallback::FindBufferevent(std::string IP, unsigned short por
 	return NULL;
 }
 
+static void Connection_close_cb(evutil_socket_t fd, short what, void *other_)
+{
+	if (what & EV_CLOSED)
+	{
+		std::cout << "connection closed!!!" << std::endl;
+	}
+}
+
 void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
 {
 	char ClientIP[addr_size];
@@ -46,7 +54,7 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	sockaddr_in* addr = (sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
 	int port = ntohs(addr->sin_port);
-//	printf("accept a client %d,IP:%s,PORT:%d\n", fd, ClientIP, port);
+	printf("accept a client %d,IP:%s,PORT:%d\n", fd, ClientIP, port);
 
 	event_base *base = (event_base*)user_data;
 
@@ -55,13 +63,16 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	if (!bev)
 	{
 		printf("Create Client bufferevent failed.\n");
-		event_errx("");
+//		event_errx("");
 		event_base_loopbreak(base);
 		return;
 	}
 
 	bufferevent_setcb(bev, EventReadCallback, EventWriteCallback, EventCallback, NULL);
-	bufferevent_enable(bev, EV_READ | EV_WRITE | EV_PERSIST);
+	bufferevent_enable(bev, EV_READ | EV_WRITE |EV_PERSIST);
+
+	event closeEvent;
+	event_assign(&closeEvent, base, fd, EV_CLOSED, Connection_close_cb, base);
 
 	event_connection* evcon = new event_connection;
 	evcon->fd = fd;
