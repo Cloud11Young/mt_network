@@ -64,7 +64,8 @@ ADDRESS_FAMILY DetermineAddrFamily(const char* lpszAddress)
 	if(::StrChrA(lpszAddress, IPV6_ADDR_SEPARATOR_CHAR))
 		return AF_INET6;
 
-	TCHAR c;
+//	TCHAR c;
+	char c;
 	int arr[4];
 
 	if(sscanf_s(lpszAddress, "%d.%d.%d.%d%c", &arr[0], &arr[1], &arr[2], &arr[3], &c, 1) != 4)

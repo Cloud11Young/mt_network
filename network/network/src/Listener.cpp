@@ -337,8 +337,8 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 	if (bGet == FALSE)
 		return HR_ERROR;
 
-	char cIP[50] = { 0 };
-	int clen = sizeof(cIP) / sizeof(char);
+//	char cIP[50] = { 0 };
+//	int clen = sizeof(cIP) / sizeof(char);
 // 	int size = WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, NULL, 0, NULL, NULL);
 // 	WideCharToMultiByte(CP_ACP, 0, m_remoteaddr->pAddress, -1, cIP, size, NULL, NULL);
 	
@@ -346,7 +346,8 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 		SOCKADDR_IN sa;
 		int len = sizeof(sa);
 		sa.sin_family = AF_INET;
-		sa.sin_addr.S_un.S_addr = inet_addr(cIP);
+//		sa.sin_addr.S_un.S_addr = inet_addr(cIP);
+		inet_pton(AF_INET, m_remoteaddr->pAddress, &sa.sin_addr);
 		sa.sin_port = htons(m_remoteaddr->usPort);
 		
 		char name[50] = { 0 };
