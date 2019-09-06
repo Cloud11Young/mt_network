@@ -1,4 +1,6 @@
 ipch/
+.vs
+
 txt.*
 *.sdf
 *.tlog
@@ -8,3 +10,6 @@ txt.*
 *.res
 *.idb
 *.opensdf
+*.ipdb
+*.iobj
+
