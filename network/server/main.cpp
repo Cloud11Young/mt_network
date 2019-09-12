@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	char ip[32] = { 0 };
 	unsigned short port = 8800;
 	printf("please input server ip and port:");
-	scanf("%s%d", &tmp,&port);
+	scanf("%s%d", tmp, &port);
 //	sscanf(tmp, "%s%d", ip, &port);
 
 	if (pNet->Initialize(NULL, &userCB, port, NULL) != 0)

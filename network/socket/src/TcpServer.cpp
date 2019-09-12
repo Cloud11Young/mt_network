@@ -11,12 +11,6 @@
 #include "log4cpp/PropertyConfigurator.hh"
 #include "mtHelper.h"
 
-#ifdef _DEBUG
-#pragma comment(lib,"../lib/log4cpp.lib")
-#else
-#pragma comment(lib,"../libR/log4cpp.lib")
-#endif
-
 static int IsDirExist(const char* path){
 	DWORD dwAttri = GetFileAttributesA(path);
 	return INVALID_FILE_ATTRIBUTES != dwAttri && 0 != (dwAttri&FILE_ATTRIBUTE_DIRECTORY);
@@ -59,9 +53,9 @@ static void Initlog()
 //	root.addAppender(RollAppender);
 	root.setRootPriority(log4cpp::Priority::ERROR);
 
-	log4cpp::Category& netlog = root.getInstance("network");
-	netlog.addAppender(RollAppender);
-	netlog.setPriority(log4cpp::Priority::INFO);
+//	log4cpp::Category& netlog = root.getInstance("network");
+//	netlog.addAppender(RollAppender);
+//	netlog.setPriority(log4cpp::Priority::INFO);
 }
 
 const CInitSocket CTcpServer::sm_wsSocket;

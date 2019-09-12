@@ -8,8 +8,6 @@
 static void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName);
 static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
 static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort);
-//static void PREAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort);
-//static void POSTAUTO_CONNECT_CALLBACK(void* pThis, char* strIP, unsigned short dwPort, int bOK);
 static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
 
 unsigned int __stdcall workthread(void* pVoid)

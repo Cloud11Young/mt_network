@@ -2,62 +2,6 @@
 #include "CNetComm.h"
 #include "BufferPool.h"
 #include <process.h>
-// #include "mtHelper.h"
-// #include "log4cpp/Category.hh"
-// #include "log4cpp/RollingFileAppender.hh"
-// #include "log4cpp/PatternLayout.hh"
-
-// static int IsDirExist(const char* path){
-// 	DWORD dwAttri = GetFileAttributesA(path);
-// 	return INVALID_FILE_ATTRIBUTES != dwAttri && 0 != (dwAttri&FILE_ATTRIBUTE_DIRECTORY);
-// }
-
-// static void Initlog()
-// {
-// 	char path[MAX_PATH];
-// 	char cfgPath[MAX_PATH] = { 0 };
-// 	char filePath[MAX_PATH] = { 0 };
-// 	GetPathExeA(path, MAX_PATH);
-// 
-// 	//	strcat(path, "\\log");
-// 	sprintf_s(filePath, "%s\\log", path);
-// 
-// 	if (!IsDirExist(filePath))
-// 	{
-// 		CreateDirectoryA(filePath, NULL);
-// 	}
-// 
-// 	time_t t;
-// 	time(&t);
-// 	struct tm* timeinfo;
-// 	timeinfo = localtime(&t);
-// 	char stm[255] = { 0 };
-// 	strftime(stm, sizeof(stm), "\\net_%y_%m_%d %H_%M_%S.txt", timeinfo);
-// 	sprintf_s(filePath, "%s\\log\\%s", path, stm);
-// 	sprintf_s(cfgPath, "%s\\config\\log4cpp.property", path);
-// 
-// 	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("default", filePath);
-// 	if (RollAppender == NULL)	return;
-// 
-// 	RollAppender->setMaximumFileSize(100 * 1024 * 1024);
-// 	RollAppender->setMaxBackupIndex(10);
-// 
-// 	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
-// 	if (layout == NULL)	return;
-// 
-// 	layout->setConversionPattern("[%d %p %t %m %n");
-// 	RollAppender->setLayout(layout);
-// 
-// 	log4cpp::Category& root = log4cpp::Category::getRoot();
-// 	root.addAppender(RollAppender);
-// 
-// 	log4cpp::Category& netlog = root.getInstance("network");
-// 	root.setRootPriority(log4cpp::Priority::ERROR);
-// 
-// 	netlog.setPriority(log4cpp::Priority::INFO);
-// //	mvslog.setPriority((log4cpp::Priority::Value)IAoiConfig()->GetLogLv());
-// 
-// }
 
 CNetComm::CNetComm() :m_pServer(NULL), m_pClient(NULL), m_pthread(NULL)
 {
@@ -68,7 +12,6 @@ CNetComm::CNetComm() :m_pServer(NULL), m_pClient(NULL), m_pthread(NULL)
 	memset(m_srvIP, 0, sizeof(*m_srvIP)*IP_LEN);
 
 	m_hExit = CreateEvent(NULL, TRUE, FALSE, NULL);
-//	Initlog();
 }
 
 CNetComm::~CNetComm()
@@ -92,11 +35,9 @@ void CNetComm::Release()
 //需要提供Server服务
 int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
 {
-	if (m_pServer != NULL)		return FALSE;
+	if (m_pServer != NULL)		return 0;
 	m_pServerCtrl = callback;
 	m_pSrvListen->RegCallBack(callback);
-// 	strcpy_s(m_srvIP, strIp);
-// 	m_srvPort = dwPort;
 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
@@ -143,7 +84,6 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 		{
 			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, NULL, 0, "create client object failed");
 		}
-//		log4cpp::Category::getInstance("network").error("%s:%d] create client object failed", __FILE__, __LINE__);
 		return 0;
 	}	
 
@@ -155,10 +95,10 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback)
 int CNetComm::GetStatus(int &bIsServer, int &bIsClient)
 {
 	if (m_pClient)
-		bIsClient = TRUE;
+		bIsClient = 1;
 	if (m_pServer)
-		bIsServer = TRUE;
-	return TRUE;
+		bIsServer = 1;
+	return 1;
 }
 
 int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnect/* = TRUE*/)
@@ -219,7 +159,7 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 		CONNID destID;
 		m_pServer->GetAllConnectionIDs(IDs, nConnected);
 		
-		for (int i = 0; i < nConnected; i++)
+		for (DWORD i = 0; i < nConnected; i++)
 		{
 			RemoteAddress remAddr;
 			remAddr.iAddressLen = 50;
@@ -323,7 +263,7 @@ int CNetComm::StartConnectThread(const char* IP, unsigned short port){
 	{
 		DWORD errCode = GetLastError();
 		char tmp[512] = { 0 };
-		sprintf_s(tmp, "client start reconnect thread error", errCode);
+		sprintf_s(tmp, "client start reconnect thread error %d", errCode);
 		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
 		{
 			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
