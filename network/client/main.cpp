@@ -15,7 +15,7 @@ static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const
 unsigned int __stdcall workthread(void* pVoid)
 {
 	INetComm* pNet = (INetComm*)pVoid;
-	pNet->ConnectTo("192.168.101.13", 9995);
+	pNet->ConnectTo("192.168.101.13", 3724);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
 //	printf("thread %d input send msg:", GetCurrentThreadId());

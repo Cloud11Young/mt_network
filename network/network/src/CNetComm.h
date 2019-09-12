@@ -19,7 +19,7 @@
 #define NET_TYPE_CLIENT 0x01
 #define NET_TYPE_SERVER 0x02
 
-typedef enum NetRet
+enum NetRet
 {
 	Ret_failed = 0,
 	Ret_ok = 1

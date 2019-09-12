@@ -239,7 +239,8 @@ int CNetComm::GetStatus(int &bIsServer, int &bIsClient)
 int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnect/* = TRUE*/)
 {
 	struct sockaddr_in sin;
-	sin.sin_addr.S_un.S_addr = inet_addr(pIP);
+//	sin.sin_addr.S_un.S_addr = inet_addr(pIP);
+	inet_pton(AF_INET, pIP, &sin.sin_addr);
 	sin.sin_port = htons(uPort);
 	sin.sin_family = AF_INET;
 
