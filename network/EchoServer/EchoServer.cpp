@@ -5,6 +5,9 @@
 #include <iostream>
 #include <time.h>
 #include <atomic>
+#include <mutex>
+#include <vector>
+#include <algorithm>
 #include "mthelper.h"
 #include "../network/src/INetComm.h"
 #include "log4cpp/Category.hh"
@@ -18,7 +21,7 @@ static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
 static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort);
 static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg);
 
-static void SendMsg(INetComm* pNet, const char* ip, unsigned short dwPort);
+static void SendMsg(INetComm* pNet, const char* ip, unsigned short dwPort, size_t count = 1);
 
 struct msgbuffer
 {
@@ -26,9 +29,11 @@ struct msgbuffer
 	char buffer[65500];
 };
 
-//static char msgbuffer[65500] = { 0 };
-std::atomic<size_t> msgCount = 0;
-const size_t maxCount = 100000;
+//std::atomic<clock_t> maxTime = 0;
+typedef std::vector<clock_t> VecMaxTime;
+typedef std::pair<std::string, VecMaxTime> ConnectMaxTime;
+std::map<std::string, ConnectMaxTime> mapConnectMaxTime;
+std::mutex vecLock;
 
 static void Initlog()
 {
@@ -54,8 +59,8 @@ static void Initlog()
 	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("RollFile", filePath);
 	if (RollAppender == NULL)	return;
 
-	RollAppender->setMaximumFileSize(20 * 1024 * 1024);
-	RollAppender->setMaxBackupIndex(100);
+	RollAppender->setMaximumFileSize(50 * 1024 * 1024);
+	RollAppender->setMaxBackupIndex(1000);
 
 	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
 	if (layout == NULL)	return;
@@ -66,11 +71,9 @@ static void Initlog()
 	log4cpp::OstreamAppender* StreamAppender = new log4cpp::OstreamAppender("console", &std::cout);
 
 	log4cpp::Category& root = log4cpp::Category::getRoot();
-//	root.addAppender(RollAppender);
+	root.addAppender(RollAppender);
 	root.addAppender(StreamAppender);
 	root.setRootPriority(log4cpp::Priority::INFO);
-
-
 }
 
 
@@ -92,11 +95,11 @@ int main(int argc, char** argv)
 	std::cout << "please input server bind port: ";
 	std::cin >> port;
 
-	if (pNet->Initialize(NULL, &userCB, port, NULL) != 0)
-		std::cout << "server start success\n";
+	if (pNet->Initialize(NULL, &userCB, port, "0.0.0.0") != 0)
+		log4cpp::Category::getRoot().info("server start success");
 	else
 	{
-		std::cout << "server start failed\n";
+		log4cpp::Category::getRoot().error("server start failed");
 		goto end;
 	}
 
@@ -108,7 +111,7 @@ int main(int argc, char** argv)
 	}
 
 	pNet->Release();
-	std::cout << "server quit\n";
+	log4cpp::Category::getRoot().info("server quit");
 end:
 	system("pause");
 
@@ -117,53 +120,113 @@ end:
 
 void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName)
 {
-	std::cout << strIP << ":" << dwPort << "connected !!!\n";
-	std::cout << "Server start send msg\n";
+	char path[MAX_PATH];
+	char filePath[MAX_PATH] = { 0 };
+	GetPathExeA(path, MAX_PATH);
+	
+	std::string logKey = strIP + std::string("_") + std::to_string(dwPort);
+	if (mapConnectMaxTime.find(logKey) == mapConnectMaxTime.end())
+	{
+		size_t logSize = mapConnectMaxTime.size();
+		std::string value = "connect_" + std::to_string(++logSize);
+		mapConnectMaxTime.insert(std::make_pair(logKey, std::make_pair(value,VecMaxTime())));
+		mapConnectMaxTime[logKey].second.reserve(50);
+	}
+	sprintf_s(filePath, "%s\\log\\%s.txt", path, mapConnectMaxTime[logKey].first.c_str());
+
+	log4cpp::RollingFileAppender* RollAppender = new log4cpp::RollingFileAppender("RollFile" + mapConnectMaxTime[logKey].first, filePath);
+	if (RollAppender == NULL)	return;
+
+	RollAppender->setMaximumFileSize(50 * 1024 * 1024);
+	RollAppender->setMaxBackupIndex(100);
+
+	log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
+	if (layout == NULL)	return;
+
+	layout->setConversionPattern("[%d %p %t %m %n");
+	RollAppender->setLayout(layout);
+
+	log4cpp::Category& cate = log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first);
+	cate.addAppender(RollAppender);
+	cate.setRootPriority(log4cpp::Priority::INFO);
+
+	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).info("%s:%d connected !!!", strIP, dwPort);
+	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).info("Server start send msg");
 	SendMsg((INetComm*)pThis, strIP, dwPort);
 }
 
 void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
 {
-	std::cout << strIP << ":" << dwPort << " disconnected !!!\n";
+	std::string logKey = strIP + std::string("_") + std::to_string(dwPort);
+	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).info("%s:%d disconnected !!!", strIP, dwPort);
+//	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).shutdown();
 }
 
 void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort)
 {
+	std::string logKey = strIP + std::string("_") + std::to_string(dwPort);
+	VecMaxTime& vMaxTime = mapConnectMaxTime[logKey].second;
+	if (!strcmp("end", (const char*)pMsg))
+	{
+		log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).error("%s:%d msg end !!!", strIP, dwPort);
+
+		std::string strTimes;
+		for (size_t i = 0; i < vMaxTime.size(); i++)
+		{
+			strTimes += std::to_string(vMaxTime[i]);
+		}
+
+		log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).notice("%s:%d max elapsed time：%s", strIP, dwPort,strTimes.c_str());
+
+		return;
+	}
+
 	msgbuffer* buf = (msgbuffer*)pMsg;
 	clock_t startT;
 	startT = (clock_t)atoi(buf->buffer);
 	clock_t gapT = clock() - startT;
-	char logbuf[256] = { 0 };
-	sprintf_s(logbuf, "Come from %s:%d, bytes = %zd, time = %ldms", strIP, dwPort, sizeof(msgbuffer), gapT);
-	log4cpp::Category::getRoot().info(logbuf);
-
-	SendMsg((INetComm*)pThis, strIP, dwPort);
-}
-
-void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)
-{
-	std::cout << strIP << ":" << dwPort <<" "<< msg << std::endl;
-}
-
-void SendMsg(INetComm* pNet,const char* ip, unsigned short dwPort)
-{
-	if (msgCount + 1 > maxCount)
-	{
-		std::cout << "please input q to quit.\n";
-		return;
-	}
 	
+	if (vMaxTime.size() > 0 && gapT > vMaxTime[0])
+	{
+		if (vMaxTime.size() >= 50)
+		{
+			vMaxTime[0] = gapT;
+		}
+		else
+			vMaxTime.emplace_back(gapT);
+		std::sort(vMaxTime.begin(), vMaxTime.end());
+	}
+	else if (vMaxTime.size() == 0)
+	{
+		vMaxTime.emplace_back(gapT);
+	}
+		
+
+	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).info
+	(
+		"Come from %s:%d count = %zd, bytes = %zd, time = %ldms", strIP, dwPort, buf->count, sizeof(msgbuffer), gapT
+	);
+
+	SendMsg((INetComm*)pThis, strIP, dwPort, ++buf->count);
+}
+
+void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* errmsg)
+{
+	std::string logKey = strIP + std::string("_") + std::to_string(dwPort);
+	log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).error("%s:%d %s !!!", strIP, dwPort, errmsg);
+}
+
+void SendMsg(INetComm* pNet,const char* ip, unsigned short dwPort, size_t count)
+{
 	clock_t t = clock();
 
 	msgbuffer buf;
-	buf.count = msgCount;
+	buf.count = count;
 	memset(buf.buffer, 0, 65500);
 	strcpy_s(buf.buffer, std::to_string(t).c_str());
 	if (!pNet->SendMsg(&buf, sizeof(buf), ip, dwPort))
 	{
-		char logbuffer[256] = { 0 };
-		sprintf_s(logbuffer, "Server send msg to %s:%d falied.", ip, dwPort);
-		log4cpp::Category::getRoot().error(logbuffer);
+		std::string logKey = ip + std::string("_") + std::to_string(dwPort);
+		log4cpp::Category::getInstance(mapConnectMaxTime[logKey].first).error("Server send msg to %s:%d falied.", ip, dwPort);
 	}
-	msgCount++;
 }

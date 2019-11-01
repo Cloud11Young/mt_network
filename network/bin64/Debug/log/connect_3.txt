@@ -1,0 +1,10 @@
+[2019-10-25 10:11:56,904 INFO 10556 127.0.0.1:62084 connected !!! 
+[2019-10-25 10:11:56,910 INFO 10556 Server start send msg 
+[2019-10-25 10:22:32,017 INFO 8092 127.0.0.1:62436 connected !!! 
+[2019-10-25 10:22:32,019 INFO 8092 Server start send msg 
+[2019-10-25 10:25:22,902 ERROR 4464 127.0.0.1:62436 socket operator so_close, error desc SUCCESS, code 0 !!! 
+[2019-10-25 10:25:22,903 INFO 4464 127.0.0.1:62436 disconnected !!! 
+[2019-10-25 11:20:24,590 INFO 17756 127.0.0.1:64070 connected !!! 
+[2019-10-25 11:20:24,592 INFO 17756 Server start send msg 
+[2019-10-25 11:21:17,819 ERROR 19216 127.0.0.1:64070 socket operator so_receive, error desc SUCCESS, code 10054 !!! 
+[2019-10-25 11:21:17,820 INFO 19216 127.0.0.1:64070 disconnected !!! 

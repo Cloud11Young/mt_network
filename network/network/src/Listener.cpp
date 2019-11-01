@@ -356,7 +356,10 @@ EnHandleResult ClientListener::OnHandShake(ITcpClient* pSender, CONNID dwConnID)
 // 		TCHAR hostname[50] = { 0 };
 // 		int iLength = MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, NULL, 0);
 // 		MultiByteToWideChar(CP_ACP, 0, name, (int)strlen(name) + 1, hostname, iLength);
-		m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, name);
+		if (m_pCallBack->lpConnectCB)
+		{
+			m_pCallBack->lpConnectCB(m_pCallBack->lpCallBackData, m_remoteaddr->pAddress, m_remoteaddr->usPort, name);
+		}
 		m_vAddr[dwConnID] = m_remoteaddr;
 	}
 	return HR_OK;

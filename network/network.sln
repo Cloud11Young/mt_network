@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EchoServer", "EchoServer\Ec
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EchoClient", "EchoClient\EchoClient.vcxproj", "{6091AEDB-09F5-4BA6-9C9C-CE8E2528ADB7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpNetwork", "HttpNetwork\HttpNetwork.vcxproj", "{9A24BEC1-557C-4849-A505-B8578B2969B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -121,6 +123,18 @@ Global
 		{6091AEDB-09F5-4BA6-9C9C-CE8E2528ADB7}.Release|Win32.Build.0 = Release|Win32
 		{6091AEDB-09F5-4BA6-9C9C-CE8E2528ADB7}.Release|x64.ActiveCfg = Release|x64
 		{6091AEDB-09F5-4BA6-9C9C-CE8E2528ADB7}.Release|x64.Build.0 = Release|x64
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|Win32.Build.0 = Debug|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|x64.ActiveCfg = Debug|x64
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Debug|x64.Build.0 = Debug|x64
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|Win32.ActiveCfg = Release|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|Win32.Build.0 = Release|Win32
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|x64.ActiveCfg = Release|x64
+		{9A24BEC1-557C-4849-A505-B8578B2969B1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

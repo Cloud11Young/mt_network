@@ -4,13 +4,13 @@
 
 #include <malloc.h>
 #include <process.h>
-
+/*
 #include "log4cpp/Category.hh"
 #include "log4cpp/RollingFileAppender.hh"
 #include "log4cpp/PatternLayout.hh"
-#include "log4cpp/PropertyConfigurator.hh"
+#include "log4cpp/PropertyConfigurator.hh"*/
 #include "mtHelper.h"
-
+/*
 static int IsDirExist(const char* path){
 	DWORD dwAttri = GetFileAttributesA(path);
 	return INVALID_FILE_ATTRIBUTES != dwAttri && 0 != (dwAttri&FILE_ATTRIBUTE_DIRECTORY);
@@ -51,12 +51,12 @@ static void Initlog()
 
 	log4cpp::Category& root = log4cpp::Category::getRoot();
 //	root.addAppender(RollAppender);
-	root.setRootPriority(log4cpp::Priority::ERROR);
+//	root.setRootPriority(log4cpp::Priority::ERROR);
 
 //	log4cpp::Category& netlog = root.getInstance("network");
 //	netlog.addAppender(RollAppender);
 //	netlog.setPriority(log4cpp::Priority::INFO);
-}
+}*/
 
 const CInitSocket CTcpServer::sm_wsSocket;
 
@@ -113,7 +113,7 @@ void CTcpServer::SetLastError(EnSocketError code, LPCSTR func, int ec)
 
 int CTcpServer::Start(const char* lpszBindAddress, unsigned short usPort)
 {
-	Initlog();
+//	Initlog();
 	if(!CheckParams() || !CheckStarting())
 		return FALSE;
 
@@ -507,7 +507,7 @@ TBufferObj* CTcpServer::GetFreeBufferObj(int iLen)
 void CTcpServer::AddFreeBufferObj(TBufferObj* pBufferObj)
 {
 	m_bfObjPool.PutFreeItem(pBufferObj);
-	log4cpp::Category::getInstance("network").info("buffer %p release", pBufferObj);
+//	log4cpp::Category::getInstance("network").info("buffer %p release", pBufferObj);
 }
 
 void CTcpServer::ReleaseFreeBuffer()
@@ -1444,49 +1444,3 @@ void CTcpServer::CheckError(TSocketObj* pSocketObj, EnSocketOperation enOperatio
 	if(iErrorCode != WSAENOTSOCK && iErrorCode != ERROR_OPERATION_ABORTED)
 		AddFreeSocketObj(pSocketObj, SCF_ERROR, enOperation, iErrorCode);
 }
-
-
-// int CTcpServer::StartDataThread(){
-// 	int isOK = TRUE;
-// 	
-// 	HANDLE hDataThread = (HANDLE)_beginthreadex(nullptr, 0, DataThreadProc, (LPVOID)this, 0, nullptr);
-// 	
-// 	if (!hDataThread)
-// 	{
-// 		SetLastError(SE_WORKER_THREAD_CREATE, __FUNCTION__, ::GetLastError());
-// 		isOK = FALSE;
-// 	}	
-// 	CloseHandle(hDataThread);
-// 
-// 	return isOK;
-// }
-
-// UINT WINAPI CTcpServer::DataThreadProc(LPVOID pv){
-// 	CTcpServer* pSrv = (CTcpServer*)pv;
-// 
-// 	CMTX	mtxlock(FALSE,"extractlock");
-// 
-// 	
-// 	while (TRUE){
-// 		DWORD dwConnected = pSrv->GetAcceptSocketCount();
-// 
-// 		CONNID* pIDs = new CONNID[dwConnected];
-// 		pSrv->GetAllConnectionIDs(pIDs, dwConnected);
-// 
-// 		for (DWORD i = 0; i < dwConnected; i++){
-// 			CMutexLock lock(mtxlock);
-// 
-// 			std::queue<Buffer*>* pComplete = BufferPool::Instance()->GetCompleteBuffers(pIDs[i]);
-// 			if (!pComplete) continue;
-// 			while (pComplete->size() > 0){
-// 				Buffer* pBuffer = pComplete->front();
-// 				printf("client id = %d : %s", pIDs[i],pBuffer->pData);
-// 				delete pBuffer;
-// 				pComplete->pop();
-// 			}
-// 		}
-// 
-// 		Sleep(100);
-// 	}
-// 	return 0;
-// }

@@ -33,18 +33,18 @@ void CNetComm::Release()
 }
 
 //需要提供Server服务
-int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
+int CNetComm::CreateServer(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
 {
 	if (m_pServer != NULL)		return 0;
-	m_pServerCtrl = callback;
-	m_pSrvListen->RegCallBack(callback);
+	m_pServerCtrl = *callback;
+	m_pSrvListen->RegCallBack(&m_pServerCtrl);
 
 	m_pServer = HP_Create_TcpPackServer(m_pSrvListen);
 	if (!m_pServer)
 	{
-		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+		if (m_pServerCtrl.lpErrorCB != NULL)
 		{
-			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, "server Create object failed");
+			m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, strIp, dwPort, "server Create object failed");
 		}
 		return 0;
 	}	
@@ -54,9 +54,9 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 	{
 		const char* err = m_pServer->GetLastErrorDesc();
 //		m_pServer->GetLastError();
-		if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+		if (m_pServerCtrl.lpErrorCB != NULL)
 		{
-			m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, strIp, dwPort, err);
+			m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, strIp, dwPort, err);
 		}
 		return 0;
 	}
@@ -71,18 +71,18 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 }
 
 //不需要提供Server服务
-int CNetComm::Initialize(void* pThis, PUSER_CB callback)
+int CNetComm::CreateClient(void* pThis, PUSER_CB callback)
 {
 	if (m_pClient != NULL)	return FALSE;
-	m_pClientCtrl = callback;
-	m_pClientListen->RegCallBack(callback);
+	m_pClientCtrl = *callback;
+	m_pClientListen->RegCallBack(&m_pClientCtrl);
 
 	m_pClient = HP_Create_TcpPackClient(m_pClientListen);	
 	if (!m_pClient)
 	{
-		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+		if (m_pClientCtrl.lpErrorCB != NULL)
 		{
-			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, NULL, 0, "create client object failed");
+			m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, NULL, 0, "create client object failed");
 		}
 		return 0;
 	}	
@@ -123,9 +123,9 @@ int CNetComm::ConnectTo(const char* pIP, unsigned short uPort, int bAutoReconnec
 				const char* err = m_pClient->GetLastErrorDesc();
 				m_pClient->GetLastError();
 
-				if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+				if (m_pClientCtrl.lpErrorCB != NULL)
 				{
-					m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+					m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, pIP, uPort, err);
 				}
 				return 0;
 			}
@@ -142,9 +142,9 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 		if (m_pClient->Stop() == 0)
 		{
 			const char* err = m_pClient->GetLastErrorDesc();
-			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			if (m_pClientCtrl.lpErrorCB != NULL)
 			{
-				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, err);
+				m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, pIP, uPort, err);
 			}
 			return 0;
 		}
@@ -189,9 +189,9 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			DWORD errCode = GetLastError();
 			char tmp[512] = { 0 };
 			sprintf_s(tmp, "server send msg error, error code = %d", errCode);
-			if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+			if (m_pServerCtrl.lpErrorCB != NULL)
 			{
-				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, pIP, uPort, tmp);
+				m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, pIP, uPort, tmp);
 			}
 			return 0;
 		}
@@ -204,9 +204,9 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			DWORD errCode = GetLastError();
 			char tmp[512] = { 0 };
 			sprintf_s(tmp, "client send msg error, error code = %d", errCode);
-			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			if (m_pClientCtrl.lpErrorCB != NULL)
 			{
-				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, tmp);
+				m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, pIP, uPort, tmp);
 			}
 			return 0;
 		}
@@ -225,9 +225,9 @@ int CNetComm::Uninitialize(){
 			DWORD errCode = GetLastError();
 			char tmp[512] = { 0 };
 			sprintf_s(tmp, "server stop error, error code = %d", errCode);
-			if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
+			if (m_pServerCtrl.lpErrorCB != NULL)
 			{
-				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, m_srvIP, m_srvPort, tmp);
+				m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, m_srvIP, m_srvPort, tmp);
 			}
 		}
 		HP_Destroy_TcpPackServer(m_pServer);
@@ -243,9 +243,9 @@ int CNetComm::Uninitialize(){
 			DWORD errCode = GetLastError();
 			char tmp[512] = { 0 };
 			sprintf_s(tmp, "client stop error, error code = %d", errCode);
-			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+			if (m_pClientCtrl.lpErrorCB != NULL)
 			{
-				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
+				m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, m_conIP, m_conPort, tmp);
 			}
 		}
 		HP_Destroy_TcpPackClient(m_pClient);
@@ -264,9 +264,9 @@ int CNetComm::StartConnectThread(const char* IP, unsigned short port){
 		DWORD errCode = GetLastError();
 		char tmp[512] = { 0 };
 		sprintf_s(tmp, "client start reconnect thread error %d", errCode);
-		if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
+		if (m_pClientCtrl.lpErrorCB != NULL)
 		{
-			m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, m_conIP, m_conPort, tmp);
+			m_pClientCtrl.lpErrorCB(m_pClientCtrl.lpCallBackData, m_conIP, m_conPort, tmp);
 		}
 		return 0;
 	}
@@ -283,9 +283,9 @@ UINT WINAPI CNetComm::ConnectThread(LPVOID p)
 			pNet->m_pClient->Stop();
 			if (!pNet->m_pClient->Start(pNet->m_conIP, pNet->m_conPort, FALSE))
 			{
-				if (pNet->m_pClientCtrl != NULL && pNet->m_pClientCtrl->lpErrorCB)
+				if (pNet->m_pClientCtrl.lpErrorCB)
 				{
-					pNet->m_pClientCtrl->lpErrorCB(pNet->m_pClientCtrl->lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
+					pNet->m_pClientCtrl.lpErrorCB(pNet->m_pClientCtrl.lpCallBackData, pNet->m_conIP, pNet->m_conPort, pNet->m_pClient->GetLastErrorDesc());
 				}
 			}
 		}

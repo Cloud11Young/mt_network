@@ -1,0 +1,8 @@
+[2019-10-25 10:44:48,202 INFO 5660 127.0.0.1:62953 connected !!! 
+[2019-10-25 10:44:48,204 INFO 5660 Server start send msg 
+[2019-10-25 10:49:19,704 ERROR 13328 127.0.0.1:62953 socket operator so_receive, error desc SUCCESS, code 10054 !!! 
+[2019-10-25 10:49:19,705 INFO 13328 127.0.0.1:62953 disconnected !!! 
+[2019-10-25 11:42:53,687 INFO 7924 127.0.0.1:64870 connected !!! 
+[2019-10-25 11:42:53,688 INFO 7924 Server start send msg 
+[2019-10-25 11:45:53,310 ERROR 7924 127.0.0.1:64870 socket operator so_receive, error desc SUCCESS, code 10054 !!! 
+[2019-10-25 11:45:53,311 INFO 7924 127.0.0.1:64870 disconnected !!! 

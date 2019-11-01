@@ -52,8 +52,8 @@ public:
 	static int CreateInstance(INetComm **ppINetComm);
 	virtual void Release() =0;
 
-	virtual int Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp) = 0;//需要提供Server服务
-	virtual int Initialize(void* pThis, PUSER_CB callback) = 0;//不需要提供Server服务
+	virtual int CreateServer(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp) = 0;//需要提供Server服务
+	virtual int CreateClient(void* pThis, PUSER_CB callback) = 0;//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient) = 0;
 	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = 1) = 0;
 	virtual int Disconnect(const char* pIP, ushort uPort) = 0;

@@ -1,0 +1,4 @@
+[2019-10-25 11:50:02,052 INFO 19216 127.0.0.1:65282 connected !!! 
+[2019-10-25 11:50:02,053 INFO 19216 Server start send msg 
+[2019-10-25 11:52:26,659 ERROR 21220 127.0.0.1:65282 socket operator so_receive, error desc SUCCESS, code 10054 !!! 
+[2019-10-25 11:52:26,660 INFO 21220 127.0.0.1:65282 disconnected !!! 

@@ -28,7 +28,7 @@
 #include "RWLock.h"
 #include "CriticalSection.h"
 
-#include "log4cpp/Category.hh"
+//#include "log4cpp/Category.hh"
 
 #define CACHE_LINE		64
 #define PACK_SIZE_OF(T)	(CACHE_LINE - sizeof(T) % CACHE_LINE)
@@ -1169,7 +1169,7 @@ public:
 					pValue	= pElement;
 					isOK	= TRUE;
 
-					log4cpp::Category::getInstance("network").info("buffer %p release to list free item", pElement);
+//					log4cpp::Category::getInstance("network").info("buffer %p release to list free item", pElement);
 
 					break;
 				}

@@ -19,8 +19,8 @@ public:
 	virtual ~CNetComm();
 	virtual void Release();
 
-	virtual int Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp);//需要提供Server服务
-	virtual int Initialize(void* pThis, PUSER_CB callback);//不需要提供Server服务
+	virtual int CreateServer(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp);//需要提供Server服务
+	virtual int CreateClient(void* pThis, PUSER_CB callback);//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient);
 	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = TRUE);
 	virtual int Disconnect(const char* pIP, ushort uPort);
@@ -35,8 +35,8 @@ private:
 private:
 	ITcpPackServer* m_pServer;
 	ITcpPackClient* m_pClient;
-	PUSER_CB    m_pServerCtrl;
-	PUSER_CB    m_pClientCtrl;
+	USER_CB    m_pServerCtrl;
+	USER_CB    m_pClientCtrl;
 	int		m_bAutoReconnect;
 	ServerListener* m_pSrvListen;
 	ClientListener* m_pClientListen;
