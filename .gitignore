@@ -1,5 +1,7 @@
+log/
 ipch/
 .vs
+temp/
 
 txt.*
 *.sdf
@@ -14,3 +16,4 @@ txt.*
 *.iobj
 *.ilk
 *.exp
+
