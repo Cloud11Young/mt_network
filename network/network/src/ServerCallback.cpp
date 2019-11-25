@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include "Callback.h"
-#include "event2/buffer.h"
-#include "event2/event.h"
+#include "libevent/event2/buffer.h"
+#include "libevent/event2/event.h"
 #include "CNetComm.h"
 
 CServerCallback* CServerCallback::m_ServerCallback = NULL;
