@@ -30,9 +30,6 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\BufferPool.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\CNetComm.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -67,9 +64,6 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BufferPool.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CNetComm.cpp">
       <Filter>src</Filter>

@@ -1,9 +1,10 @@
 #ifndef NETWORK_CALLBACK_H_
 #define NETWORK_CALLBACK_H_
 
-#include "event2/bufferevent.h"
 #include <map>
 #include <string>
+#include "event/event.h"
+#include "event/evutil.h"
 
 struct _USER_CB;
 class INetComm;
@@ -26,11 +27,11 @@ public:
 
 	void SetCallback(_USER_CB* pCallback, INetComm* pNetComm);
 	_USER_CB* GetCBFunction();
-	bufferevent* FindBufferevent(std::string IP, unsigned short port);
+	struct bufferevent* FindBufferevent(std::string IP, unsigned short port);
 	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
-	static void EventReadCallback(bufferevent* bev, void* arg);
-	static void EventWriteCallback(bufferevent* bev, void* arg);
-	static void EventCallback(bufferevent* bev, short events, void* arg);
+	static void EventReadCallback(struct bufferevent* bev, void* arg);
+	static void EventWriteCallback(struct bufferevent* bev, void* arg);
+	static void EventCallback(struct bufferevent* bev, short events, void* arg);
 	static void TimerCallback(evutil_socket_t, short, void *);
 
 private:

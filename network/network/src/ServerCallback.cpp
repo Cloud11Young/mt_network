@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include "Callback.h"
-#include "libevent/event2/buffer.h"
-#include "libevent/event2/event.h"
+//#include "libevent/event2/buffer.h"
+#include "event/event.h"
 #include "CNetComm.h"
 
 CServerCallback* CServerCallback::m_ServerCallback = NULL;
@@ -29,7 +29,7 @@ _USER_CB* CServerCallback::GetCBFunction()
 	return m_pCallback;
 }
 
-bufferevent* CServerCallback::FindBufferevent(std::string IP, unsigned short port)
+struct bufferevent* CServerCallback::FindBufferevent(std::string IP, unsigned short port)
 {
 	std::string key = IP + ":" + std::to_string(port);
 	if (m_mapClient.find(key) != m_mapClient.end())
@@ -49,17 +49,17 @@ static void Connection_close_cb(evutil_socket_t fd, short what, void *other_)
 
 void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
 {
-	char ClientIP[addr_size];
+	/*char ClientIP[addr_size];
 	
-	sockaddr_in* addr = (sockaddr_in*)sock;
+	struct sockaddr_in* addr = (struct sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
 	int port = ntohs(addr->sin_port);
-	printf("accept a client %d,IP:%s,PORT:%d\n", fd, ClientIP, port);
+	printf("accept a client %d, IP: %s, PORT: %d\n", fd, ClientIP, port);*/
 
 	event_base *base = (event_base*)user_data;
 
 	//为这个客户端分配一个bufferevent  
-	bufferevent *bev = bufferevent_socket_new(base, fd,	BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
+	struct bufferevent *bev = bufferevent_socket_new(base, fd,	BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 	if (!bev)
 	{
 		printf("Create Client bufferevent failed.\n");
