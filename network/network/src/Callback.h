@@ -41,6 +41,7 @@ private:
 	std::map<std::string, event_connection*> m_mapClient;
 };
 
+
 class CClientCallback
 {
 public:

@@ -3,8 +3,6 @@
 #include <process.h>
 #include "../network/src/INetComm.h"
 
-#pragma comment(lib,"../lib/network.lib")
-
 static void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName);
 static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
 static void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort);
@@ -52,7 +50,7 @@ int main(int argc, char** argv)
 
 	char tmp[64] = { 0 };
 	char ip[32] = { 0 };
-	unsigned short port = 9995;
+	unsigned short port = 5001;
 //	printf("please input server ip and port:");
 //	scanf("%s%d", &tmp,&port);
 //	sscanf(tmp, "%s%d", ip, &port);

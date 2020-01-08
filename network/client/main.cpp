@@ -3,7 +3,7 @@
 #include "../network/src/INetComm.h"
 #include <process.h>
 
-#pragma comment(lib,"../lib/network.lib")
+//#pragma comment(lib,"../lib/network.lib")
 
 static void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName);
 static void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort);
@@ -15,7 +15,7 @@ static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const
 unsigned int __stdcall workthread(void* pVoid)
 {
 	INetComm* pNet = (INetComm*)pVoid;
-	pNet->ConnectTo("192.168.101.13", 3724);
+	pNet->ConnectTo("192.168.101.13", 5001);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
 //	printf("thread %d input send msg:", GetCurrentThreadId());
@@ -29,7 +29,7 @@ unsigned int __stdcall workthread(void* pVoid)
 //		char* lmsg = new char[10 * 1024 * 1024];
 //		memset(lmsg, 1, 10 * 1024 * 1024);
 
-//		pNet->SendMsg("hi, server!!!", 14, "192.168.101.13", 9995);
+		pNet->SendMsg("hi, server!!!", 14, "192.168.101.13", 5001);
 //		delete[] lmsg;
 		Sleep(3000);
 	}

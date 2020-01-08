@@ -49,12 +49,12 @@ static void Connection_close_cb(evutil_socket_t fd, short what, void *other_)
 
 void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data)
 {
-	/*char ClientIP[addr_size];
+	char ClientIP[addr_size];
 	
 	struct sockaddr_in* addr = (struct sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
 	int port = ntohs(addr->sin_port);
-	printf("accept a client %d, IP: %s, PORT: %d\n", fd, ClientIP, port);*/
+	printf("accept a client %d, IP: %s, PORT: %d\n", fd, ClientIP, port);
 
 	event_base *base = (event_base*)user_data;
 
@@ -69,10 +69,11 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	}
 
 	bufferevent_setcb(bev, EventReadCallback, EventWriteCallback, EventCallback, NULL);
-	bufferevent_enable(bev, EV_READ | EV_WRITE |EV_PERSIST);
+	bufferevent_enable(bev, EV_READ | EV_WRITE |EV_PERSIST | EV_CLOSED);
 
 	event closeEvent;
 	event_assign(&closeEvent, base, fd, EV_CLOSED, Connection_close_cb, base);
+
 
 	event_connection* evcon = new event_connection;
 	evcon->fd = fd;
