@@ -9,27 +9,27 @@
 class CTcpServer : public ITcpServer
 {
 public:
-	virtual int Start	(const char* lpszBindAddress, unsigned short usPort);
-	virtual int Stop	();
-	virtual int Send	(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset = 0);
+	virtual int Start(const char* lpszBindAddress, unsigned short usPort);
+	virtual int Stop();
+	virtual int Send(CONNID dwConnID, const BYTE* pBuffer, int iLength, int iOffset = 0);
 	virtual int SendSmallFile(CONNID dwConnID, const char* lpszFileName, const LPWSABUF pHead = nullptr, const LPWSABUF pTail = nullptr);
 	virtual int SendPackets	(CONNID dwConnID, const WSABUF pBuffers[], int iCount)	{return DoSendPackets(dwConnID, pBuffers, iCount);}
-	virtual int			HasStarted					()	{return m_enState == SS_STARTED || m_enState == SS_STARTING;}
-	virtual EnServiceState	GetState					()	{return m_enState;}
-	virtual int			Disconnect					(CONNID dwConnID, int bForce = TRUE);
-	virtual int			DisconnectLongConnections	(unsigned long dwPeriod, int bForce = TRUE);
-	virtual int			DisconnectSilenceConnections(unsigned long dwPeriod, int bForce = TRUE);
-	virtual int			GetListenAddress			(char lpszAddress[], int& iAddressLen, USHORT& usPort);
-	virtual int			GetLocalAddress				(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
-	virtual int			GetRemoteAddress			(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int	HasStarted()	{return m_enState == SS_STARTED || m_enState == SS_STARTING;}
+	virtual EnServiceState	GetState()	{return m_enState;}
+	virtual int	Disconnect(CONNID dwConnID, int bForce = TRUE);
+	virtual int	DisconnectLongConnections(unsigned long dwPeriod, int bForce = TRUE);
+	virtual int	DisconnectSilenceConnections(unsigned long dwPeriod, int bForce = TRUE);
+	virtual int	GetListenAddress(char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int	GetLocalAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
+	virtual int	GetRemoteAddress(CONNID dwConnID, char lpszAddress[], int& iAddressLen, USHORT& usPort);
 	
-	virtual int GetPendingDataLength	(CONNID dwConnID, int& iPending);
+	virtual int GetPendingDataLength(CONNID dwConnID, int& iPending);
 	virtual unsigned long GetConnectionCount	();
-	virtual int GetAllConnectionIDs	(CONNID pIDs[], unsigned long& dwCount);
-	virtual int GetConnectPeriod		(CONNID dwConnID, unsigned long& dwPeriod);
-	virtual int GetSilencePeriod		(CONNID dwConnID, unsigned long& dwPeriod);
-	virtual EnSocketError GetLastError	()	{return m_enLastError;}
-	virtual const char*	GetLastErrorDesc	()	{return ::GetSocketErrorDesc(m_enLastError);}
+	virtual int GetAllConnectionIDs(CONNID pIDs[], unsigned long& dwCount);
+	virtual int GetConnectPeriod(CONNID dwConnID, unsigned long& dwPeriod);
+	virtual int GetSilencePeriod(CONNID dwConnID, unsigned long& dwPeriod);
+	virtual EnSocketError GetLastError()	{return m_enLastError;}
+	virtual const char*	GetLastErrorDesc()	{return ::GetSocketErrorDesc(m_enLastError);}
 
 #ifdef _SSL_SUPPORT
 	virtual int SetupSSLContext	(int iVerifyMode = SSL_VM_NONE, const char* lpszPemCertFile = nullptr, const char* lpszPemKeyFile = nullptr, const char* lpszKeyPasswod = nullptr, const char* lpszCAPemCertFileOrPath = nullptr, Fn_SNI_ServerNameCallback fnServerNameCallback = nullptr)	{return FALSE;}
