@@ -13,18 +13,13 @@ CServerCallback::CServerCallback()
 	m_pNetComm = NULL;
 }
 
-CServerCallback::~CServerCallback()
-{
-
-}
-
-void CServerCallback::SetCallback(_USER_CB* pCallback, INetComm* pNetComm)
+void CServerCallback::SetCallback(NetworkCallback* pCallback, INetComm* pNetComm)
 {
 	m_pCallback = pCallback;
 	m_pNetComm = pNetComm;
 }
 
-_USER_CB* CServerCallback::GetCBFunction()
+NetworkCallback* CServerCallback::GetCBFunction()
 {
 	return m_pCallback;
 }
@@ -54,7 +49,7 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	struct sockaddr_in* addr = (struct sockaddr_in*)sock;
 	evutil_inet_ntop(addr->sin_family, &addr->sin_addr, ClientIP, sizeof(ClientIP));
 	int port = ntohs(addr->sin_port);
-	printf("accept a client %d, IP: %s, PORT: %d\n", fd, ClientIP, port);
+	printf("accept a client %lld, IP: %s, PORT: %d\n", fd, ClientIP, port);
 
 	event_base *base = (event_base*)user_data;
 
@@ -101,9 +96,9 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 	int port = ntohs(ClientAddr.sin_port);
 	evutil_inet_ntop(ClientAddr.sin_family, &ClientAddr.sin_addr, address, sizeof(address));
 
-	if (m_ServerCallback->m_pCallback && m_ServerCallback->m_pCallback->lpRecvMsgCB)
+	if (m_ServerCallback->m_pCallback && m_ServerCallback->m_pCallback->_receiveCB)
 	{
-		m_ServerCallback->m_pCallback->lpRecvMsgCB(m_ServerCallback->m_pNetComm, msg, msglen, address, port);
+		m_ServerCallback->m_pCallback->_receiveCB(m_ServerCallback->m_pNetComm, msg, msglen, address, port);
 	}
 
 	delete[] msg;

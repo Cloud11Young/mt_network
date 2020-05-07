@@ -32,8 +32,8 @@ public:
 	virtual ~CNetComm();
 	virtual void Release();
 
-	virtual int Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp);//需要提供Server服务
-	virtual int Initialize(void* pThis, PUSER_CB callback);//不需要提供Server服务
+	virtual int InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, const char* strIp);//需要提供Server服务
+	virtual int InitClient(void* pThis, NetworkCallback* callback);//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient);
 	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = 0);
 	virtual int Disconnect(const char* pIP, ushort uPort);

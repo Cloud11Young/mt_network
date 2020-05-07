@@ -99,12 +99,12 @@ void CNetComm::Release(){
 }
 
 //需要提供Server服务
-int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const char* strIp)
+int CNetComm::InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, const char* strIp)
 {
 	m_ServerCallback.SetCallback(callback,this);
  	m_srvPort = dwPort;
 
-	event_set_log_callback(callback->lpLogCB);
+	event_set_log_callback(callback->_logCB);
 
 	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
@@ -170,11 +170,11 @@ int CNetComm::Initialize(void* pThis, PUSER_CB callback, ushort dwPort, const ch
 }
 
 //不需要提供Server服务
-int CNetComm::Initialize(void* pThis, PUSER_CB callback)
+int CNetComm::InitClient(void* pThis, NetworkCallback* callback)
 {
 	m_NetType = NET_TYPE_CLIENT;
 	m_ClientCallback.SetCallback(callback,this);
-	event_set_log_callback(callback->lpLogCB);
+	event_set_log_callback(callback->_logCB);
 
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);

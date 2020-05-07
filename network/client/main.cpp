@@ -42,18 +42,18 @@ int main(int argc, char** argv)
 // 	if (pNet == NULL)
 // 		return -1;
 
-	USER_CB userCB;
-	userCB.lpConnectCB = ConnectCB;
-	userCB.lpDisconnectCB = DisconnectCB;
-	userCB.lpRecvMsgCB = RecvCB;
-	userCB.lpErrorCB = ErrorCB;
+	NetworkCallback callback;
+	callback._connectCB = ConnectCB;
+	callback._disconnCB = DisconnectCB;
+	callback._receiveCB = RecvCB;
+	callback.lpErrorCB = ErrorCB;
 
 	INetComm* Nets[16] = { 0 };
 
 	for (int i = 0; i < 1; i++)
 	{
 		INetComm::CreateInstance(&Nets[i]);
-		Nets[i]->Initialize(NULL, &userCB);
+		Nets[i]->InitClient(NULL, &callback);
 		_beginthreadex(NULL, 0, workthread, Nets[i], 0, NULL);
 	}
 

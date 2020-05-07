@@ -34,19 +34,18 @@ unsigned int __stdcall SendThread(void* pvoid)
 }
 
 int main(int argc, char** argv)
-{
-	
+{	
 	INetComm::CreateInstance(&pNet);
 	if (pNet == NULL)
 		return -1;
 
-	USER_CB userCB;
-	userCB.lpConnectCB = ConnectCB;
-	userCB.lpDisconnectCB = DisconnectCB;
-	userCB.lpRecvMsgCB = RecvCB;
-	userCB.lpErrorCB = ErrorCB;
-	userCB.lpCallBackData = pNet;
-	userCB.lpLogCB = LogCB;
+	NetworkCallback callback;
+	callback._connectCB = ConnectCB;
+	callback._disconnCB = DisconnectCB;
+	callback._receiveCB = RecvCB;
+	callback.lpErrorCB = ErrorCB;
+	callback._callbackData = pNet;
+	callback._logCB = LogCB;
 
 	char tmp[64] = { 0 };
 	char ip[32] = { 0 };
@@ -55,7 +54,7 @@ int main(int argc, char** argv)
 //	scanf("%s%d", &tmp,&port);
 //	sscanf(tmp, "%s%d", ip, &port);
 
-	if (pNet->Initialize(NULL, &userCB, port, NULL) != 0)
+	if (pNet->InitServer(NULL, &callback, port, NULL) != 0)
 	{
 		printf("server start success\n");
 	}
