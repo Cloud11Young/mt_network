@@ -13,13 +13,13 @@ CServerCallback::CServerCallback()
 	m_pNetComm = NULL;
 }
 
-void CServerCallback::SetCallback(NetworkCallback* pCallback, INetComm* pNetComm)
+void CServerCallback::SetCallback(ICallback* pCallback, INetComm* pNetComm)
 {
 	m_pCallback = pCallback;
 	m_pNetComm = pNetComm;
 }
 
-NetworkCallback* CServerCallback::GetCBFunction()
+ICallback* CServerCallback::GetCBFunction()
 {
 	return m_pCallback;
 }
@@ -69,7 +69,6 @@ void CServerCallback::ListenerCallback(struct evconnlistener* listener, evutil_s
 	event closeEvent;
 	event_assign(&closeEvent, base, fd, EV_CLOSED, Connection_close_cb, base);
 
-
 	event_connection* evcon = new event_connection;
 	evcon->fd = fd;
 	evcon->bufev = bev;
@@ -96,9 +95,9 @@ void CServerCallback::EventReadCallback(bufferevent* bev, void* arg)
 	int port = ntohs(ClientAddr.sin_port);
 	evutil_inet_ntop(ClientAddr.sin_family, &ClientAddr.sin_addr, address, sizeof(address));
 
-	if (m_ServerCallback->m_pCallback && m_ServerCallback->m_pCallback->_receiveCB)
+	if (m_ServerCallback->m_pCallback)
 	{
-		m_ServerCallback->m_pCallback->_receiveCB(m_ServerCallback->m_pNetComm, msg, msglen, address, port);
+		m_ServerCallback->m_pCallback->DoReceive(m_ServerCallback->m_pNetComm, msg, msglen, address, port);
 	}
 
 	delete[] msg;
@@ -109,9 +108,12 @@ void CServerCallback::EventWriteCallback(bufferevent* bev, void* arg)
 	printf("%s: ", __FUNCTION__);
 	evbuffer* output = bufferevent_get_output(bev);
 	size_t buflen = evbuffer_get_length(output);
-	char buf[512] = { 0 };
-	evbuffer_copyout(output, buf, 512);
-	printf("output buf: %s\n", buf);
+	if(!buflen)
+		printf("send msg to client done.\n");
+	else
+	{
+
+	}
 }
 
 void CServerCallback::EventCallback(bufferevent* bev, short events, void* arg)

@@ -12,12 +12,12 @@ BOOL INetComm::CreateInstance(INetComm **ppINetComm){
 	return FALSE;
 }
 
-NetAPI IServer* Network::CreateServer(NetworkCallback* callback)
+NetAPI IServer* Network::CreateServer(ICallback* callback)
 {
 	return new CServer(callback);
 }
 
-NetAPI IClient* Network::CreateClient(NetworkCallback* callback)
+NetAPI IClient* Network::CreateClient(ICallback* callback)
 {
 	return new CClient(callback);
 }

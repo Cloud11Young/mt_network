@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 #include <list>
 
+#include "NetworkDefine.h"
 #include "IServer.h"
 #include "IClient.h"
 
@@ -24,10 +25,8 @@
 #define SEND_SYN  0  // 同步
 #define SEND_ASYN 1  // 异步
 
-typedef unsigned short ushort;
-typedef unsigned long  ulong;
-
-
+//typedef unsigned short ushort;
+//typedef unsigned long  ulong;
 
 class NetAPI INetComm
 {
@@ -35,13 +34,13 @@ public:
 	static int CreateInstance(INetComm **ppINetComm);
 	virtual void Release() = 0;
 
-	virtual int InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, const char* strIp) = 0;	//需要提供Server服务
-	virtual int InitClient(void* pThis, NetworkCallback* callback) = 0;										//不需要提供Server服务
+	virtual int InitServer(void* pThis, ICallback* callback, uint16_t dwPort, const char* strIp) = 0;	//需要提供Server服务
+	virtual int InitClient(void* pThis, ICallback* callback) = 0;										//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient) = 0;
-	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = 1) = 0;
-	virtual int Disconnect(const char* pIP, ushort uPort) = 0;
+	virtual int ConnectTo(const char* pIP, uint16_t uPort, int bAutoReconnect = 1) = 0;
+	virtual int Disconnect(const char* pIP, uint16_t uPort) = 0;
 
-	virtual int SendMsg(void* pMsg, ulong dwMsgLen, const char* pIP, ushort uPort, ulong dwWay = SEND_ASYN) = 0;
+	virtual int SendMsg(void* pMsg, size_t dwMsgLen, const char* pIP, uint16_t uPort) = 0;
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList) = 0;
 
 	virtual int Uninitialize() = 0;
@@ -49,8 +48,8 @@ public:
 
 namespace Network
 {
-	NetAPI IServer* CreateServer(NetworkCallback*);
-	NetAPI IClient* CreateClient(NetworkCallback*);
+	NetAPI IServer* CreateServer(ICallback*);
+	NetAPI IClient* CreateClient(ICallback*);
 
 	NetAPI void ReleaseServer(IServer* pServer);
 	NetAPI void ReleaseClient(IClient* pClient);

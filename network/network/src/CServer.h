@@ -3,10 +3,12 @@
 
 #include "IServer.h"
 
+class ICallback;
+
 class CServer : public IServer
 {
 public:
-	CServer(NetworkCallback* callback);
+	CServer(ICallback* callback) : m_pCallback(callback) {}
 	virtual ~CServer() {}
 
 	virtual int Start(){ return 0; }
@@ -15,7 +17,7 @@ public:
 	virtual int DisConnect() { return 0; }
 
 private:
-	NetworkCallback* m_pCallback;
+	ICallback* m_pCallback;
 };
 
 #endif

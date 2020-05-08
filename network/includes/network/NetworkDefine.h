@@ -1,24 +1,21 @@
 #ifndef NETWORK_DEFINE_H_
 #define NETWORK_DEFINE_H_
 
-typedef void(*ConnectCallback)(void* pThis, const char* strIP, ushort dwPort, const char* strPcName);
-typedef void(*DisconnectCallback)(void* pThis, const char* strIP, ushort dwPort);
-typedef void(*ReceiveCallback)(void* pThis, void* pMsg, ulong dwMsgLen, const char* strIP, ushort dwPort);
-typedef void(*LPPREAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort);
-typedef void(*LPPOSTAUTO_CONNECT_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, int bOK);
-typedef void(*LPERROR_CALLBACK)(void* pThis, const char* strIP, ushort dwPort, const char* msg);
-typedef void(*LogCallback)(int severity, const char* msg);
+#include <stdint.h>
 
-struct NetworkCallback
+
+class ICallback
 {
-	ConnectCallback		_connectCB;
-	DisconnectCallback	_disconnCB;
-	ReceiveCallback		_receiveCB;
-	LPPREAUTO_CONNECT_CALLBACK lpPreAutoConnectCB;
-	LPPOSTAUTO_CONNECT_CALLBACK lpPostAutoConnectCB;
-	LPERROR_CALLBACK        lpErrorCB;
-	LogCallback			_logCB;
-	void*				_callbackData;
+public:
+	virtual ~ICallback() {}
+	virtual void DoConnect(void* pThis, const char* strIP, uint16_t dwPort, const char* strPcName) = 0;
+	virtual void DoDisconnect(void* pThis, const char* strIP, uint16_t dwPort) = 0;
+	virtual void DoReceive(void* pThis, void* pMsg, size_t dwMsgLen, const char* strIP, uint16_t dwPort) = 0;
+	virtual void LPPREAUTO_CONNECT_CALLBACK(void* pThis, const char* strIP, uint16_t dwPort) = 0;
+	virtual void LPPOSTAUTO_CONNECT_CALLBACK(void* pThis, const char* strIP, uint16_t dwPort, int bOK) = 0;
+//	virtual void LPERROR_CALLBACK(void* pThis, const char* strIP, uint16_t dwPort, const char* msg) = 0;
+	virtual void DoLogger(int severity, const char* msg) = 0;
 };
+
 
 #endif

@@ -6,7 +6,7 @@
 #include "event/event.h"
 #include "event/evutil.h"
 
-struct NetworkCallback;
+class ICallback;
 class INetComm;
 
 #define addr_size 16
@@ -27,8 +27,8 @@ public:
 private:
 	CServerCallback();
 
-	void SetCallback(NetworkCallback* pCallback, INetComm* pNetComm);
-	NetworkCallback* GetCBFunction();
+	void SetCallback(ICallback* pCallback, INetComm* pNetComm);
+	ICallback* GetCBFunction();
 
 	struct bufferevent* FindBufferevent(std::string IP, unsigned short port);
 	static void ListenerCallback(struct evconnlistener* listener, evutil_socket_t fd, struct sockaddr* sock, int socklen, void* user_data);
@@ -38,7 +38,7 @@ private:
 	static void TimerCallback(evutil_socket_t, short, void *);
 
 private:
-	NetworkCallback* m_pCallback;
+	ICallback* m_pCallback;
 	INetComm* m_pNetComm;
 	static CServerCallback* m_ServerCallback;
 	std::map<std::string, event_connection*> m_mapClient;
@@ -52,14 +52,14 @@ public:
 	~CClientCallback();
 
 	bufferevent* GetBufferevent();
-	void SetCallback(NetworkCallback* pCallback, INetComm* pNetComm);
-	NetworkCallback* GetCBFunction();
+	void SetCallback(ICallback* pCallback, INetComm* pNetComm);
+	ICallback* GetCBFunction();
 	static void EventReadCallback(bufferevent* bev, void* arg);
 	static void EventWriteCallback(bufferevent* bev, void* arg);
 	static void EventCallback(bufferevent* bev, short events, void* arg);
 
 private:
-	NetworkCallback* m_pCallback;
+	ICallback* m_pCallback;
 	INetComm* m_pNetComm;
 	static bufferevent* m_ClientEvent;
 };

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
-#include "../network/src/INetComm.h"
+#include "INetComm.h"
 #include <process.h>
 
 //#pragma comment(lib,"../lib/network.lib")
@@ -15,7 +15,7 @@ static void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const
 unsigned int __stdcall workthread(void* pVoid)
 {
 	INetComm* pNet = (INetComm*)pVoid;
-	pNet->ConnectTo("192.168.101.13", 5001);
+	pNet->ConnectTo("192.168.101.11", 5001);
 	char msg[256] = { 0 };
 	char tmp[256] = { 0 };
 //	printf("thread %d input send msg:", GetCurrentThreadId());
@@ -35,55 +35,56 @@ unsigned int __stdcall workthread(void* pVoid)
 	}
 }
 
+class NetCallback : public ICallback
+{
+public:
+	virtual void DoConnect(void* pThis, const char* strIP, uint16_t dwPort, const char* strPcName)
+	{
+		printf("client [%s:%d] connect to server success\n", strIP, dwPort);
+	}
+
+	virtual void DoDisconnect(void* pThis, const char* strIP, uint16_t dwPort)
+	{
+		printf("client [%s:%d] disconnected\n", strIP, dwPort);
+	}
+
+	virtual void DoReceive(void* pThis, void* pMsg, size_t dwMsgLen, const char* strIP, uint16_t dwPort)
+	{
+		printf("client [%s:%d] recv msg = \"%s\", length = %lld\n", strIP, dwPort, (char*)pMsg, dwMsgLen);
+	}
+
+	virtual void LPPREAUTO_CONNECT_CALLBACK(void* pThis, const char* strIP, uint16_t dwPort)
+	{
+	}
+
+	virtual void LPPOSTAUTO_CONNECT_CALLBACK(void* pThis, const char* strIP, uint16_t dwPort, int bOK)
+	{
+	}
+
+	virtual void DoLogger(int severity, const char* msg)
+	{
+		printf("severity = %d, msg = %s\n", severity, msg);
+	}
+};
+
 int main(int argc, char** argv)
 {
-//	INetComm* pNet = NULL;
-	
-// 	if (pNet == NULL)
-// 		return -1;
-
-	NetworkCallback callback;
-	callback._connectCB = ConnectCB;
-	callback._disconnCB = DisconnectCB;
-	callback._receiveCB = RecvCB;
-	callback.lpErrorCB = ErrorCB;
-
 	INetComm* Nets[16] = { 0 };
+	ICallback* Callbacks[16] = { 0 };
 
 	for (int i = 0; i < 1; i++)
 	{
 		INetComm::CreateInstance(&Nets[i]);
-		Nets[i]->InitClient(NULL, &callback);
+		Callbacks[i] = new NetCallback();
+
+		Nets[i]->InitClient(NULL, Callbacks[i]);
 		_beginthreadex(NULL, 0, workthread, Nets[i], 0, NULL);
 	}
 
 	while (true)
 	{
-//		pNet->SendMsg(msg, 11, "127.0.0.1", 8080);
 		Sleep(20);
 	}
 
 	return 0;
-}
-
-void ConnectCB(void* pThis, const char* strIP, unsigned short dwPort, const char* strPcName)
-{
-	printf("client [%s:%d] connect to server success\n", strIP, dwPort);
-}
-
-void DisconnectCB(void* pThis, const char* strIP, unsigned short dwPort)
-{
-	printf("client [%s:%d] disconnected\n", strIP, dwPort);
-
-}
-
-void RecvCB(void* pThis, void* pMsg, unsigned long dwMsgLen, const char* strIP, unsigned short dwPort)
-{
-	printf("client [%s:%d] recv msg = \"%s\", length = %d\n", strIP, dwPort, (char*)pMsg, dwMsgLen);
-
-}
-
-void ErrorCB(void* pThis, const char* strIP, unsigned short dwPort, const char* msg)
-{
-	printf("client [%s:%d] error = \"%s\"\n", strIP, dwPort, msg);
 }

@@ -99,12 +99,12 @@ void CNetComm::Release(){
 }
 
 //需要提供Server服务
-int CNetComm::InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, const char* strIp)
+int CNetComm::InitServer(void* pThis, ICallback* callback, uint16_t dwPort, const char* strIP)
 {
 	m_ServerCallback.SetCallback(callback,this);
  	m_srvPort = dwPort;
 
-	event_set_log_callback(callback->_logCB);
+//	event_set_log_callback(&ICallback::DoLogger);
 
 	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
@@ -127,6 +127,11 @@ int CNetComm::InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, 
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(dwPort);
+	if (strIP && strlen(strIP) > 0)
+	{
+		InetPtonA(AF_INET, strIP, &sin.sin_addr);
+//		sin.sin_addr.S_un.S_addr = InetPtonA(AF_INET, strIP);
+	}
 
 	m_pListener = evconnlistener_new_bind(m_srvBase, CServerCallback::ListenerCallback, m_srvBase,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&sin, sizeof(sin));
@@ -170,11 +175,11 @@ int CNetComm::InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, 
 }
 
 //不需要提供Server服务
-int CNetComm::InitClient(void* pThis, NetworkCallback* callback)
+int CNetComm::InitClient(void* pThis, ICallback* callback)
 {
 	m_NetType = NET_TYPE_CLIENT;
 	m_ClientCallback.SetCallback(callback,this);
-	event_set_log_callback(callback->_logCB);
+//	event_set_log_callback(callback->_logCB);
 
 //	struct event_config* cfg = event_config_new();
 //	event_config_set_flag(cfg, EVENT_BASE_FLAG_STARTUP_IOCP);
@@ -312,14 +317,13 @@ void evbuf_ref_cleanup_cb(const void *data, size_t datalen, void *extra)
 	printf("%s\n", __FUNCTION__);
 }
 
-int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/)
+int CNetComm::SendMsg(void* pMsg, size_t dwMsgLen, const char* pIP, uint16_t uPort)
 {
 	if (m_NetType == NET_TYPE_CLIENT)
 	{
 		bufferevent* bev = m_ClientCallback.GetBufferevent();
-		if (bev == NULL)
-			return false;
-		bufferevent_write(bev, pMsg, dwMsgLen);
+		if (bev == NULL)	return 0;
+		return bufferevent_write(bev, pMsg, dwMsgLen);
 	}
 	else
 	{
@@ -330,47 +334,8 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 			return 0;
 		}
 
-		//char* msgBuffer = new char[sizeof(message_buffer) + dwMsgLen];
-		//message_buffer* buf = (message_buffer*)msgBuffer;
-		//buf->header = dwMsgLen;
-		evbuffer* evbuf = evbuffer_new();
-		evbuffer_add_reference(evbuf, pMsg, dwMsgLen, evbuf_ref_cleanup_cb, evbuf);
-		bufferevent_write_buffer(bev, evbuf);
-		evbuffer_free(evbuf);
+		return bufferevent_write(bev, pMsg, dwMsgLen);		
 	}
-	//	int bSend = FALSE;
-// 	if (m_pServer && m_pServer->HasStarted())
-// 	{
-// 		char tmpIP[IP_LEN] = { 0 };
-// 		strcpy_s(tmpIP, pIP);
-// 		CONNID id = m_pSrvListen->FindConnID(tmpIP, strlen(tmpIP), uPort);
-// 		if (m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen) == 0)
-// 		{
-// 			DWORD errCode = GetLastError();
-// 			char tmp[512] = { 0 };
-// 			sprintf_s(tmp, "server send msg error, error code = %d", errCode);
-// 			if (m_pServerCtrl && m_pServerCtrl->lpErrorCB != NULL)
-// 			{
-// 				m_pServerCtrl->lpErrorCB(m_pServerCtrl->lpCallBackData, pIP, uPort, tmp);
-// 			}
-// 			return 0;
-// 		}
-// 	}
-// 
-// 	if (m_pClient && m_pClient->HasStarted())
-// 	{
-// 		if (m_pClient->Send((BYTE*)pMsg, dwMsgLen)==0)
-// 		{
-// 			DWORD errCode = GetLastError();
-// 			char tmp[512] = { 0 };
-// 			sprintf_s(tmp, "client send msg error, error code = %d", errCode);
-// 			if (m_pClientCtrl && m_pClientCtrl->lpErrorCB != NULL)
-// 			{
-// 				m_pClientCtrl->lpErrorCB(m_pClientCtrl->lpCallBackData, pIP, uPort, tmp);
-// 			}
-// 			return 0;
-// 		}
-// 	}
 
 	return 1;
 }
@@ -500,6 +465,7 @@ void CNetComm::TimerCallback(evutil_socket_t, short, void *){
 unsigned int __stdcall CNetComm::LoopThread(void* p)
 {
 	event_base* base = (event_base*)p;
+
 	event_base_dispatch(base);
 
 	return 0;

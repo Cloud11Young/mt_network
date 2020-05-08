@@ -15,13 +15,13 @@ CClientCallback::~CClientCallback()
 
 }
 
-void CClientCallback::SetCallback(NetworkCallback* pCallback, INetComm* pNetComm)
+void CClientCallback::SetCallback(ICallback* pCallback, INetComm* pNetComm)
 {
 	m_pCallback = pCallback;
 	m_pNetComm = pNetComm;
 }
 
-NetworkCallback* CClientCallback::GetCBFunction()
+ICallback* CClientCallback::GetCBFunction()
 {
 	return m_pCallback;
 }

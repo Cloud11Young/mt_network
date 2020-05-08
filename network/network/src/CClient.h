@@ -3,16 +3,18 @@
 
 #include "IClient.h"
 
+class ICallback;
 class CClient : public IClient
 {
 public:
-	CClient(NetworkCallback* callback);
+	CClient(ICallback* callback):m_pCallback(callback)
+	{}
 	virtual ~CClient() {}
 	virtual int Start(){ return 0; }
 	virtual int Stop(){ return 0; }
 	virtual int Send(){ return 0; }
 
 private:
-	NetworkCallback* m_pCallback;
+	ICallback* m_pCallback;
 };
 #endif

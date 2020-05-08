@@ -32,13 +32,13 @@ public:
 	virtual ~CNetComm();
 	virtual void Release();
 
-	virtual int InitServer(void* pThis, NetworkCallback* callback, ushort dwPort, const char* strIp);//需要提供Server服务
-	virtual int InitClient(void* pThis, NetworkCallback* callback);//不需要提供Server服务
+	virtual int InitServer(void* pThis, ICallback* callback, uint16_t dwPort, const char* strIp);	//需要提供Server服务
+	virtual int InitClient(void* pThis, ICallback* callback);										//不需要提供Server服务
 	virtual int GetStatus(int &bIsServer, int &bIsClient);
-	virtual int ConnectTo(const char* pIP, ushort uPort, int bAutoReconnect = 0);
-	virtual int Disconnect(const char* pIP, ushort uPort);
+	virtual int ConnectTo(const char* pIP, uint16_t uPort, int bAutoReconnect = 0);
+	virtual int Disconnect(const char* pIP, uint16_t uPort);
 
-	virtual int SendMsg(void* pMsg, ulong dwMsgLen, const char* pIP, ushort uPort, ulong dwWay = SEND_ASYN);
+	virtual int SendMsg(void* pMsg, size_t dwMsgLen, const char* pIP, uint16_t uPort);
 //	virtual int GetSocket(char* pIP, unsigned short uPort, std::list<HANDLE> SocketList);
 	virtual int Uninitialize();
 
@@ -57,7 +57,7 @@ private:
 	int		m_bAutoReconnect;
 //	CMTX     m_extractlock;
 	char            m_srvIP[IP_LEN];
-	ushort          m_srvPort;
+	uint16_t        m_srvPort;
 	char			m_conIP[IP_LEN];
 	unsigned short  m_conPort;
 	int				m_bConStart;
