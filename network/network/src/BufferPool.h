@@ -9,10 +9,10 @@
 
 class BufferPool{
 public:
-	static BufferPool* Instance(){
-		if (ptr == NULL)
-		ptr = new BufferPool;
-		return ptr;
+	static BufferPool* Instance()
+	{
+		static BufferPool ins;
+		return &ins;
 	}
 	std::deque<Buffer*>* CreateBuffer(CONNID dwConID);
 	std::deque<Buffer*>* GetCompleteBuffers();
@@ -20,7 +20,7 @@ public:
 	BOOL BufferPool::RemoveLeftBuffer(CONNID dwConnID);
 
 private:
-	static BufferPool* ptr;
+//	static BufferPool* ptr;
 	BufferPool();
 	~BufferPool();	
 	std::map<CONNID, std::deque<Buffer*>* > m_mapPool;

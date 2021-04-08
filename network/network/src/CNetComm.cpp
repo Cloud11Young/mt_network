@@ -177,24 +177,29 @@ int CNetComm::Disconnect(const char* pIP, unsigned short uPort)
 	return 0;
 }
 
-int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/){
-//	int bSend = FALSE;
+int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsigned short uPort, unsigned long dwWay /*= SEND_ASYN*/)
+{
 	if (m_pServer && m_pServer->HasStarted())
 	{
 		char tmpIP[IP_LEN] = { 0 };
 		strcpy_s(tmpIP, pIP);
 		CONNID id = m_pSrvListen->FindConnID(tmpIP, strlen(tmpIP), uPort);
-		if (m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen) == 0)
-		{
-			DWORD errCode = GetLastError();
-			char tmp[512] = { 0 };
-			sprintf_s(tmp, "server send msg error, error code = %d", errCode);
-			if (m_pServerCtrl.lpErrorCB != NULL)
+
+		//int count = dwMsgLen / 0x400000 + 1;
+		//for (int i = 0; i < count; i++)
+		//{			
+			if (m_pServer->Send(id, (BYTE*)pMsg, dwMsgLen) == 0)
 			{
-				m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, pIP, uPort, tmp);
+				DWORD errCode = GetLastError();
+				char tmp[512] = { 0 };
+				sprintf_s(tmp, "server send msg error, error code = %d", errCode);
+				if (m_pServerCtrl.lpErrorCB != NULL)
+				{
+					m_pServerCtrl.lpErrorCB(m_pServerCtrl.lpCallBackData, pIP, uPort, tmp);
+				}
+				return 0;
 			}
-			return 0;
-		}
+		//}
 	}
 
 	if (m_pClient && m_pClient->HasStarted())
@@ -215,7 +220,8 @@ int CNetComm::SendMsg(void* pMsg, unsigned long dwMsgLen, const char* pIP, unsig
 	return 1;
 }
 
-int CNetComm::Uninitialize(){
+int CNetComm::Uninitialize()
+{
 	int isOK = 0;
 	if (m_pServer)
 	{
@@ -254,8 +260,8 @@ int CNetComm::Uninitialize(){
 	return isOK;
 }
 
-int CNetComm::StartConnectThread(const char* IP, unsigned short port){
-
+int CNetComm::StartConnectThread(const char* IP, unsigned short port)
+{
 	ResetEvent(m_hExit);
 	m_pthread = (HANDLE)_beginthreadex(nullptr, 0, ConnectThread, (LPVOID)this, 0, nullptr);
 

@@ -96,11 +96,12 @@ EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, i
 	return HR_IGNORE;
 }
 
-EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength){
+EnHandleResult ServerListener::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength)
+{
 // 	Buffer* pBuf = new Buffer;
 // 	pBuf->copy(pData, iLength);
 // 
-// 	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
+ 	std::deque<Buffer*>* pQueue = BufferPool::Instance()->CreateBuffer(dwConnID);
 // 	pQueue->push_back(pBuf);
 // 
 // 	ExtractBuffer(pQueue, dwConnID);
